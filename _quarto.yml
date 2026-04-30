@@ -36,7 +36,7 @@ format:
     theme: cosmo
     toc: true
     toc-depth: 3
-    number-sections: true
+    number-sections: false
     code-fold: true
     fig-align: center
     css: style.css
