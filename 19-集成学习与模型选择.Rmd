@@ -1,0 +1,160 @@
+# 集成学习与模型选择
+
+> 三个臭皮匠，顶个诸葛亮。集成学习的核心洞见是：将多个弱学习器组合起来，整体的预测性能往往显著优于任何单个学习器。
+
+## 为什么集成有效？
+
+预测误差可以分解为三个来源（在 Ch04 和 Ch10 中已讨论过平方损失下的偏差-方差分解）：
+
+$$\text{Error} = \text{Bias}^2 + \text{Variance} + \text{Noise}$$
+
+- **偏差**：模型本身的表达能力不足导致的系统误差。过于简单的模型（如线性回归拟合非线性数据）高偏差。
+- **方差**：模型对训练数据的微扰过于敏感。过于复杂的模型（如深度决策树）高方差。
+- **噪声**：数据本身固有的不可约误差。
+
+单个复杂模型的误差往往来自**方差过大**。集成学习通过组合多个模型来**降低方差**（Bagging）或**降低偏差**（Boosting）。
+
+条件：基础学习器之间需要具有**差异性**（diversity），且每个学习器的错误率不能太高（通常要求 $< 0.5$）。
+
+## Bagging 与随机森林
+
+### Bagging（Bootstrap Aggregating）
+
+**步骤**：
+
+1. 从原始训练集做 $B$ 次 Bootstrap 抽样（有放回），得到 $B$ 个自助样本。
+2. 在每个自助样本上训练一个同类型的基学习器。
+3. 对分类问题：用投票法汇总；对回归问题：用平均法汇总。
+
+Bootstrap 抽样的关键性质：每个自助样本大约包含原始数据 $63.2\%$ 的观测值（因为 $(1 - 1/n)^n \to 1/e \approx 0.368$），剩余约 $36.8\%$ 的观测未被抽中——这些就是**袋外样本**（Out-of-Bag, OOB），可以用来无偏地估计泛化误差。
+
+### 随机森林（Random Forest）
+
+随机森林在 Bagging + 决策树的基础上，增加了一层随机性——**每次分裂时，只从随机选取的 $m$ 个特征中选择最优分裂特征**（通常 $m \approx \sqrt{p}$ 用于分类，$m \approx p/3$ 用于回归）。
+
+这一额外的随机化使得树与树之间的相关性减小，进一步降低了集成后的方差。
+
+**随机森林的核心超参数**：
+
+- `ntree`：树的数量，通常越大越好（收益递减）。
+- `mtry`：每次分裂考虑的候选特征数。
+- `max_depth` 或 `min_node_size`：限制单棵树的复杂度。
+
+**OOB 误差**是随机森林的一个优良特性——不需要单独的验证集即可获得泛化误差的无偏估计。
+
+```{r}
+library(randomForest)
+data(iris)
+set.seed(123)
+rf <- randomForest(Species ~ ., data = iris, ntree = 500, mtry = 2, importance = TRUE)
+print(rf)                  # OOB 误差
+importance(rf)             # 变量重要性
+varImpPlot(rf)             # 变量重要性图
+```
+
+### 变量重要性
+
+随机森林提供了两种变量重要性的度量：
+
+1. **平均精度下降**（Mean Decrease Accuracy）：对某个变量的取值进行随机置换后，OOB 预测精度的下降程度。
+2. **平均基尼下降**（Mean Decrease Gini）：在所有树的所有节点分裂中，由该变量带来的基尼不纯度下降之和。
+
+## Boosting
+
+Boosting 与 Bagging 的哲学不同：Bagging 是**并行的**——各学习器独立训练然后平均；Boosting 是**串行的**——每个新学习器关注前一个学习器犯错的样本。
+
+### AdaBoost
+
+AdaBoost（Adaptive Boosting）的核心机制是**样本权重的自适应调整**：
+
+1. 初始化所有样本权重相同：$w_i = 1/n$。
+2. 对 $t = 1, 2, \ldots, T$：
+   - 在加权样本上训练基学习器 $h_t$。
+   - 计算加权错误率 $\epsilon_t$。
+   - 计算学习器的权重 $\alpha_t = \frac{1}{2} \ln \frac{1 - \epsilon_t}{\epsilon_t}$。
+   - 增加被误分类样本的权重，减小正确分类样本的权重。
+3. 最终分类器：$H(x) = \text{sign}\left(\sum_{t=1}^T \alpha_t h_t(x)\right)$。
+
+> AdaBoost 的损失函数是指数损失，这恰好等同于用加法模型在前向分步算法下拟合指数损失——这是 AdaBoost 与统计方法的深刻联系。
+
+### 梯度提升（Gradient Boosting）
+
+梯度提升从**函数空间的梯度下降**视角理解 Boosting：
+
+1. 从初始模型 $F_0(x) = \arg\min_c \sum L(y_i, c)$ 开始。
+2. 对 $m = 1, \ldots, M$：
+   - 计算伪残差：$r_{im} = -\left[\frac{\partial L(y_i, F(x_i))}{\partial F(x_i)}\right]_{F = F_{m-1}}$
+   - 用基学习器 $h_m$ 拟合伪残差。
+   - 找到最优步长 $\rho_m$，更新 $F_m = F_{m-1} + \rho_m h_m$。
+
+不同的损失函数 $L$ 对应不同的提升方法：平方损失 → L2Boosting；指数损失 → AdaBoost；对数损失 → LogitBoost。
+
+**XGBoost** 和 **LightGBM** 是梯度提升的两个工业级实现，在 Kaggle 比赛中统治了表格数据的预测任务。它们在标准梯度提升的基础上加入了正则化项、列抽样、直方图加速等技术。
+
+```{r}
+library(xgboost)
+# 准备数据
+data(iris)
+X <- as.matrix(iris[, 1:4])
+y <- as.numeric(iris$Species) - 1
+# 训练 XGBoost
+dtrain <- xgb.DMatrix(X, label = y)
+param <- list(objective = "multi:softmax", num_class = 3, max_depth = 3, eta = 0.3)
+bst <- xgb.train(params = param, data = dtrain, nrounds = 50, verbose = 0)
+pred <- predict(bst, X)
+table(pred, y)
+```
+
+## Stacking（堆叠泛化）
+
+Stacking 的核心思想是"用模型来组合模型"。不同于 Bagging/Boosting 使用固定的组合规则（投票/加权平均），Stacking 训练一个**元学习器**（Meta-learner）来学习如何最好地组合基学习器的输出。
+
+**步骤**：
+
+1. 将训练集分为 $K$ 折。
+2. 对每个基学习器，使用交叉验证生成"元特征"（即每个基学习器对每个训练样本的预测值）。
+3. 用元特征作为输入、原始标签作为输出，训练元学习器（通常是简单的模型如逻辑回归）。
+4. 预测时，先由基学习器生成元特征，再由元学习器做出最终预测。
+
+## 模型选择与超参数调优
+
+### 偏差-方差分解的实践含义
+
+| 模型 | 偏差倾向 | 方差倾向 |
+|---|---|---|
+| 线性回归 | 高 | 低 |
+| 决策树（深） | 低 | 高 |
+| 随机森林 | 低 | 中 |
+| GBDT | 低 | 中 |
+| 神经网络（大） | 低 | 高 |
+
+低偏差 + 高方差 → 用 Bagging 降方差。
+高偏差 + 低方差 → 用 Boosting 降偏差。
+
+### 超参数搜索策略
+
+- **网格搜索**（Grid Search）：对所有超参数组合穷举搜索。维度高时计算量爆炸（维数灾难）。
+- **随机搜索**（Random Search）：在超参数空间随机采样。研究证明比网格搜索更高效，因为通常只有少数超参数真正重要。
+- **贝叶斯优化**：用高斯过程建模"超参数 → 验证性能"的映射，每次选择最不确定且可能最优的点进行评估。在评估昂贵的场景下特别有效。
+
+### 交叉验证
+
+$K$ 折交叉验证是模型选择的黄金标准（已在 Ch17 中讨论）：
+
+$$\text{CV}_{(K)} = \frac{1}{K} \sum_{k=1}^K \text{Error}_k$$
+
+$K = 5$ 或 $10$ 是常用的折数。$K = n$ 时退化为留一法交叉验证（LOOCV）。
+
+> 嵌套交叉验证（Nested CV）：外层 CV 估计泛化误差，内层 CV 选择超参数。这是最严格的模型评估方法。
+
+---
+
+**速查卡片**：
+
+- **核心问题**：如何组合多个弱模型得到一个强模型？
+- **Bagging**：并行的，降方差，代表=随机森林
+- **Boosting**：串行的，降偏差，代表=XGBoost/LightGBM
+- **Stacking**：用元学习器组合基学习器
+- **模型选择**：网格搜索 → 随机搜索 → 贝叶斯优化（由简到繁）
+- **R命令**：`randomForest::randomForest()`, `xgboost::xgboost()`, `caret::train()`
+- **参见**：Ch04（偏差-方差不等式）, Ch10（回归的诊断）, Ch18（分类方法）

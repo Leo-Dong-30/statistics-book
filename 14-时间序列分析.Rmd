@@ -1,0 +1,218 @@
+# 时间序列分析
+
+> 前面各章讨论的数据，一个隐含的假设是观测值之间相互独立。但时间序列数据最本质的特征恰恰在于：**观测值之间存在时间上的依赖关系**。昨天的股价影响今天的判断，上个月的销售额预示本月的趋势——忽视这种依赖会导致错误的推断。
+
+## 时间序列的基本概念
+
+### 什么是时间序列
+
+**时间序列**（Time Series）是按照时间顺序排列的一组观测值，记为 $\{X_t\}_{t=1}^T$。与截面数据不同，时间序列数据的两个基本特征是：
+
+1. **自相关（Autocorrelation）**：$X_t$ 与 $X_{t-k}$ 之间不是独立的。
+2. **非平稳性（Non-stationarity）**：数据的统计特性（均值、方差、自协方差）可能随时间变化。
+
+### 平稳性
+
+一个时间序列称为**严平稳**（Strictly Stationary），如果其任意有限维分布对时间的平移不变：
+
+$$(X_{t_1}, \ldots, X_{t_k}) \stackrel{d}{=} (X_{t_1+h}, \ldots, X_{t_k+h}), \quad \forall h$$
+
+在实际应用中，我们通常只要求**弱平稳**（Weak Stationarity）：
+
+1. $E[X_t] = \mu$（均值恒定）。
+2. $Var[X_t] = \sigma^2$（方差恒定）。
+3. $Cov(X_t, X_{t+k})$ 仅依赖于滞后 $k$，不依赖于 $t$。
+
+> 对于正态过程，弱平稳与严平稳等价。
+
+### 自相关函数（ACF）与偏自相关函数（PACF）
+
+**自协方差函数**（Autocovariance Function）：
+
+$$\gamma(k) = Cov(X_t, X_{t+k}) = E[(X_t - \mu)(X_{t+k} - \mu)]$$
+
+**自相关函数**（Autocorrelation Function, ACF）：
+
+$$\rho(k) = \frac{\gamma(k)}{\gamma(0)}$$
+
+其中 $\rho(k) \in [-1, 1]$，$\rho(0) = 1$。
+
+**偏自相关函数**（Partial Autocorrelation Function, PACF）：$\phi_{kk}$ 度量了在消除中间 $X_{t+1}, \ldots, X_{t+k-1}$ 的线性影响后，$X_t$ 与 $X_{t+k}$ 之间的净相关性。
+
+ACF 和 PACF 是识别 ARMA 模型阶数的核心工具。
+
+## 白噪声过程
+
+**白噪声**（White Noise）是最简单的时间序列模型：
+
+$$\varepsilon_t \sim WN(0, \sigma^2)$$
+
+即：$E[\varepsilon_t] = 0$，$Var[\varepsilon_t] = \sigma^2$，且对任意 $k \neq 0$，$Cov(\varepsilon_t, \varepsilon_{t+k}) = 0$。
+
+白噪声是构造复杂时间序列模型的基本构件。ACF 图若显示所有非零滞后都落在置信区间内，则可初步判断序列为白噪声。
+
+## ARMA 模型族
+
+ARMA（Autoregressive Moving Average）模型是平稳时间序列建模的核心框架。
+
+### 自回归模型 AR(p)
+
+AR(p) 模型假设当前值是其过去 $p$ 个值的线性组合加上白噪声：
+
+$$X_t = \phi_1 X_{t-1} + \phi_2 X_{t-2} + \cdots + \phi_p X_{t-p} + \varepsilon_t$$
+
+其中 $\varepsilon_t \sim WN(0, \sigma^2)$。
+
+**平稳性条件**：特征方程 $1 - \phi_1 z - \phi_2 z^2 - \cdots - \phi_p z^p = 0$ 的根全部落在单位圆外。对于 AR(1)，即 $|\phi_1| < 1$。
+
+AR(1) 过程的性质：
+
+- $E[X_t] = 0$（若均值为零）
+- $Var[X_t] = \frac{\sigma^2}{1 - \phi_1^2}$
+- $\rho(k) = \phi_1^{|k|}$（指数衰减）
+- PACF：$\phi_{11} = \phi_1$，$\phi_{kk} = 0$ 对 $k > 1$（**截尾**）
+
+**识别特征**：ACF 拖尾（指数衰减），PACF 在滞后 $p$ 处截尾。
+
+### 移动平均模型 MA(q)
+
+MA(q) 模型将当前值表示为当前和过去 $q$ 个白噪声的线性组合：
+
+$$X_t = \varepsilon_t + \theta_1 \varepsilon_{t-1} + \theta_2 \varepsilon_{t-2} + \cdots + \theta_q \varepsilon_{t-q}$$
+
+MA(q) 过程总是平稳的（有限个 $\varepsilon$ 的和）。
+
+**可逆性条件**：特征方程 $1 + \theta_1 z + \cdots + \theta_q z^q = 0$ 的根全部落在单位圆外。
+
+MA(1) 过程的性质：
+
+- $\rho(1) = \frac{\theta_1}{1 + \theta_1^2}$，$\rho(k) = 0$ 对 $k > 1$（ACF **截尾**）
+- PACF 拖尾（指数衰减）
+
+**识别特征**：ACF 在滞后 $q$ 处截尾，PACF 拖尾。
+
+### ARMA(p, q) 模型
+
+ARMA(p, q) 结合了 AR 和 MA 两个成分：
+
+$$X_t = \sum_{i=1}^p \phi_i X_{t-i} + \varepsilon_t + \sum_{j=1}^q \theta_j \varepsilon_{t-j}$$
+
+**识别特征**：ACF 和 PACF 均拖尾。模型阶数选择常借助 AIC/BIC 准则。
+
+## 非平稳时间序列与 ARIMA
+
+现实中的时间序列往往是非平稳的。最常见的情况是**差分平稳**——序列本身不平稳，但一阶或多阶差分后平稳。
+
+### ARIMA(p, d, q)
+
+ARIMA 模型在 ARMA 的基础上增加了差分阶数 $d$：
+
+$$\nabla^d X_t = (1 - B)^d X_t$$
+
+其中 $B$ 是后移算子 $B X_t = X_{t-1}$，$\nabla^d$ 是 $d$ 阶差分。
+
+ARIMA(p, d, q) 的建模步骤（Box-Jenkins 方法）：
+
+1. **识别**：观察时序图和 ACF/PACF 图，判断是否需要差分（$d$ 的选择），初步判断 $p$ 和 $q$ 的范围。
+2. **估计**：用最大似然法或条件最小二乘估计参数。
+3. **诊断**：检验残差是否为白噪声（Ljung-Box 检验），若不通过则回到步骤 1。
+4. **预测**：利用拟合模型进行区间预测。
+
+```{r}
+# ARIMA 建模示例
+library(forecast)
+# 模拟 ARIMA(1,1,1) 过程
+set.seed(123)
+y <- arima.sim(n = 200, list(order = c(1, 1, 1), ar = 0.7, ma = -0.3))
+# 自动选择 ARIMA 模型
+fit <- auto.arima(y)
+summary(fit)
+# 残差诊断
+checkresiduals(fit)
+# 预测未来 20 期
+forecast(fit, h = 20) |> autoplot()
+```
+
+### 单位根检验
+
+在建模之前，需要先判断序列是否需要差分。常用的检验包括：
+
+- **ADF 检验**（Augmented Dickey-Fuller）：$H_0$：存在单位根（非平稳） vs $H_1$：平稳。
+- **KPSS 检验**：$H_0$：平稳 vs $H_1$：存在单位根。
+
+两种检验的 $H_0$ 方向相反，结合使用可以提高判断的可靠性。
+
+## GARCH 模型与波动率建模
+
+金融时间序列的一个重要特征是**波动率聚集**（Volatility Clustering）——大的波动往往跟随大的波动（无论方向），因此虽然收益率序列本身可能是白噪声，但其**平方序列**或**绝对值序列**却呈现显著的自相关。
+
+### ARCH(m) 模型
+
+ARCH（Autoregressive Conditional Heteroskedasticity）模型假设：
+
+$$\varepsilon_t = \sigma_t z_t, \quad z_t \sim N(0, 1)$$
+$$\sigma_t^2 = \alpha_0 + \alpha_1 \varepsilon_{t-1}^2 + \cdots + \alpha_m \varepsilon_{t-m}^2$$
+
+### GARCH(m, s) 模型
+
+GARCH 模型在 ARCH 基础上加入了条件方差自身的滞后项：
+
+$$\sigma_t^2 = \alpha_0 + \sum_{i=1}^m \alpha_i \varepsilon_{t-i}^2 + \sum_{j=1}^s \beta_j \sigma_{t-j}^2$$
+
+最常用的是 GARCH(1,1)：$\sigma_t^2 = \alpha_0 + \alpha_1 \varepsilon_{t-1}^2 + \beta_1 \sigma_{t-1}^2$
+
+> 持久性条件：$\alpha_1 + \beta_1 < 1$ 保证了 $\sigma_t^2$ 的平稳性。$\alpha_1 + \beta_1$ 越接近 1，波动率的持续性越强。
+
+```{r}
+# GARCH 建模示例
+library(rugarch)
+# 手动模拟 GARCH(1,1) 数据
+set.seed(123)
+n <- 500
+omega <- 0.1; alpha <- 0.1; beta <- 0.8
+sigma2 <- numeric(n); y <- numeric(n)
+epsilon <- rnorm(n)
+sigma2[1] <- omega / (1 - alpha - beta)
+y[1] <- sqrt(sigma2[1]) * epsilon[1]
+for (t in 2:n) {
+  sigma2[t] <- omega + alpha * y[t-1]^2 + beta * sigma2[t-1]
+  y[t] <- sqrt(sigma2[t]) * epsilon[t]
+}
+# 拟合 GARCH
+spec <- ugarchspec(
+  variance.model = list(model = "sGARCH", garchOrder = c(1, 1)),
+  mean.model = list(armaOrder = c(0, 0), include.mean = TRUE),
+  distribution.model = "norm"
+)
+fit <- ugarchfit(spec, y, solver = "hybrid")
+show(fit)
+```
+
+## 状态空间模型与卡尔曼滤波
+
+状态空间模型（State Space Model）为时间序列分析提供了一个统一的框架。它将系统分为两部分：
+
+- **状态方程**：$\alpha_t = T_t \alpha_{t-1} + R_t \eta_t$（不可观测的状态如何演化）
+- **观测方程**：$y_t = Z_t \alpha_t + \varepsilon_t$（状态如何产生可观测数据）
+
+ARIMA、结构性时间序列、时变参数模型都可以写成状态空间形式。
+
+**卡尔曼滤波**（Kalman Filter）是一组递推公式，用于在线性高斯状态空间模型中，根据截止到当前时刻的观测，最优地估计当前状态及其不确定性。卡尔曼平滑则利用全部观测对历史状态进行回顾性估计。
+
+## 与本书其他章节的联系
+
+- ARIMA 模型的估计使用 Ch06 中的最大似然方法。
+- GARCH 模型的条件方差方程是 Ch10 回归模型的自然延伸。
+- 状态空间模型与 Ch09 的贝叶斯动态模型有直接联系。
+- 时间序列的预测问题与 Ch17 中的序列建模（RNN/LSTM）形成互补视角。
+
+---
+
+**速查卡片**：
+
+- **核心问题**：如何处理观测值之间存在时间依赖的数据？
+- **关键概念**：平稳性、ACF/PACF、ARMA、差分、GARCH
+- **建模流程**：识别(看ACF/PACF) → 估计(最大似然) → 诊断(残差白噪声检验) → 预测
+- **R命令**：`arima()`, `auto.arima()`, `ugarchfit()`, `KalmanForecast()`
+- **注意**：伪回归！用非平稳序列直接回归会得到虚假的高 $R^2$
+- **参见**：Ch06（MLE）, Ch10（回归分析）, Ch09（贝叶斯计算）

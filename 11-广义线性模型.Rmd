@@ -1,0 +1,456 @@
+# 广义线性回归
+
+## 引言
+
+## 统一方法
+
+### 指数族 EF
+
+**1、指数族的定义**
+
+设$\mathcal{F} =\{f(x,\theta):\theta\in\Theta\}$是分布族，若其概率函数$f(x,\theta)$可以表示成如下形式 $$
+f(x,\theta) = A(\theta)exp\{\sum_{i=1}^k\ Q_i(\theta)\ T_i(x)\}h(x)
+$$ 则称此分布族为指数型分布族（简称指数族），其中$A(\theta),Q_i(\theta)$是定义在参数空间上的函数，$h(x),T_i(x)$是定义在样本空间上的函数。
+
+由概率函数的积分为1，可知：
+
+$$
+0<\int_{\mathcal{X}}exp\{\sum_{i=1}^k\ Q_i(\theta)\ T_i(x) \}h(x)dx = \frac{1}{A(\theta)}<\infty
+$$
+
+称$G(x)$为概率函数$f(x,\theta)$的支撑集，若$G(x) = \{x:f(x,\theta)>0\}$。指数族中所有分布具有相同的支撑集。
+
+**2、指数族的自然形式**
+
+$$
+f(x,\theta) = C(\theta)exp\{\sum_{i=1}^k\theta_iT_i(x) \}h(x)
+$$
+
+自然参数空间表示如下：
+
+$$
+\Theta^* = \{(\theta_1,\theta_2,\cdots,\theta_k):\int_{\mathcal{X}}exp\{\sum_{i=1}^k\theta_iT_i(x) \}h(x)dx<\infty \}
+$$
+
+**3、正态分布族和二项分布族**
+
+正态分布族的例子：
+
+$$
+f(x,\theta) = \frac{1}{\sqrt{2\pi}\sigma} e^{-\frac{(x-\mu)^2}{2\sigma^2}} = \frac{1}{\sqrt{2\pi}\sigma} e^{-\frac{\mu^2}{2\sigma^2}} e^{\frac{\mu}{\sigma^2}x-\frac{1}{2\sigma^2}x^2}
+$$
+
+令$\phi_1 = \frac{\mu}{\sigma^2},\phi_2 =-\frac{1}{2\sigma^2}$，则 $$
+\frac{1}{\sqrt{2\pi}\sigma}e^{-\frac{\mu^2}{2\sigma^2}} = \sqrt{-\frac{\phi_2}{\pi}}e^{\frac{\phi_1^2}{4\phi_2}} = C(\phi)
+$$ 因此，正态分布的自然形式为：
+
+$$
+f(x,\phi) = \sqrt{-\frac{\phi_2}{\pi}}e^{\frac{\phi_1^2}{4\phi_2}} e^{\phi_1x + \phi_2x^2} = C(\phi)e^{\phi_1t_1(x)+\phi_2t_2(x)}h(x)
+$$
+
+二项分布族的例子：
+
+$$
+f(x,\theta) = C_n^x\theta^x(1-\theta)^{1-x} = (1-\theta)^n\cdot e^{log(\frac{\theta}{1-\theta}\cdot x)}\cdot C_n^x
+$$
+
+令$log(\frac{\theta}{1-\theta}) = \phi$，则
+
+$$
+f(x,\phi) = \frac{1}{(1+e^\phi)^n}\cdot e^{\phi x}\cdot C_n^x = C(\phi)\cdot e^{\phi t_1(x)}h(x)
+$$
+
+值得注意，均匀分布和t分布不是指数族分布。
+
+**4、指数族的性质**
+
+-   性质1：在指数族的自然形式下，自然参数空间为凸集。
+
+-   性质2：设指数族的自然形式中，自然参数空间有内点，$g(x)$是任一有界可积函数，则对 $G(\theta) = \int g(x)exp\{\sum\theta_jT_j(x) \}h(x)dx$，积分和求导顺序可以互换。 $$
+      \frac{\partial^mG(\theta)}{\partial\theta_1^{m_1}\cdots \partial\theta_k^{m_k}} = \int\frac{\partial^m}{\partial\theta_1^{m_1}\cdots \partial\theta_k^{m_k}}[g(x)exp\{\sum\theta_jT_j(x) \}h(x)]dx
+    $$
+
+-   推论1：以$\Theta_0$记自然参数空间的内点集，则指数族自然形式表达式中的$C(\theta)$在$\Theta_0$上解析，其对各$\theta_j$的偏导数可通过在积分号下求导算出。
+
+-   推论2：若$\theta\in\Theta_0$，则在分布$P_{\theta}$下，$T_j(x)$的各阶矩都存在有限，且可通过积分号下求导算出。
+
+### 指数分散族 EDF
+
+**1、指数分散族定义**
+
+对**单一兴趣参数**的指数族分布，其随机变量Y的概率函数可表示为：
+
+$$
+p(y,\theta)=exp[\eta(\theta)t(y)+log(s(\theta))+log(h(y))]
+$$ 经过转换，可以得到：
+
+$$
+p(y,\theta) = exp[\theta y-b(\theta)+c(y)]
+$$
+
+如果还有冗余参数不能简单忽略，则可以进一步改写为更一般的形式：
+
+$$
+p(y;\theta,\phi)=exp[\frac{y\theta-b(\theta)}{\phi}+c(y,\phi)]
+$$
+
+其中：
+
+-   $\theta$为典型参数，常为兴趣参数或均值参数的函数。与Y的均值密切关联。
+
+-   $b(\theta)$称为累积量函数，因其不含Y也常称为归一化常数，在计算分布的矩方面有重要作用。
+
+-   $\phi$为分散参数，其常与Y的方差密切相关。
+
+**2、指数分散族的性质**
+
+设指数族随机变量Y的概率函数表示为$p(y;\theta,\phi)=exp[\frac{y\theta-b(\theta)}{\phi}+c(y,\phi)]$，对数似然函数$l(\theta,\phi;y)= \frac{y\theta-b(\theta)}{\phi}+c(y,\phi)$，则有：
+
+$$
+a.\ E(\frac{\partial l}{\partial\theta})=0;\ \ b.E(\frac{\partial^2l}{\partial\theta^2})+E((\frac{\partial l }{\partial\theta})^2)=0;\ \ c.Var(\frac{\partial l }{\partial\theta})=-E[\frac{\partial^2 l }{\partial\theta^2}]
+$$
+
+指数分散族得分函数的性质推导如下：
+
+对对数似然函数求导：$\frac{\partial l}{\partial \theta} = \frac{y - b'(\theta)}{\phi}$。
+
+由$E(\frac{\partial l}{\partial \theta}) = 0$可得$E(Y) = b'(\theta)$。
+
+由$\frac{\partial^2 l}{\partial \theta^2} = -\frac{b''(\theta)}{\phi}$可得$Var(\frac{\partial l}{\partial \theta}) = -E(\frac{\partial^2 l}{\partial \theta^2}) = \frac{b''(\theta)}{\phi}$，因此$Var(Y) = \phi b''(\theta)$。
+
+进一步，$b(\theta)$与归一化常数的关系为：$b(\theta) = \phi \log \int \exp\left(\frac{y\theta}{\phi} + c(y,\phi)\right) dy$。对$b(\theta)$求导：$b'(\theta) = E(Y)$，$b''(\theta) = Var(Y)/\phi$。$b''(\theta)$被称为方差函数，记为$V(\mu)$，它刻画了均值-方差关系。
+
+$$
+(a)\frac{b(\theta)}{\phi}=log[\int exp(\frac{y\theta}{\phi}+c(y,\phi))dy];\ \ (b)E(Y)=b'(\theta);\ \ (c)Var(Y)=\phi b''(\theta)
+$$
+
+**指数分散族常见分布汇总表：**
+
+| 分布 | $\theta$ | $\phi$ | $b(\theta)$ | $b'(\theta) = \mu$ | $b''(\theta) = V(\mu)$ |
+|---|---|---|---|---|---|
+| 正态 $N(\mu, \sigma^2)$ | $\mu$ | $\sigma^2$ | $\theta^2/2$ | $\theta$ | $1$ |
+| 二项 $B(m, p)/m$ | $\log\frac{p}{1-p}$ | $1/m$ | $\log(1+e^\theta)$ | $\frac{e^\theta}{1+e^\theta}$ | $\mu(1-\mu)$ |
+| 泊松 $P(\lambda)$ | $\log\lambda$ | $1$ | $e^\theta$ | $e^\theta$ | $\mu$ |
+| 伽马 $G(\mu, \nu)$ | $-1/\mu$ | $1/\nu$ | $-\log(-\theta)$ | $-1/\theta$ | $\mu^2$ |
+| 逆高斯 | $-1/(2\mu^2)$ | $\phi$ | $-\sqrt{-2\theta}$ | $1/\sqrt{-2\theta}$ | $\mu^3$ |
+
+## 模型简介
+
+### 定义
+
+广义线性模型具有以下三个部分：
+
+-   随机成分：被解释变量$Y_1,Y_2,\cdots,Y_n$ 来自指数族的同一分布族，具有相同形式的概率函数
+
+-   系统成分：线性结构$\eta_i=x_i'\beta$ 是线性预测的系统成分。
+
+-   连接函数：单调连接函数$g(\cdot)$ 连接随机部分的均值参数或兴趣参数和系统成分
+
+### 典型连接
+
+典型连接$g=b'^{-1}$ 使得线性系统成分$\eta$直接等于典型参数$\theta$。
+
+1.  二项分布的例子
+    1.  $$
+        f(y;p,m)=C_m^yp^y(1-p)^{m-y}=exp[ylog(\frac{p}{1-p})+mlog(1-p)+log(C_m^y)]
+        $$
+    2.  典型参数$\theta = log(\frac{p}{1-p})$ ；分散参数$\phi=1$ ；累计函数$b(\theta)=-mlog(1-p)=mlog(1+e^{\theta})$
+    3.  均值$\mu = b'(\theta) = m\frac{e^{\theta}}{1+e^{\theta}}=mp$ ；方差函数$v(\mu)=b''(\theta)=mp(1-p)$ ；方差$Var(Y)=mp(1-p)$
+    4.  典型连接：$\mu=\theta=b'^{-1}(\mu)=log(\frac{p}{1-p})=logit(p)$；
+    5.  $$
+        Y_i\sim B(m_i,p_i),l(\beta)=\sum_{i=1}^n[y_i\eta_i-m_ilog(1+e_i^{\eta})+log(C_{m_i}^{y_i})]
+        $$
+
+## 估计
+
+### Newton-Raphson算法
+
+迭代方程：
+
+$$
+\beta^{(m)}=\beta^{(m-1)}+[J(\beta^{m-1})]^{-1}U(\beta^{m-1})
+$$
+
+其中，$U(\beta)=l'(\beta)$ 是对数似然函数关于参数向量的一阶导数（得分函数，记分函数）;$J(\beta)=-E[U'(\beta)]$ 为信息矩阵
+
+### 极大似然估计
+
+对于所有观测值的对数似然函数为：
+
+$$
+l=\sum_{i=1}^nl_i=\sum_{i=1}^n[\frac{y_i\theta_i-b(\theta_i)}{\phi}+c(y_i,\phi)]
+$$
+
+对数似然函数关于参数$\beta_j$ 的得分函数为：
+
+$$
+U_j=\frac{\partial l}{\partial \beta_j}=\sum_{i=1}^n\frac{\partial l_i}{\partial\beta_j}=\sum_{i=1}^n\frac{\partial l_i}{\partial\theta_i}\frac{\partial\theta_i}{\partial\mu_i}\frac{\partial\mu_i}{\partial \eta_i}\frac{\partial\eta_i}{\partial\beta_j}=\sum_{i=1}^n\frac{y_i-\mu_i}{\phi b''(\theta_i)}\frac{d\mu_i}{d\eta_i}x_{ij}
+$$
+
+得分向量的期望为零，则信息矩阵可表示为：
+
+$$
+J_{jk}=E(U_jU_k)=\sum_{i=1}^n\frac{x_{ij}x_{ik}}{\phi b''(\theta_i)}(\frac{d\mu_i}{d\eta_i})^2
+$$
+
+进一步，可写成矩阵形式：
+
+$$
+U=\frac{1}{\phi}X'WD\ \ ;\ \ J=\frac{1}{\phi}X'WX
+$$
+
+其中，$W$为对角权重矩阵，其对角元素为$w_i = \frac{1}{\phi b''(\theta_i)} \left(\frac{d\mu_i}{d\eta_i}\right)^2$；$D$为偏差向量，其分量为$D_i = (y_i - \mu_i) \frac{d\eta_i}{d\mu_i}$。注意$W$依赖于当前的参数估计值，因此需要迭代求解。
+
+得到最终的迭代方程：
+
+$$
+\beta^{(m)}=(X'W^{m-1}X)^{-1}X'W^{m-1}Z^{m-1},Z^{m-1}=X\beta^{m-1}+D^{m-1}
+$$
+
+该迭代过程即为**迭代再加权最小二乘法（IRLS）**。其核心思想是：每一步迭代，使用当前的参数估计值计算加权矩阵$W$和调整响应变量$Z$，然后求解加权最小二乘问题更新$\beta$。该过程不断重复，直到参数估计收敛。这一算法的优雅之处在于将非线性极大似然估计问题转化为一系列加权线性回归问题。
+
+## 推断
+
+### Wald检验
+
+问题：对于指数分散族形式的概率函数，分散参数𝜙已知，如何基于近似得分函数得到极大似然估计的抽样分布？
+
+$\hat{\beta}$的渐进分布为：$(\hat{\beta}-\beta)'J(\beta)(\hat{\beta}-\beta)\sim \chi^2(p)$
+
+### 偏差统计量
+
+首先引入兴趣模型和饱和模型的概念。定义对数似然比：
+
+$$
+log\lambda = l(\hat{\beta}_m;y)-l(\hat{\beta};y)
+$$
+
+显然，**饱和模型对数据的描述最全面**，对数似然比越大说明兴趣模型对数据的描述相对更差。
+
+含分散参数$\phi$的定标偏差定义为（偏差D不含$\phi$）：
+
+$$
+D^*=\frac{D}{\phi}=2log(\lambda) = 2(l(\hat{\beta}_m;y)-l(\hat{\beta};y))
+$$
+
+定标偏差服从非中心卡方分布：
+
+$$
+D^*\sim \chi^2(n-p,v),D\sim \phi \chi^2(n-p,v)
+$$
+
+### 偏差之差
+
+对于两个嵌套关系模型，其中一个模型$M_0$是另一个更一般化模型$M_1$的特殊形式（它们有共同得饱和模型），可以通过偏差之差判定哪个模型对数据拟合得更好。
+
+定标偏差之差： $$
+\Delta D^*=D_0^*-D_1^*=2(l(\hat{\beta}_m;y)-l(\hat{\beta_0};y))-2(l(\hat{\beta}_m;y)-l(\hat{\beta_1};y))=2(l(\hat{\beta}_0;y)-l(\hat{\beta_1};y))
+$$
+
+统计假设：
+
+$$
+H_0:\beta_{q+1}=\beta_{q+2}=\cdots=\beta_p=0
+$$
+
+如果模型$M_0$ 和$M_1$ 对数据描述都较好，一般选择对应原假设$H_0$ 的简洁模型$M_0$。
+
+如果模型$M_0$ 对数据描述不好，同时模型$M_1$ 对数据描述较好，此时认为模型$M_1$ 明显更适合描述数据。
+
+### 残差
+
+#### Pearson残差
+
+$$
+r_i^P=\frac{y_i-\hat{\mu_i}}{\sqrt{v(\hat{\mu}_i)}}=\frac{y_i-b'(\hat{\theta}_i)}{\sqrt{b''(\hat{\theta}_i)}}
+$$
+
+正态分布：
+
+二项分布：
+
+泊松分布：
+
+负二项分布：
+
+伽马分布：
+
+#### 偏差残差
+
+$$
+r_i^D=sign(y_i-\hat{\mu}_i)\sqrt{D_i}
+$$
+
+其中，$sign(y_i-\hat{\mu}_i)=\frac{y_i-\hat{\mu}_i}{|y_i-\hat{\mu}_i|}$，
+
+各常见分布的偏差残差分量$D_i$（满足$D = \sum D_i$）的计算公式：
+
+- **正态分布**：$D_i = (y_i - \hat{\mu}_i)^2$
+- **二项分布**：$D_i = 2\left[y_i \log\frac{y_i}{\hat{\mu}_i} + (m_i - y_i) \log\frac{m_i - y_i}{m_i - \hat{\mu}_i}\right]$
+- **泊松分布**：$D_i = 2\left[y_i \log\frac{y_i}{\hat{\mu}_i} - (y_i - \hat{\mu}_i)\right]$
+- **负二项分布**：$D_i = 2\left[y_i \log\frac{y_i}{\hat{\mu}_i} - (y_i + \kappa) \log\frac{y_i + \kappa}{\hat{\mu}_i + \kappa}\right]$
+- **伽马分布**：$D_i = 2\left[-\log\frac{y_i}{\hat{\mu}_i} + \frac{y_i - \hat{\mu}_i}{\hat{\mu}_i}\right]$
+
+## 模型应用
+
+常用广义线性模型包括二分类响应，计数响应，比例响应以及多分类响应模型。
+
+### 二分类响应
+
+#### 二点响应
+
+二点响应模型（Bernoulli响应）：设$Y_i \in \{0, 1\}$，$P(Y_i = 1) = p_i$。其概率函数可写为指数分散族形式：
+
+$$f(y_i; p_i) = p_i^{y_i}(1-p_i)^{1-y_i} = \exp\left[y_i \log\frac{p_i}{1-p_i} + \log(1-p_i)\right]$$
+
+其中，典型参数$\theta_i = \log\frac{p_i}{1-p_i}$，$b(\theta_i) = \log(1+e^{\theta_i})$，$\phi = 1$。均值$\mu_i = p_i$，方差函数$V(\mu_i) = p_i(1-p_i)$。
+
+#### 二项响应
+
+二项响应模型：设$Y_i \sim B(m_i, p_i)$，其中$m_i$为第$i$次观测的试验次数。其概率函数为：
+
+$$f(y_i; p_i, m_i) = \binom{m_i}{y_i} p_i^{y_i} (1-p_i)^{m_i - y_i} = \exp\left[y_i \log\frac{p_i}{1-p_i} + m_i \log(1-p_i) + \log\binom{m_i}{y_i}\right]$$
+
+此时$\theta_i = \log\frac{p_i}{1-p_i}$，$b(\theta_i) = m_i \log(1+e^{\theta_i})$，$\phi = 1$。均值$\mu_i = m_i p_i$，方差函数$V(\mu_i) = m_i p_i (1-p_i) = \mu_i(1 - \mu_i/m_i)$。在实际建模中，通常对比例$\hat{p}_i = Y_i/m_i$建模，使用权重$m_i$处理不等精度。
+
+挑战者算例回顾。
+
+```{r}
+# 数据导入
+data(orings, package = "faraway")
+orings$total <- 6  #定义每个观测的 O 型环总数为 6
+# 拟合二项式GLM
+lmod <- glm(cbind(damage, total-damage) ~ 1 + temp, family=binomial, orings)
+summary(lmod)#输出系数、标准误、z 统计量、p 值，以及残差偏差、AIC 等
+cat("##########")
+
+# 手动计算拟合值
+beta <- coef(lmod)#提取系数
+x <- matrix(1, nrow = 23, ncol = 2)#构造设计矩阵
+x[ ,2] <- orings$temp
+eta <- x%*%beta
+phat <- exp(eta)/(1 + exp(eta)) ## fitted(lmod)
+# 计算偏差残差
+d1 <- orings$damage*log(ifelse(orings$damage!=0,orings$damage/(orings$total*phat), 1))
+d2 <- (orings$total-orings$damage)*log(ifelse(
+orings$damage!=orings$total,
+(orings$total-orings$damage)/(orings$total-orings$total*phat), 1))
+devres <- sign(orings$damage - orings$total*phat) * sqrt(2 * (d1+d2))
+# 计算偏差残差的分位数
+quantile(devres, c(0, 0.25, 0.5, 0.75, 1))
+# 计算总偏差（所有偏差残差平方和）
+dev <- sum(devres^2)
+dev
+# 手动计算系数p值（z检验）
+pvalue <- 2 * (1 - pnorm(abs(summary(lmod)$coef[ ,1]/summary(lmod)$coef[ ,2])))
+pvalue
+# 手动计算AIC（模型选择指标）
+aic <- -2*sum(orings$damage*eta - orings$total*log(1+exp(eta))
++ log(choose(orings$total,orings$damage))) + 2 * 2
+aic
+
+```
+
+#### 公差分布
+
+公差分布模型的基本设定为：存在一个潜在的连续公差变量$Y^*$，当$Y^*$超过某个阈值时，响应为1。设$Y^*$的CDF为$F$，则有
+
+$$P(Y=1 | x) = P(Y^* > \gamma | x) = 1 - F(\gamma - x^T\beta)$$
+
+若$F$为对称分布，可写为$P(Y=1 | x) = F(x^T\beta - \gamma)$。将$\gamma$吸收进截距项，得：
+
+$$g(p) = \eta = x^T\beta$$
+
+其中$g = F^{-1}$为连接函数。不同$F$的选择对应不同的连接函数。
+
+下面是三种常见的，**基于不同公差分布**的二分类模型连接函数。
+
+1.  Logit连接
+
+    $$
+    f(s)=\frac{e^s}{(1+e^s)^2},\eta=F^{-1}(p)=log(\frac{p}{1-p})
+    $$
+
+2.  Probit连接
+
+    $$
+    f(s)=\frac{1}{\sqrt{2\pi}}e^{-s^2/2} ,\eta=\Phi^{-1}(p)
+    $$
+
+3.  Cloglog连接
+
+    $$
+    f(s)=exp(s-exp(s)),\eta=F^{-1}(p)=log(-log(1-p))
+    $$
+
+#### 潜变量
+
+除了公差分布，也可以用潜变量构造二元响应概率和线性系统成分之间的连接函数。
+
+潜变量方法假设存在一个不可观测的连续变量$Y^* = x^T\beta + \epsilon$，其中$\epsilon$的分布决定了连接函数：
+
+1. **Logit连接**：$\epsilon$服从标准Logistic分布，其CDF为$F(s) = \frac{e^s}{1+e^s}$，PDF为$f(s) = \frac{e^s}{(1+e^s)^2}$。
+
+2. **Probit连接**：$\epsilon$服从标准正态分布，其CDF为$F(s) = \Phi(s)$，PDF为$f(s) = \frac{1}{\sqrt{2\pi}} e^{-s^2/2}$。
+
+3. **互补双对数(Cloglog)连接**：$\epsilon$服从极值分布，其CDF为$F(s) = 1 - \exp(-e^s)$，PDF为$f(s) = \exp(s - e^s)$。
+
+观察二分类响应$Y = I(Y^* > \gamma)$，则$P(Y=1|x) = P(Y^* > \gamma|x) = F(x^T\beta - \gamma)$。
+
+1.  Logit连接
+2.  Probit连接
+3.  互补双对数连接
+
+下面是一个昆虫试剂浓度的算例。
+
+```{r}
+# 加载数据：五种不同浓度下昆虫死亡数和存活数
+data(bliss, package = "faraway")
+# 3中连接函数下的拟合
+mlogit <- glm(cbind(dead, alive) ~ conc, family = binomial, bliss)
+mprobit <- glm(cbind(dead, alive) ~ conc, family = binomial(link=probit), bliss)
+mcloglog <- glm(cbind(dead, alive) ~ conc, family = binomial(link=cloglog), bliss)
+# 提取并整理各模型的拟合值
+predval <- sapply(list(mlogit,mprobit,mcloglog), fitted)
+dimnames(predval) <- list(1:5, c("logit","probit","cloglog"))
+round(predval, 3)# 不同浓度下，三种连接函数拟合的昆虫死亡概率。
+```
+
+#### 过度分散
+
+现实数据经常发生过度分散，表现为数据方差膨胀，其对结果可解释性造成负面影响，常见原因是存在模型未能捕捉到的变异性，从而观测值方差大于模型的估计方差。
+
+下面是一个鳟鱼卵箱的算例。
+
+```{r}
+data(troutegg, package = "faraway")
+#ftable(xtabs(cbind(survive,total) ~ location + period, troutegg))
+bmod <- glm(cbind(survive, total-survive) ~ location + period,
+family = binomial, troutegg)
+summary(bmod)
+
+beta <- coef(bmod)
+x <- matrix(1, nrow = 20, ncol = 8)
+x[ ,2] <- troutegg$location == 2
+x[ ,3] <- troutegg$location == 3
+x[ ,4] <- troutegg$location == 4
+x[ ,5] <- troutegg$location == 5
+x[ ,6] <- troutegg$period == 7
+x[ ,7] <- troutegg$period == 8
+x[ ,8] <- troutegg$period == 11
+phat <- exp(x%*%beta)/(1 + exp(x%*%beta))
+peares <- (troutegg$survive-troutegg$total*phat)/sqrt(troutegg$total*phat*(1-phat))
+#residuals(bmod, type = "pearson")
+phi <- sum(peares^2)/(20-8)
+phi
+summary(bmod, dispersion = phi)
+```
+
+---
+
+**速查卡片**：
+
+- **核心问题**：当响应变量不是连续正态变量时，如何建立回归模型？
+- **关键概念**：指数分散族（EDF） → 连接函数与典型连接 → IRLS算法 → 偏差统计量与偏差之差 → Pearson残差与偏差残差 → Logit/Probit/Cloglog连接 → 过度分散与准似然
+- **R命令**：`glm()`, `family = binomial() / poisson() / Gamma()`, `MASS::glm.nb()`, `faraway::troutegg` (示例)
+- **参见**：Ch10（线性回归基础）, Ch06（MLE）, Ch18（二分类方法）

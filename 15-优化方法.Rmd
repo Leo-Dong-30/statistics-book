@@ -1,0 +1,212 @@
+# 优化方法
+
+> 当解析解不可得时，数值优化是统计计算的基石。从最大似然估计到深度学习，优化算法无处不在。
+
+统计计算让统计推断成为可能。理论告知计算什么，计算告知如何真正计算。本章从最基本的求根方法出发，逐步深入到现代机器学习中广泛使用的随机梯度下降。
+
+## 优化 Optimisation
+
+### 牛顿法 Newton Method
+
+1.  二分法是寻找一元函数根的简单方法。
+
+    二分法的基本步骤为：若$f(a)$与$f(b)$异号，则区间$(a, b)$内必有根。取中点$c = (a+b)/2$，计算$f(c)$。若$f(c) = 0$，则$c$即为根；若$f(a)f(c) < 0$，根在$(a, c)$内；否则根在$(c, b)$内。每次迭代将区间长度减半，经过$k$次迭代后精度达到$(b-a)/2^k$。二分法保证收敛但收敛速度较慢（线性收敛）。
+
+2.  牛顿法是一种迭代算法，需要使用原函数和函数的导数，如果有解则会收敛很快。
+
+    迭代步骤： $$
+      x_{n+1} = x_n - \frac{f(x_n)}{f'(x_n)}
+      $$
+
+    停止规则：牛顿法如果无法到达精确解可能会迭代很久，因此必须设定一个停止规则。我们取一个tolerance level，如果$|f(x^*)|<\epsilon$我们认为计算解已经十分接近真实解了
+
+    牛顿法的几何直观为：在点$(x_n, f(x_n))$处作函数$f(x)$的切线，切线与$x$轴的交点即为下一次迭代值$x_{n+1}$。切线的斜率为$f'(x_n)$，由点斜式方程可得$x_{n+1} = x_n - f(x_n)/f'(x_n)$。当初始值足够靠近真实根时，牛顿法具有二次收敛速度，远快于二分法。
+
+3.  比较两种方法的收敛速率
+
+    1.  线性收敛（比如二分法）
+
+        $$
+        \frac{||x_{n+1}-x_{\infty}||}{||x_n-x_{\infty}||}\leq r,r \in (0,1)
+        $$
+
+    2.  超线性收敛
+
+        $$
+        lim_{n\rightarrow\infty}\frac{||x_{n+1}-x_{\infty}||}{||x_n-x_{\infty}||}=0
+        $$
+
+    3.  二次收敛（如牛顿法，使用泰勒展开分析）
+
+        $$
+        \frac{||x_{n+1}-x_{\infty}||}{||x_n-x_{\infty}||^2}\leq M
+        $$
+
+4.  使用牛顿法的注意事项
+
+    ```{r}
+    # Newton–Raphson using deriv() for automatic derivative
+    newton_raphson <- function(expr, x0, tol = 1e-8, max_iter = 100, verbose = TRUE) {
+      # expr should be an expression, e.g. expression(x^2 - 5)
+      var <- all.vars(expr)
+      if (length(var) != 1) stop("Only single-variable functions supported.")
+      # Create a function that returns both value and gradient
+      f_deriv <- deriv(expr, var)
+      # Initialize
+      x <- x0
+      for (i in 1:max_iter) {
+        # Evaluate f and f'
+        val <- eval(f_deriv, envir = list(x = x))
+        fx  <- as.numeric(val)        # 函数值
+        fpx <- attr(val, "gradient")  # 导数值
+        # Newton–Raphson update
+        if (abs(fpx) < 1e-12) {
+          warning("Derivative too close to zero. Stopping.")
+          break
+        }
+        x_new <- x - fx / fpx
+        if (verbose)
+          cat(sprintf("Iter %d: x = %.8f, f(x) = %.8f\n", i, x_new, fx))
+        # Check convergence
+        if (abs(x_new - x) < tol) {
+          if (verbose) cat("Converged!\n")
+          return(x_new)
+        }
+        x <- x_new
+      }
+      warning("Did not converge within max_iter.")
+      return(x)
+    }
+
+    # 调用牛顿法迭代
+    root <- newton_raphson(expression(x^2 - 5), x0 = 1)
+    #root <- newton_raphson(expression(x^3 - 2*x^2 -11*x +12),x0 = 2.35287527)
+    #root <- newton_raphson(expression(x^3 - 2*x^2 -11*x +12),x0 = 2.35284172)
+
+    #root <- newton_raphson(expression(2*x^3+3*x^2+5),x0 = 0.5)
+    #root <- newton_raphson(expression(2*x^3+3*x^2+5),x0 = 0)
+    #注1： Derivative too close to zero. Stopping.
+    #注2： Did not converge within max_iter.
+    ```
+
+5.  小结：牛顿法并不总是能够收敛；初始值的选取很重要，不同初始值可能导致收敛到不同的根；无法计算一阶导数为零的情况；如果函数在根的邻域内是不可微的，牛顿法会无法收敛；
+
+6.  利用牛顿法求极值
+
+    关注步长的表达式$-\frac{f'(x)}{f''(x)}$，符号表示了下一步的迭代方向，大小表示了下一步的迭代步长。二阶导数的绝对值越大，步长会越小。
+
+7.  多变量优化
+
+    1.  在确定风险效率最高的投资组合时，回报率是许多权重（每种资产一个权重）的函数。在线性回归模型的最小二乘估计中，平方和是许多系数（每个回归因子一个系数）的函数。
+
+    2.  当目标函数的自变量是向量的时候，一阶导数计算梯度向量$\frac{\partial y}{\partial X}$（对每个变量求偏导数，合并为一个列向量），二阶导数计算海塞矩阵$\frac{\partial^2y}{\partial X\partial X'}$，这样牛顿法迭代公式可写为：$$
+        x_{n+1} = x_n - (\frac{\partial^2f(x)}{\partial x\partial x'})^{-1}\frac{\partial f(x)}{\partial(x)}
+        $$
+
+8.  线性模型的极大似然估计
+
+    $$
+    y_i = \beta_0 + \beta_1x_i+\epsilon_i,\epsilon_i\sim N(0,1)
+    $$
+
+    ```{r}
+    ## Generate some data
+    beta0 <- 1
+    beta1 <- 3
+    sigma <- 1
+    n <- 1000
+    x <- rnorm(n, 3, 1)
+    y <- beta0 + x * beta1 + rnorm(n, mean = 0, sd = sigma)
+    ## Make the log normal likelihood function
+    func = function(beta){
+      sum((y-beta[1]-beta[2]*x)^2)
+    }
+    grad = function(beta){
+      matrix(c(sum(-2*(y-beta[1]-beta[2]*x)),sum(-2*x*(y-beta[1]-beta[2]*x))),2,1)
+    }
+    hess = function(beta){
+      matrix(c(2*length(x),2*sum(x),2*sum(x),2*sum(x^2)),2,2)
+    }
+    ## 定义牛顿优化函数
+    newton <- function(f, init, maxit = 100, epsilon = 1e-6) {
+      beta <- init
+      for (i in 1:maxit) {
+        res <- f(beta)
+        g <- res$gradient
+        H <- res$hessian
+        if (max(abs(g)) < epsilon) break
+        H_inv <- solve(H)
+        beta <- beta - as.vector(H_inv %*% g)
+      }
+      return(beta)
+    }
+    ## Newton optimization
+    optimOut <- newton(
+      function(beta){
+      list(value=func(beta), gradient=grad(beta), hessian=hess(beta))}
+      , c(-4, -5))  
+
+    optimOut
+    ```
+
+    ```{r}
+    beta0Hat <- optimOut[1]
+    beta1Hat <- optimOut[2]
+    myLM <- lm(y~x)
+    myLMCoef <- myLM$coefficients
+    coefs <- data.frame(Method = c('Newton', 'LM'), intercept = c(beta0Hat, myLMCoef[1]), slope = c(beta1Hat,myLMCoef[2]))
+    coefs
+    ```
+
+    ```{r}
+    library(ggplot2)
+    qplot(x, y) +
+      geom_abline(aes(slope = myLMCoef[2], 
+                      intercept = myLMCoef[1], color = 'LM'), size = 3) +
+       geom_abline(aes(slope = beta1Hat, intercept = beta0Hat, color='Newton'),
+                   linetype="dashed", linewidth = 1) + labs(color = "Method")
+    ```
+
+    ```{r}
+    # nlm()函数在R中实现了给定初始值，用牛顿法最小化多元函数的方法
+    nlm(func, c(-4, 5))$estimate
+    ```
+
+### 单纯形法 Nelder Mead Algorithm
+
+牛顿法用函数一阶导数和二阶导数构建局部二次近似模型，通过迭代求解近似模型的最优解，逐步逼近原函数的最优解。当二阶导数（海塞矩阵）难以计算时，用函数值和一阶导数信息迭代近似海森矩阵，称作拟牛顿法，如BFGS。
+
+当导数不存在时，最常用的是Nelder-Mead单纯形法。
+
+-   第一步：选点
+
+-   第二步：找重心
+
+-   第三步：找反射点
+
+-   第四步：分情况得到下一步的迭代点
+
+    具体迭代规则如下：
+
+    - 若反射点的函数值优于当前最优点：尝试沿反射方向**扩张（Expansion）**，若扩张点更优则接受扩张点，否则接受反射点。
+    - 若反射点的函数值介于最好点和最差点之间：**接受反射点**。
+    - 若反射点的函数值差于当前所有点：进行**收缩（Contraction）**，向内收缩或向外收缩，取较优者。
+    - 若收缩后仍无明显改善：执行**全局缩小（Shrink）**，所有点向当前最优点靠拢。
+
+    通过以上四种操作，单纯形在参数空间中逐渐缩小并收敛到局部极小值点。
+
+### 随机梯度下降 SGD
+
+$$
+x_{n+1} = x_n - \alpha \nabla f(x_n),\alpha >0
+$$
+
+对比牛顿法和梯度下降法，可以看出牛顿法更快收敛到极值，因为牛顿法用了函数的二阶导数信息，而梯度下降法只用了一阶梯度的信息。
+
+两种方法的比较：
+- **牛顿法**：利用了二阶导数（海塞矩阵）信息，构造局部二次近似模型，收敛速度快（二次收敛），但每步需计算和求逆海塞矩阵，计算成本高。
+- **梯度下降法**：只使用一阶梯度信息，每次迭代计算量小，但收敛慢（线性收敛）。在极值点附近，梯度接近零，步长自动变小；而远离极值点时步长较大。
+- **随机梯度下降（SGD）**：每次只用一个（或小批量）样本的梯度更新参数，适用于大规模数据和在线学习场景，但收敛路径带有随机波动。
+
+什么时候使用随机梯度下降？当训练时间久，样本量大的时候。
+

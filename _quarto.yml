@@ -1,0 +1,42 @@
+project:
+  type: book
+
+book:
+  title: "统计学：从概率论到深度学习"
+  author: "穿行冷风"
+  date: today
+  language: zh
+  chapters:
+    - index.Rmd
+    - 01-概率初步与随机变量的分布.Rmd
+    - 02-多维随机变量及其分布.Rmd
+    - 03-大数定律和中心极限定理.Rmd
+    - 04-概率不等式与收敛性.Rmd
+    - 05-统计量与抽样分布.Rmd
+    - 06-参数估计.Rmd
+    - 07-假设检验与方差分析.Rmd
+    - 08-贝叶斯统计.Rmd
+    - 09-贝叶斯计算.Rmd
+    - 10-回归分析.Rmd
+    - 11-广义线性模型.Rmd
+    - 12-类别数据分析.Rmd
+    - 13-非参数统计.Rmd
+    - 14-时间序列分析.Rmd
+    - 15-优化方法.Rmd
+    - 16-矩阵计算与数值方法.Rmd
+    - 17-机器学习基础.Rmd
+    - 18-经典分类方法.Rmd
+    - 19-集成学习与模型选择.Rmd
+    - 20-深度学习.Rmd
+    - 21-多元统计分析.Rmd
+    - 22-因果推断入门.Rmd
+
+format:
+  html:
+    theme: cosmo
+    toc: true
+    toc-depth: 3
+    number-sections: true
+    code-fold: true
+    fig-align: center
+    css: style.css

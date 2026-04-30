@@ -1,0 +1,176 @@
+# 多元统计分析
+
+> 当数据从"每个个体一个指标"扩展到"每个个体多个指标"时，变量之间的相关性成为了信息的核心来源。多元统计分析的目标正是揭示和利用这种变量之间的结构。
+
+前面各章主要关注单个响应变量与若干自变量之间的关系（Ch10, Ch11）。多元统计分析则将所有变量放在同等的地位上，同时研究变量之间的相关结构、降维方式和分组模式。它横跨了经典统计学与机器学习之间的桥梁。
+
+## 多元数据的描述
+
+### 样本均值向量与协方差矩阵
+
+设有 $n$ 个观测，每个观测有 $p$ 个变量：$\mathbf{x}_i = (x_{i1}, x_{i2}, \ldots, x_{ip})'$。
+
+**样本均值向量**：
+
+$$\bar{\mathbf{x}} = \frac{1}{n} \sum_{i=1}^n \mathbf{x}_i$$
+
+**样本协方差矩阵**：
+
+$$\mathbf{S} = \frac{1}{n-1} \sum_{i=1}^n (\mathbf{x}_i - \bar{\mathbf{x}})(\mathbf{x}_i - \bar{\mathbf{x}})'$$
+
+$\mathbf{S}$ 是一个 $p \times p$ 的对称正定矩阵。对角线元素是各变量的样本方差，非对角线元素是两两变量之间的样本协方差。
+
+**样本相关矩阵**：
+
+$$\mathbf{R} = \mathbf{D}^{-1/2} \mathbf{S} \mathbf{D}^{-1/2}$$
+
+其中 $\mathbf{D} = \text{diag}(s_1^2, \ldots, s_p^2)$。$\mathbf{R}$ 的 $(i, j)$ 元即为 $X_i$ 与 $X_j$ 的样本相关系数。
+
+### 多元正态分布
+
+$p$ 维随机向量 $\mathbf{X}$ 服从多元正态分布 $N_p(\boldsymbol{\mu}, \boldsymbol{\Sigma})$，如果其密度函数为：
+
+$$f(\mathbf{x}) = \frac{1}{(2\pi)^{p/2} |\boldsymbol{\Sigma}|^{1/2}} \exp\left(-\frac{1}{2} (\mathbf{x} - \boldsymbol{\mu})' \boldsymbol{\Sigma}^{-1} (\mathbf{x} - \boldsymbol{\mu})\right)$$
+
+**核心性质**：
+
+1. 边缘分布：$\mathbf{X}$ 的任意子向量也服从正态分布。
+2. 条件分布：给定部分变量后，其余变量的条件分布也是正态分布。
+3. 线性变换：$\mathbf{Y} = \mathbf{A}\mathbf{X} + \mathbf{b} \sim N_q(\mathbf{A}\boldsymbol{\mu} + \mathbf{b}, \mathbf{A}\boldsymbol{\Sigma}\mathbf{A}')$。
+4. 独立性与不相关性等价：在多元正态下，$\text{Cov}(X_i, X_j) = 0 \Leftrightarrow X_i$ 与 $X_j$ 独立。
+
+> 性质 4 对多元正态成立，但对一般分布不成立——这是 Ch02 中反复强调的"不相关 ≠ 独立"在多元正态中的例外。
+
+## 主成分分析（PCA）
+
+### 基本思想
+
+主成分分析的目标是找到变量的线性组合，使得这些组合：
+1. 方差尽可能大（保留尽可能多的信息）。
+2. 彼此之间不相关（去冗余）。
+
+从几何上看，PCA 等价于对数据做**坐标旋转**，使得新坐标轴的方向与数据最大变异方向对齐。
+
+### 数学推导
+
+问题：寻找方向 $\mathbf{a}$（$\|\mathbf{a}\| = 1$），使得投影 $\mathbf{a}'\mathbf{X}$ 的方差最大化：
+
+$$\max_{\|\mathbf{a}\|=1} \text{Var}(\mathbf{a}'\mathbf{X}) = \max_{\|\mathbf{a}\|=1} \mathbf{a}' \boldsymbol{\Sigma} \mathbf{a}$$
+
+解：$\mathbf{a}$ 是 $\boldsymbol{\Sigma}$ 的最大特征值对应的特征向量。这就是**第一主成分**。
+
+第二主成分在与第一主成分正交的约束下最大化方差，对应第二大的特征向量。以此类推。
+
+### 方差解释比例
+
+第 $k$ 个主成分的方差解释比例为：
+
+$$\lambda_k \Big/ \sum_{j=1}^p \lambda_j$$
+
+其中 $\lambda_1 \geq \lambda_2 \geq \cdots \geq \lambda_p \geq 0$ 是 $\boldsymbol{\Sigma}$（或 $\mathbf{S}$）的特征值。
+
+> 实践中，通常选取前几个主成分，使得累积方差解释比例达到 80%-90%。这既实现了降维，又保留了大部分信息。
+
+```{r}
+# PCA 示例：iris 数据集
+data(iris)
+pca <- prcomp(iris[, 1:4], scale. = TRUE)
+summary(pca)          # 方差解释
+pca$rotation           # 载荷（特征向量）
+biplot(pca)            # 双标图
+```
+
+### PCA 与 SVD 的联系
+
+对中心化的数据矩阵 $\tilde{\mathbf{X}}$（$n \times p$），其样本协方差矩阵为 $\mathbf{S} = \frac{1}{n-1} \tilde{\mathbf{X}}'\tilde{\mathbf{X}}$。
+
+若对 $\tilde{\mathbf{X}}$ 做 SVD：$\tilde{\mathbf{X}} = \mathbf{U} \boldsymbol{\Sigma} \mathbf{V}'$，则：
+
+- $\mathbf{V}$ 的列就是主成分方向（$\mathbf{S}$ 的特征向量）。
+- $\sigma_i^2 / (n-1)$ 就是第 $i$ 个特征值。
+
+这一联系（Ch16 中也有讨论）意味着 PCA 的计算本质上就是一个 SVD 分解。
+
+## 因子分析
+
+因子分析（Factor Analysis）与 PCA 不同：PCA 是纯变量变换，而因子分析假设存在**隐变量**驱动观测变量之间的相关性。
+
+$$X_i = \lambda_{i1} F_1 + \lambda_{i2} F_2 + \cdots + \lambda_{im} F_m + \varepsilon_i, \quad m < p$$
+
+其中：
+- $F_1, \ldots, F_m$ 是公共因子（不可观测）。
+- $\lambda_{ij}$ 是**因子载荷**（Factor Loading）。
+- $\varepsilon_i$ 是特殊因子（变量 $X_i$ 独有的部分）。
+
+> PCA 和因子分析的区别：PCA 想的是"如何用少数组合作替原始变量"，因子分析想的是"有没有少量隐变量可以解释观测变量间的相关性"。
+
+## 聚类分析
+
+聚类分析（Cluster Analysis）将相似的观测归入同一组，使得组内尽可能同质、组间尽可能异质。
+
+### K-means 聚类
+
+**算法步骤**：
+
+1. 随机初始化 $K$ 个聚类中心 $\mathbf{c}_1, \ldots, \mathbf{c}_K$。
+2. 将每个样本分配到最近的中心。
+3. 重新计算每个聚类的中心（均值）。
+4. 重复步骤 2-3 直至收敛。
+
+K-means 最小化的是组内平方和：$W(C) = \sum_{k=1}^K \sum_{i \in C_k} \|\mathbf{x}_i - \mathbf{c}_k\|^2$。
+
+**注意事项**：K-means 需要预先指定 $K$；对初始值敏感；只能发现球形聚类。
+
+### 层次聚类
+
+层次聚类不需要预先指定聚类数，而是构建一个树状结构（系统树图）：
+
+- **凝聚法**（Agglomerative）：从每个样本各自为一类开始，逐步合并最近的类。
+- **分裂法**（Divisive）：从所有样本为一类开始，逐步分裂。
+
+类间距离的定义方式（单连接、全连接、平均连接、Ward 方法）会影响聚类结果。
+
+```{r}
+# K-means 与层次聚类示例
+data(iris)
+scaled_iris <- scale(iris[, 1:4])
+
+# K-means
+km <- kmeans(scaled_iris, centers = 3)
+table(km$cluster, iris$Species)
+
+# 层次聚类
+hc <- hclust(dist(scaled_iris), method = "ward.D2")
+plot(hc, labels = FALSE)
+```
+
+## 判别分析
+
+与聚类分析不同，判别分析是有监督的分类方法——已知每个样本的类别标签，目标是找到能将不同类别最好地分开的方向。
+
+### 线性判别分析（LDA）
+
+LDA 假设各类别服从多元正态分布，且具有相同的协方差矩阵（但均值不同）。分类规则为：
+
+将 $\mathbf{x}$ 分配到使后验概率 $P(Y = k \mid \mathbf{x})$ 最大的类别。
+
+LDA 找到的判别方向恰好是 $\boldsymbol{\Sigma}^{-1} (\boldsymbol{\mu}_1 - \boldsymbol{\mu}_2)$（二分类情况），也就是**最大化类间方差与类内方差之比**的方向。
+
+> LDA 既可以用于分类，也可以用于降维（找到最具判别力的投影方向）。
+
+## 与本书其他章节的联系
+
+- PCA 的计算依赖 Ch16 中的 SVD 分解。
+- 判别分析与 Ch11（GLM 的二分类）和 Ch18（分类方法）密切相关。
+- 聚类与 Ch17 中的无监督学习主题重叠。
+- 协方差矩阵的估计与检验依赖于 Ch07 中的多元检验理论。
+
+---
+
+**速查卡片**：
+
+- **核心问题**：如何在多变量数据的复杂结构中提取简化的、可解释的模式？
+- **三大任务**：降维（PCA/因子分析）、分组（聚类/判别分析）、相关结构建模
+- **关键方法**：PCA = SVD + 方差最大化；LDA = 最大化类间/类内方差比
+- **R命令**：`prcomp()`, `factanal()`, `kmeans()`, `hclust()`, `lda()` (MASS)
+- **参见**：Ch02（多元正态分布）, Ch16（SVD）, Ch17（无监督学习）

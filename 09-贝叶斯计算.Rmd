@@ -1,0 +1,672 @@
+# 贝叶斯计算
+
+> Ch08 介绍了贝叶斯统计的理论框架。本章回答一个更实际的问题：当后验分布没有解析形式时，如何用计算机从后验分布中抽样？
+
+## 贝叶斯思维
+
+#### Beyes rule
+
+The process of using Bayes' rule to update a probability based on an event affecting it, is called Bayes' updating.
+
+The what one tries to update can be considered 'prior' information, sometimes simply called the **prior**.
+
+Then, updating this prior using Bayes' rule gives the information conditional on the data, also known as the **posterior**, as in the information after having seen the data.
+
+Going from the prior to the posterior is **Bayes learning** or Bayes updating.
+
+不同于频率学派对概率的定义，贝叶斯学派认为概率反映的是我们先验的信念，因此$P(E)$可以是任何可能的分布。
+
+我们的一生又何尝不是一场旷日持久的贝叶斯更新。
+
+A Beyesian credible interval is a range for which the Bayesian thinks that the probability of including the true value is , say, 0.95.
+
+Thus a Bayesian can say that there is a 95 percent chance that the credible interval contains the true parameter value.
+
+Beyesian inference is to modify our beliefs to account for new data.
+
+贝叶斯推断就是更新我们的信念去解释新的数据。
+
+$$
+p(\theta|data) = \frac{p(data|\theta)p(\theta)}{p(data)}\propto p(data|\theta)\cdot p(\theta)
+$$
+
+如何选择先验？
+
+There is no "true" prior. In some cases expert opinion can be used to specify an informative prior. It would be a waste to discard this information.
+
+If prior information is unavailable, then the prior should be uninformative. The prior is best viewed as an initial value to a statistical procedure.
+
+只要先验选择是合理的，随着数据不断收集和贝叶斯学习不断的进行，后验会集中围绕在真值附近。但是在有限的样本中，先验是会产生影响的。
+
+#### Example1
+
+下面是一个关于睡眠时长分布的例子。
+
+```{r}
+# 描述先验分布
+p = seq(0.05, 0.95, by = 0.1) #p的可能取值
+prior = c(1, 5.2, 8, 7.2, 4.6, 2.1, 0.7, 0.1, 0, 0)
+prior = prior/sum(prior) #权重
+plot(p, prior, ylim = c(0,1), type = "h", ylab="Prior")
+# 计算后验分布
+s <- 11; f <- 16
+like <- p^s*(1-p)^f # 计算似然
+post <- prior*like # 计算后验
+post <- post/sum(post) #归一化
+plot(p,post,type = "h",lty = 1,ylim = c(0,1),ylab = "Posterior")
+```
+
+下面我们把参数的取值指定为一个beta分布。现在的问题是，在已知一些先验知识的前提下，如何确定一个beta分布的形状参数来最好的匹配先验的知识？
+
+```{r}
+quantile2=list(p=0.9,x=0.5)#  p的0.9分位数是0.5
+quantile1=list(p=0.5,x=0.3)#  p的中位数是0.3
+LearnBayes::beta.select(quantile1,quantile2)# 找到最符合的形状参数取值
+```
+
+将先验和似然函数相乘，可以得到后验分布： $$
+g(p|data)\propto p^{a+s-1}(1-p)^{b+f-1}
+$$
+
+可以看出，它们同属于beta分布族。
+
+```{r}
+# Plot beta prior, likelihood and posterior
+a = 3.26; b = 7.19; s = 11; f = 16
+curve(dbeta(x,a+s,b+f), from=0, to=1,
+      xlab="p",ylab="Density",lty=1,lwd=4)  # 后验分布
+curve(dbeta(x,s+1,f+1),add=TRUE,lty=2,lwd=4) # 似然分布
+curve(dbeta(x,a,b),add=TRUE,lty=3,lwd=4)# 先验分布
+legend(.7,4,c("Prior","Likelihood","Posterior"),
+       lty=c(3,2,1),lwd=c(3,3,3))
+```
+
+#### Example2
+
+下面我们要考虑的是均值已知，方差未知的正态分布。我们用美国足球成绩来估计未知方差。观测值为$d_1,d_2,\cdots,d_n$。
+
+似然函数：$L(\sigma^2)\propto (\sigma^2)^{-n/2}exp\{-\sum_{i=1}^nd_i^2/(2\sigma^2) \}$
+
+先验分布（使用非信息先验）：$p(\sigma^2)\propto 1/\sigma^2$
+
+后验分布：$g(\sigma^2|data)\propto (\sigma^2)^{-n/2-1}exp\{-v/(2\sigma^2)\},v=\sum_{i=1}^nd_i^2$
+
+定义$Y=1/\sigma^2$，给出Y的分布，以及$\sigma$的点估计和0.95置信区间。
+
+#### Example3
+
+下面我们考虑双参数未知的正态分布数据。我们使用的数据是纽约马拉松完赛时间，共有20个观测值$y_1,\cdots,y_{20}$，观测值都来自正态分布$N(\mu,\sigma^2)$
+
+非信息先验分布：$g(\mu,\sigma^2)\propto 1/\sigma^2$.
+
+似然函数：$L(y|\mu,\sigma^2) \propto \sigma^{-n}exp\{-\frac{1}{2\sigma^2}\sum_{i=1}^n(y_i-\mu)^2\}$
+
+联合后验分布： $$
+g(\mu,\sigma^2|y)\propto \sigma^{-n-2}exp\{-\frac{1}{2\sigma^2}\sum_{i=1}^n(y_i-\mu)^2 \}
+$$
+
+联合后验密度可以分解为条件后验密度和边际后验密度的乘积。如何做到？ $$
+g(\mu,\sigma^2|y)=g(\mu|\sigma^2,y)\times p(\sigma^2|y)
+$$
+
+条件后验分布：$\mu|\sigma^2,y \sim N(\bar{y},\sigma^2/n)$.
+
+边际后验分布：$p(\sigma^2|y) \sim Scale-Inv-\chi^2(n-1,s^2)$.
+
+将双参数的联合抽样转化为“先抽$\sigma^2$，再抽$\mu$”的两步抽样。
+
+```{r}
+library(LearnBayes)
+data(marathontimes)
+attach(marathontimes)
+# 绘制联合后验等高线图，等高线图的每一条线代表联合后验密度相等的点。
+d = mycontour(normchi2post, c(220, 330, 500, 9000), time, xlab="mean",ylab="variance")
+
+# simulation
+S = sum((time - mean(time))^2)
+n = length(time)
+sigma2 = S/rchisq(1000, n - 1)#从边际后验抽方差
+mu = rnorm(1000, mean = mean(time), sd = sqrt(sigma2)/sqrt(n))# 从条件后验抽均值
+# 验证抽样有效性，将抽样样本堆叠到等高线图上
+d = mycontour(normchi2post, c(220, 330, 500, 9000), time, xlab="mean",ylab="variance")
+points(mu, sigma2)
+
+#inference
+quantile(mu, c(0.025, 0.975))
+quantile(sqrt(sigma2), c(0.025, 0.975))
+```
+
+使用网格估计的方法重新做一遍：
+
+```{r}
+# Data
+library(LearnBayes)
+Y <- marathontimes$time
+n <- length(Y)
+# Create a grid
+npts    <- 100
+mu      <- seq( 250, 350,length=npts)
+s2      <- seq( 30^2,80^2,length=npts)
+grid_mu <- matrix(mu,npts,npts,byrow=FALSE)
+grid_s2 <- matrix(s2,npts,npts,byrow=TRUE)
+
+#先验
+prior <- matrix(1,npts,npts)
+for(i in 1:n){
+  prior <- 1/grid_s2
+}
+prior <- prior/sum(prior)
+library(fields)
+image.plot(mu,s2,prior,main="Prior")
+
+#似然
+like   <- matrix(1,npts,npts)
+for(i in 1:n){
+  like <- like * dnorm(Y[i],grid_mu,sqrt(grid_s2))
+}
+like <- like/sum(like)
+image.plot(mu,s2,like,main="Likelihood")
+
+# 后验
+post <- prior * like
+post <- post/sum(post)
+image.plot(mu,s2,post,main="Posterior")
+
+#mu的边际分布
+post_mu <-colSums(post)
+post_mu <- post_mu/sum(post_mu)
+plot(mu,post_mu,ylab="f(mu|Y)",type="l")
+abline(v=mean(Y))
+
+#方差的边际分布
+post_s2 <-rowSums(post)
+post_s2 <- post_s2/sum(post_s2)
+plot(s2,post_s2,ylab="f(sigma2|Y)",type="l")
+abline(v=var(Y))
+
+# 整合结果
+post_mean_mu <- sum(mu*post_mu)
+post_sd_mu   <- sum(mu*mu*post_mu) - post_mean_mu^2
+post_q025_mu <- max(mu[cumsum(post_mu)<0.025])
+post_q975_mu <- max(mu[cumsum(post_mu)<0.975])
+post_mean_s2 <- sum(s2*post_s2)
+post_sd_s2   <- sum(s2*s2*post_s2) - post_mean_s2^2
+post_q025_s2 <- max(s2[cumsum(post_s2)<0.025])
+post_q975_s2 <- max(s2[cumsum(post_s2)<0.975])
+out1 <- c(post_mean_mu,post_sd_mu,post_q025_mu,post_q975_mu)
+out2 <- c(post_mean_s2,post_sd_s2,post_q025_s2,post_q975_s2)
+out  <- rbind(out1,out2)
+colnames(out) <- c("Mean","SD","Q025","Q975")
+rownames(out) <- c("mu","sigma2")
+print(out)
+```
+
+### 贝叶斯计算
+
+Bear in mind that given the prior and data, the posterior is fixed and a Bayesian analysis really boils down to summarizing the posterior.
+
+Summarizing a p-dimensional posterior distribution is challenging for large p.
+
+#### MAP 估计
+
+MAP与极大似然估计很像，但是添加了先验。
+
+$$
+\hat{\theta}=argmax_{\theta}\ p(\theta|Y) = argmax_{\theta} log[f(Y|\theta)]+log[p(\theta)]
+$$
+
+一个具体的例子，我们想研究一支队伍的胜率，它在上一个赛季的38场比赛中赢了30场。
+
+我们先用MLE估计，写出似然函数，极大化就好。 $$
+P(X=k|\theta)=C_n^k\theta^k(1-\theta)^{n-k}
+$$
+
+$$
+L(\theta)=p(data|\theta) = C_{38}^{30}\theta^{30}(1-\theta)^8
+$$ 求导解得极大似然估计的参数值：
+
+$$
+\hat{\theta}_{MLE}=\frac{k}{n}=\frac{30}{38}
+$$
+
+当样本足够多的时候，MLE是很好的方法。但是样本数据不足的情况下呢？MAP就使用了先验的知识，辅助我们估计参数，使之更贴合实际。
+
+先验分布：$\theta\sim Beta(10,10),p(\theta)\propto \theta^9(1-\theta)^9$
+
+后验分布：$p(\theta|data)\propto \theta^{39}(1-\theta)^{17}$
+
+求导解得MAP估计的参数值：
+
+$$
+\hat{\theta}_{MAP}=\frac{k+\alpha-1}{n+\alpha+\beta-2}=\frac{30+10-1}{38+10+10-2}=\frac{39}{56}
+$$
+
+#### 后验分布高斯近似
+
+贝叶斯中心极限定理：当样本量非常大的时候， $$
+\theta|Y\sim Normal[\hat{\theta}_{MAP},I(\hat{\theta}_{MAP})^{-1}]
+$$
+
+$$
+I_{jk}=-\frac{\partial^2}{\partial\theta_j\partial\theta_k}log[p(\theta|Y)]
+$$
+
+练习：Say $Y|\theta\sim B(n,\theta),\theta\sim Beta(0.5,0.5)$,find the Gaussian approximation for $p(\theta|Y)$
+
+后验分布：$\theta|Y\sim Beta(Y+1/2,n-Y+1/2)$
+
+MAP估计：$\hat{\theta}=A/(A+B),A=Y-1/2,B=n-Y-1/2$
+
+后验方差估计：$(\frac{A}{\hat{\theta}^2}+\frac{B}{(1-\hat{\theta})^2})^{-1}$
+
+```{r}
+theta <- seq(0.001,0.999,.001) # Grid of thetas for plotting
+#Y <- 2; n <- 5# 小样本下估计
+Y <- 30; n  <- 100#大样本下估计
+# Compute the posterior mean and Fisher information matrix
+A <- Y-0.5; B <- n-Y-0.5
+theta_MAP <- A/(A+B)
+Info  <- A/theta_MAP^2+B/(1-theta_MAP)^2
+# Plot the true and approximate posteriors
+post1 <- dbinom(Y,n,theta)*dbeta(theta,0.5,0.5)
+post1 <- post1/sum(post1)
+post2 <- dnorm(theta,theta_MAP,sqrt(1/Info))
+post2 <- post2/sum(post2)
+plot(theta,post1,type="l",lwd=2,
+     xlab=expression(theta),ylab="Posterior")
+abline(v=theta_MAP,col=3,lwd=2)
+lines(theta,post2,col=2,lwd=2)
+legend("topright",c("Exact Posterior ","CLT","MAP"),bty="n",col=1:3,cex=1.5,lwd=2)
+```
+
+### 独立蒙特卡洛
+
+#### 直接抽样法
+
+直接抽样要求目标分布有CDF且能求逆。
+
+Suppose that we are given $U \sim U(0,1)$ and want to simulate a continuous r.v.X with cdf $F_x$. Put $Y=F_X^{-1}(U)$, we have $$
+F_Y(y)=P(Y\leq y)=P(F_X^{-1}(U)\leq y)=P(U\leq F_X(y))=F_X(y)
+$$ For any continuous r.v.X,$F_X(X)\sim U(0,1)$,Why?
+
+来自指数分布的例子。
+
+```{r}
+#小样本可视化映射关系
+lambda <- 1
+u <- runif(20)# 生成20个U(0,1)均匀分布的样本
+x <- -1/lambda * log(1 - u)# 逆CDF变换：将均匀样本u转化为指数分布样本x
+# 绘制指数分布的CDF曲线
+curve(1 - exp(-x), 0, 5, ylab = "u", main = "Inverse CDF transformation for exp(1)")
+# 为每个(u[i], x[i])画虚线，展示“u→x”的映射关系
+for (i in 1:length(x)) {
+    lines(c(x[i], x[i]), c(u[i], 0), lty = "dashed")
+    lines(c(x[i], 0), c(u[i], u[i]), lty = "dashed")
+}
+
+# 大样本验证用逆CDF变换的抽样结果
+lambda <- 1
+u <- runif(1000)# 生成1000个U(0,1)样本
+x <- -1/lambda * log(1 - u)# 同样用逆CDF变换生成指数分布样本
+hist(x)# 绘制样本x的直方图
+```
+
+#### 拒绝抽样
+
+**What if we can not write the inverse?**
+
+Although we cannot easily sample from $f(\theta|y)$, there exists another density $g(\theta)$(called proposal density), like a Normal distribution or perhaps a t-distribution, from which it is easy for us to sample.
+
+Then we can sample from $g(\theta)$ directly and then "reject" the samples in a strategic way to make the resulting "non-rejected" samples look like they came from $f(\theta|y)$ .
+
+| 符号 | 含义 |
+|----|----|
+| $f(\theta|y)$ | 目标分布的概率密度函数 |
+| $g(\theta)$ | 提议分布的概率密度函数 |
+| $M$ | 包络常数，满足$M = max_{\theta}\frac{f(\theta|y)}{g(\theta)}$, 作用是让$M\cdot g(\theta)\geq f(\theta|y)$ ，即放大后的提议分布能包裹目标分布 |
+| $U$ | 从均匀分布$Unif(0,1)$中抽取的随机数，保证阈值是随机的（而不能是固定的） |
+| $\theta$ | 提议分布抽样得到的候选样本 |
+| $\alpha = \frac{f(\theta|y)}{Mg(\theta)}\in [0,1]$ | 样本被接受概率 |
+
+**拒绝抽样步骤：**
+
+1.  Sample $U \sim Unif(0,1)$.
+
+2.  Sample $\theta$ at randon from the probability density proportional to $g(\theta)$.
+
+3.  if $U\leq \frac{f(\theta|y)}{Mg(\theta)}$,accept $\theta$ as a draw from f; if the drown $\theta$ is rejected, return to step 1.
+
+重复此步骤，直到接受的样本足够多。
+
+**直观理解：**
+
+拒绝抽样的几何直观（以一维为例）：
+
+- 上方曲线为放大后的提议分布$M \cdot g(\theta)$，下方曲线为目标分布$f(\theta|y)$。两条曲线之间围成的区域代表了被拒绝的样本空间。
+- 从$g(\theta)$中抽取一个候选值$\theta^*$（对应横轴上的点），在两条曲线之间随机取一个高度$U \cdot M g(\theta^*)$。若该高度落在下方曲线之下（即$U \leq f(\theta^*|y) / [M g(\theta^*)]$），则接受$\theta^*$。
+- 接受的样本比例恰好等于$1/M$，即下方曲线面积与上方曲线面积之比。因此$M$越接近1，抽样效率越高。
+
+The top curve is an approximation function, $Mg(\theta)$ （注意这是放大后的提议分布）, and the button curve is the target density, $f(\theta|y)$.
+
+As required, $Mg(\theta)\geq f(\theta|y)$ for all $\theta$. The vertical line indicates a single random draw $\theta$ from the density proportional to g. The probability that a sampled draw $\theta$ is accepted is the ratio of the height of the lower curve to the height of the highter curve at the value $\theta$.
+
+正是通过设置随机阈值，当迭代次数足够多时，目标分布密度高的区域，接受概率也高，这样接受的样本数量多。反之目标分布密度低的区域接受额样本数量就会少，最终接受样本的分布会严格服从目标分布！
+
+**如何选择**$g(\theta)$**？**
+
+A simple choice is choose $g(\theta)$ that heavier tails.（厚尾分布优先）
+
+For example, if we want to get samples from $N(0,1)$, we could use the $t_2$ distribution as our proposal density as it has heavier tails than the Normal.
+
+```{r warning=FALSE}
+curve(dnorm(x), -6, 6, xlab = expression(theta), ylab = "Density", n = 200)
+curve(dt(x, 2), -6, 6, add = TRUE, col = 4, n = 200)
+legend("topright", c("Normal density", "t density"), col = c(1, 4), bty = "n", lty = 1)
+x <- rt(200, 2)
+rug(x, col = 4)
+y <- rnorm(200)
+rug(y, col = 1)
+```
+
+样本$\theta$ 被接受的概率：
+
+$$
+P(\theta_{accept})=P(U\leq \frac{f(\theta|y)}{Mg(\theta)})=\frac{1}{M}
+$$
+
+由此，我们应该选取尽可能接近目标分布的提议分布g。
+
+**拒绝抽样的问题**
+
+For example, if g has heavier tails than f, then there will be too many extreme values generated from g. Rejection sampling simply thins out those extreme values to obtain the right proportion. But what if we could take those rejected values and, instead of discarding them, simply downweight or upweight them in a specific way?
+
+#### 重要性抽样
+
+重要性抽样是拒绝抽样的进阶版，核心是用“样本加权”替代“样本拒绝”，直接计算目标分布f下函数h的期望。
+
+target:
+
+$$
+E_f[h(\theta)|y]=E_g[\frac{f(\theta|y)}{g(\theta)}h(\theta|y)]
+$$
+
+if $\theta_1.\cdots,\theta_n\sim g$, we get:
+
+$$
+\mu_n'=\frac{1}{n}\sum_{i=1}^n\frac{f(\theta_i|y)}{g(\theta_i)}h(\theta_i|y)=\frac{1}{n}\sum_{i=1}^nw_ih(\theta_i|y)\approx E_f[h(\theta|)]
+$$
+
+$w_i$ are referred to as the importance weights.
+
+### 马尔科夫链蒙特卡洛方法MCMC
+
+**What is Markov chain?**
+
+A Markov chain is a sequence of random variables $\theta^1,\theta^2,\cdots,$ for which, for any t, the distribution of $\theta^t$ given all previous $\theta'$s depends only on the most recent value, $\theta^{t-1}$.
+
+The key to MCMC's success is that the approximate distributions are improved at each step in simulation (in the sense of converging to the target distribution).
+
+#### The Metropolis algorithm
+
+The aim of Metropolis algorithm is to simulate $x\sim p(x)$ where $p(x)$ is called the target density, and we will need a proposal density $q(x^{[new]}|x^{[old]})$.
+
+An important property of q in the Metropolis algorithm is symmetry of the proposal:
+
+$$
+q(x^{[new]}|x^{[old]})=q(x^{[old]}|x^{[new]})
+$$
+
+To make sure this Markov chain converges to our target, we need to include the following steps.
+
+1.  At step i+1, set $x^{[old]}=x^{[i]}$.
+
+2.  Generate $x^{[new]}\sim N(x^{[old]},1)$, (or $x^{[new]}=x^{[old]}+\epsilon$ random walk proposal) and compute
+
+    $$
+    \alpha = min(1,\frac{p(x^{[new]})}{p(x^{[old]})})
+    $$
+
+3.  Set $x^{[i+1]}=x^{[new]}$ with probability $\alpha$ (accept) ; set $x^{[i+1]}=x^{[old]}$ with probability $1-\alpha$ (reject).
+
+Example.
+
+```{r}
+#1. 抽样的目标分布：混合正态分布
+p <- 0.4# 第一个正态分布的权重
+mu <- c(-1, 2)
+sd <- c(.5, 2)
+f <- function(x){
+    p     * dnorm(x, mu[1], sd[1]) +
+    (1-p) * dnorm(x, mu[2], sd[2])
+} 
+curve(f(x), -4, 8, n=301, las=1)
+
+#2. 定义对称提议分布
+q <- function(x) rnorm(1, x, 4)
+
+#3. 定义单步转移函数
+step <- function(x, f, q) {
+  ## 从提议分布生成候选状态xp
+  xp <- q(x)
+  ## 计算接受概率α
+  alpha <- min(1, f(xp) / f(x))
+  ## 随机判断是否接受候选状态
+  if (runif(1) < alpha)
+    x <- xp
+  ## 返回当前状态
+  x
+}
+#4. 定义迭代抽样函数
+run <- function(x, f, q, nsteps) {
+  # 初始化矩阵：存储nsteps次迭代的状态
+  res <- matrix(NA, nsteps, length(x))
+  # 循环nsteps次，每次调用step()更新状态，并存储结果
+  for (i in seq_len(nsteps))
+    res[i,] <- x <- step(x, f, q)
+  # 返回所有迭代的状态序列（马尔可夫链）
+  return(res)
+}
+# 执行抽样：初始状态x=-10，迭代1100次
+res <- run(-10, f, q, 1100)
+# 绘制烧脑期后样本的直方图
+hist(res[101:1100], 50, freq=FALSE, main="", ylim=c(0, .4), las=1,
+     xlab="x", ylab="Probability density")
+z <- integrate(f, -Inf, Inf)$value
+curve(f(x) / z, add=TRUE, col="red", n=200)
+# 绘制迹图验证收敛性
+plot(res[,1], type="l")
+```
+
+#### The Convergence efficiency of MCMC
+
+我们可以计算样本均值方差来表示 Monte Carlo error.
+
+对于MCMC样本，由于样本之间存在自相关，样本均值的方差不能简单用$Var(X)/M$计算。考虑自相关后的正确方差为：
+
+$$\text{Var}(\bar{x}) = \frac{\sigma^2}{M} \left(1 + 2\sum_{k=1}^{\infty} \rho_k \right)$$
+
+其中$\sigma^2 = Var(X)$，$\rho_k$为滞后$k$的自相关系数。定义积分自相关时间（IACT）$\tau = 1 + 2\sum_{k=1}^{\infty} \rho_k$，则$\text{Var}(\bar{x}) = \sigma^2 \tau / M$。
+
+ACF（自相关强度）
+
+ACF（自相关函数）图展示了马尔可夫链在不同滞后距离下的自相关强度$\rho_k = Corr(x_t, x_{t+k})$。如果ACF随滞后快速衰减至零，说明链的混合性能好；如果ACF缓慢衰减，说明链的自相关性强，有效样本量（ESS）低。ESS定义为$M_{ESS} = M / \tau$，其中$\tau$为积分自相关时间。ESS越高，蒙特卡洛估计越精确。
+
+Effective sample size (ESS):
+
+$$
+Var(\frac{1}{M}\sum_{i=1}^Mx_i)=\frac{Var(X)}{M}+\frac{2}{M}\sum\sum cov(x_i,x_j) = \frac{Var(X)}{M_{ESS}}
+$$
+
+#### The Metropolis Hastings algorithm
+
+MH是马尔可夫蒙特卡洛的核心算法，用于从无法直接采样的目标分布中生成样本。
+
+Metropolis-Hastings算法的接受概率为：
+
+$$\alpha(x^{[old]} \rightarrow x^{[new]}) = \min\left(1, \frac{p(x^{[new]}) \cdot q(x^{[old]} | x^{[new]})}{p(x^{[old]}) \cdot q(x^{[new]} | x^{[old]})}\right)$$
+
+关键点：
+- 当提议分布$q$为对称分布时（即$q(x'|x) = q(x|x')$），接受率退化为$\min(1, p(x^{[new]})/p(x^{[old]}))$，此时退化为Metropolis算法。
+- MH算法通过引入提议分布比值$q(x^{[old]}|x^{[new]})/q(x^{[new]}|x^{[old]})$，纠正了非对称提议带来的采样偏差，使马尔可夫链的平稳分布恰好为目标分布$p(x)$。
+- 该修正因子被称为Hastings比率，是MH算法区别于Metropolis算法的核心。
+
+2d example
+
+```{r}
+# 构造多元正态分布的概率密度函数
+make.mvn <- function(mean, vcv) {
+  logdet <- as.numeric(determinant(vcv, TRUE)$modulus) # 协方差矩阵的对数行列式
+  tmp <- length(mean) * log(2 * pi) + logdet # 多元正态PDF的常数项部分
+  vcv.i <- solve(vcv) # 协方差矩阵的逆矩阵
+  # 返回闭包（输入样本x，输出PDF值）
+  function(x) {
+    dx <- x - mean
+    exp(-(tmp + rowSums((dx %*% vcv.i) * dx))/2)
+  }
+}
+
+# 定义目标分布：双峰混合双变量正态分布
+mu1 <- c(-1, 1) #峰1均值
+mu2 <- c(2, -2) #峰2均值
+vcv1 <- matrix(c(1, .25, .25, 1.5), 2, 2) #峰1协方差矩阵
+vcv2 <- matrix(c(2, -.5, -.5, 2), 2, 2) #峰2协方差矩阵
+f1 <- make.mvn(mu1, vcv1) # 峰1概率密度函数
+f2 <- make.mvn(mu2, vcv2) # 峰2概率密度函数
+f <- function(x)f1(x) + f2(x) # 目标分布
+
+# 可视化目标分布
+x <- seq(-5, 6, length=71) #x轴网格点
+y <- seq(-7, 6, length=61) #y轴网格点
+xy <- expand.grid(x=x, y=y) #生成所有网格点组合
+z <- matrix(apply(as.matrix(xy), 1, f), length(x), length(y))
+# 计算每个网格点的目标分布密度
+image(x, y, z, las=1) # 画热力图
+contour(x, y, z, add=TRUE) # 叠加等高线
+
+# 定义提议分布：对称随机游走
+q <- function(x, d=8) x + runif(length(x), -d/2, d/2)
+
+# MH采样与可视化
+x0 <- c(-4, -4) #采样初始值
+set.seed(1)
+# 迭代1000次采样（短序列，看轨迹）
+samples <- run(x0, f, q, 1000)
+image(x, y, z, xlim=range(x, samples[,1]), ylim=range(x, samples[,2]))
+contour(x, y, z, add=TRUE)
+lines(samples[,1], samples[,2], col="#00000088")
+# 迭代10000次采样（长序列，验证收敛）
+samples <- run(x0, f, q, 100000)
+smoothScatter(samples)
+contour(x, y, z, add=TRUE)
+```
+
+**间接抽样法和MH方法的异同点比较**
+
+相同点：都依赖提议分布；提议分布的适配性决定采样效率；均含有接受-拒绝机制。
+
+不同点：间接抽样法产生独立样本，MH方法产生相关样本；间接抽样法要求存在上界M；MH更适合高维向量情况
+
+#### Gibbs sampler
+
+吉布斯采样相比于MH算法的优点在于，将高维采样问题拆解为一系列低维条件分布的采样，避免设计复杂的高维提议分布。
+
+吉布斯采样的工作流程（以二维为例）：
+
+设目标分布为$p(x, y)$，已知条件分布$p(x|y)$和$p(y|x)$均可直接采样。
+
+1. 初始化：给定初始值$y^{(0)}$。
+
+2. 第$t$次迭代：
+   - 从$p(x | y^{(t-1)})$中采样得到$x^{(t)}$
+   - 从$p(y | x^{(t)})$中采样得到$y^{(t)}$
+
+3. 重复步骤2，经过烧脑期后，样本对$(x^{(t)}, y^{(t)})$近似来自联合分布$p(x, y)$。
+
+Gibbs采样在参数空间中沿坐标轴方向移动，每一步只改变一个分量。在高维问题中，这种"分而治之"的策略避免了直接处理高维提议分布的困难。
+
+Gibbs采样是MH算法的特例，其提议分布是目标分布的条件分布，因此接受率恒等于1。
+
+$$
+\alpha=min(1,\frac{f(x^{[i+1]},y)f(x^{[i]}|y)}{f(x^{[i]},y)f(x^{[i+1]}|y)})=1
+$$
+
+-   优点：无需调优提议分布；提议总是被接受
+
+-   缺点：依赖条件分布的可采样性；参数高度相关时采样极慢
+
+```{r warning=FALSE}
+set.seed(123)
+rho <- 0.8 # 相关系数
+n <- 5000 # Gibbs迭代次数
+X <- Y <- numeric(n) # 初始化存储采样结果的向量
+# 初始值
+X[1] <- 0
+Y[1] <- 0
+sd <- sqrt(1 - rho^2) # 条件分布的标准差
+
+# Gibbs 核心迭代循环
+for (t in 2:n) {
+  X[t] <- rnorm(1, mean = rho * Y[t-1], sd = sd) # Sample X | Y
+  Y[t] <- rnorm(1, mean = rho * X[t], sd = sd)  # Sample Y | X
+}
+
+# 可视化采样结果
+plot(X, Y, pch = 20, col = rgb(0,0,1,0.4),
+     main = "Joint Samples (X, Y) with Contour",
+     xlab = "X", ylab = "Y")
+
+# 与真实二维正态分布对比
+library(mvtnorm)
+# Grid for contour plot
+xg <- seq(min(X)-1, max(X)+1, length=80)
+yg <- seq(min(Y)-1, max(Y)+1, length=80)
+grid <- expand.grid(x=xg, y=yg)
+# True bivariate normal density
+Sigma <- matrix(c(1, rho, rho, 1), 2, 2)
+dens <- dmvnorm(grid, mean=c(0,0), sigma=Sigma)
+# Add contour
+contour(xg, yg, matrix(dens, 80, 80),
+        add=TRUE, drawlabels=FALSE,
+        col="red", lwd=2)
+# Add legend
+legend("bottomright",
+       legend=c("Gibbs Samples", "True Contour"),
+       col=c(rgb(0,0,1,0.4), "red"),
+       pch=c(20, NA),
+       lty=c(NA, 1),
+       lwd=c(NA, 2))
+```
+
+**Metropolis within Gibbs**
+
+即使单个条件分布难以模拟采样，也可在每个 Gibbs 步骤中使用 Metropolis-Hastings 算法。这样既保留了Gibbs高维拆低维的核心优势，又用MH弥补Gibbs条件分布需可采样的缺陷，适配现实中复杂的目标分布。
+
+#### 贝叶斯线性回归模型
+
+线性回归模型：
+
+$$
+y_i=\beta_0+\beta_1x_i+\epsilon_i
+$$
+
+贝叶斯法则：
+
+$$
+p(\beta_0,\beta_1,\sigma^2|y,x)\propto p(y|\beta_0,\beta_1,\sigma^2,x)p(\beta_0,\beta_1,\sigma^2)
+$$
+
+Gibbs采样：
+
+贝叶斯线性回归的Gibbs采样步骤如下：
+
+给定先验$p(\beta, \sigma^2) \propto 1/\sigma^2$，后验条件分布为：
+
+1. $\beta | \sigma^2, y, X \sim N(\hat{\beta}_{OLS}, \sigma^2 (X'X)^{-1})$
+
+2. $\sigma^2 | \beta, y, X \sim \text{Scale-Inv-}\chi^2(n, s^2)$，其中$s^2 = \frac{1}{n}\sum_{i=1}^n (y_i - x_i'\beta)^2$
+
+Gibbs迭代：
+- 步骤1：从条件后验$\beta | \sigma^{2(t-1)}, y, X$中抽取$\beta^{(t)}$
+- 步骤2：从条件后验$\sigma^2 | \beta^{(t)}, y, X$中抽取$\sigma^{2(t)}$
+- 交替重复，收敛后获得联合后验样本$(\beta^{(t)}, \sigma^{2(t)})$。
+

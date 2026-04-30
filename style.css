@@ -1,0 +1,16 @@
+/* Chinese font stack */
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei",
+    "微软雅黑", "Noto Sans SC", sans-serif;
+}
+
+/* Code blocks - use monospace */
+code, pre {
+  font-family: "Cascadia Code", "Fira Code", "JetBrains Mono", "Source Code Pro",
+    "Consolas", monospace;
+}
+
+/* Wider content for readability */
+.book .book-body .page-wrapper .page-inner {
+  max-width: 900px;
+}
