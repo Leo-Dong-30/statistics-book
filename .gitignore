@@ -17,15 +17,8 @@ statistic-book.Rmd
 *.fdb_latexmk
 *.synctex.gz
 
-# Bookdown intermediate files
-_bookdown_files/
+# Quarto PDF intermediate files
 statistic-book_files/
-statistic-book.aux
-statistic-book.toc
-statistic-book.log
-statistic-book.out
-statistic-book.fls
-statistic-book.fdb_latexmk
 
 /.quarto/
 **/*.quarto_ipynb

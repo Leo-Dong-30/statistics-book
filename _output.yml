@@ -1,8 +1,0 @@
-bookdown::pdf_book:
-  includes:
-    in_header: preamble.tex      # 插入LaTeX宏包
-  latex_engine: xelatex          # 支持中文
-  citation_package: natbib
-  keep_tex: true
-bookdown::gitbook:
-  css: style.css                 # HTML样式（可选）
