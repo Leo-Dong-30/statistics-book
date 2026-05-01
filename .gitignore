@@ -6,7 +6,11 @@
 # Quarto output
 _book/
 _site/
-statistic-book.Rmd
+
+# Legacy bookdown output
+docs/
+_bookdown_files/
+statistic-book_files/
 
 # LaTeX build artifacts
 *.aux
@@ -16,9 +20,6 @@ statistic-book.Rmd
 *.fls
 *.fdb_latexmk
 *.synctex.gz
-
-# Quarto PDF intermediate files
-statistic-book_files/
 
 /.quarto/
 **/*.quarto_ipynb
