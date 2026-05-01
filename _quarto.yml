@@ -2,10 +2,13 @@ project:
   type: book
 
 book:
-  title: "统计学：从概率论到深度学习"
+  title: "乱中寻序：统计学的统一逻辑"
   author: "穿行冷风"
   date: today
   language: zh
+  sidebar:
+    style: "docked"
+    collapse-level: 1
   chapters:
     - index.Rmd
     - part: "Part I: 概率论基础"

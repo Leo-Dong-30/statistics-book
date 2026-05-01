@@ -256,7 +256,17 @@ $$
 \frac{\partial l(\theta;x)}{\partial \theta_i}=0,i=1,2,...,k
 $$
 
-> 从信息论视角看，MLE 等价于最小化经验分布与模型分布之间的 KL 散度——你是在用数据"压缩"对真实分布的无知。这一点在 Ch01 §分布之间的距离中做了完整的推导。
+### MLE 的信息论解释
+
+Ch01 定义了 KL 散度 $D_{KL}(P \parallel Q)$ = 用 $Q$ 近似 $P$ 时额外浪费的信息量。设经验分布为 $\hat{P}_n$（在每个观测值上赋予质量 $1/n$），模型分布为 $P_\theta$，则：
+
+$$\arg\min_\theta D_{KL}(\hat{P}_n \parallel P_\theta) = \arg\min_\theta \left[-\frac{1}{n}\sum_i \log p_\theta(x_i) - H(\hat{P}_n)\right] = \arg\max_\theta \sum_i \log p_\theta(x_i)$$
+
+$H(\hat{P}_n)$ 不依赖于 $\theta$，因此**最小化 KL 散度 = 最大化对数似然**。换言之：
+
+> **MLE 在寻找那个与数据分布"信息损失最小"的参数。** 你不是在"猜"参数，而是在"压缩"经验分布——用参数化模型 $P_\theta$ 替代原始频率表 $\hat{P}_n$，并最小化压缩过程中的信息损失。
+
+这一视角将 Ch06 的 MLE、Ch08 的贝叶斯推断（后验模态 = MAP）、Ch18 的交叉熵损失、Ch20 的 SGD 训练统一在同一个信息论框架下。
 
 ### MLE的性质
 
@@ -272,10 +282,11 @@ MLE通常具有渐近正态性。
 
 **速查卡片**：
 
-- **核心问题**：如何用样本数据估计未知参数？怎样的估计是"好"的？
-- **关键概念**：无偏性 → 有效性 → 相合性 → 渐近正态性 → 矩估计 → 最大似然估计（MLE） → Fisher信息量与C-R下界 → 充分性原则 → UMVUE
-- **R命令**：`fitdistrplus::fitdist()`, `MASS::fitdistr()`, `optim()` 自定义似然函数
-- **参见**：Ch05（充分统计量）, Ch07（假设检验）, Ch08（贝叶斯估计）
+- **核心问题**：给定数据，真实参数 $\theta$ 最可能是什么？
+- **两大方法**：矩估计（简单直观但非最优）→ MLE（渐近最优，等价于最小化 KL 散度）
+- **核心理论**：C-R 下界（无偏估计方差的下限）→ Fisher 信息量（数据携带的"关于 $\theta$ 的信息"）→ 渐近正态性（$\sqrt{n}(\hat{\theta} - \theta) \xrightarrow{d} N(0, I^{-1}(\theta))$）
+- **R 命令**：`fitdistrplus::fitdist()`, `MASS::fitdistr()`, `bbmle::mle2()`
+- **参见**：Ch01（KL 散度）, Ch07（似然比检验）, Ch08（贝叶斯后验）, Ch15（Newton-Raphson 求解 MLE）
 
 
 

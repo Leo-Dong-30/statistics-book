@@ -304,6 +304,8 @@ $$
 
 其中$\mathbf{H} = \mathbf{X}(\mathbf{X}'\mathbf{X})^{-1}\mathbf{X}'$称为帽子矩阵（hat matrix），它将观测值$\mathbf{y}$投影到$\mathbf{X}$的列空间上。$\mathbf{H}$是对称幂等矩阵，满足$\mathbf{H}^2 = \mathbf{H}$。
 
+> **投影几何直觉**：OLS 的本质是一个几何操作。设计矩阵 $\mathbf{X}$ 的 $p$ 个列张成一个 $p$ 维子空间 $\mathcal{C}(\mathbf{X})$（$\mathbb{R}^n$ 中的"平面"）。OLS 做的事就是：把观测向量 $\mathbf{y}$ **正交投影**到 $\mathcal{C}(\mathbf{X})$ 上，投影点 $\hat{\mathbf{y}} = \mathbf{H}\mathbf{y}$ 是这个子空间中离 $\mathbf{y}$ 欧氏距离最近的点。残差 $\mathbf{e} = (\mathbf{I} - \mathbf{H})\mathbf{y}$ 垂直于 $\mathcal{C}(\mathbf{X})$——这恰是正规方程 $\mathbf{X}'(\mathbf{y} - \mathbf{X}\hat{\boldsymbol{\beta}}) = \mathbf{0}$ 的几何含义：残差与每一个列向量正交。$\hat{\boldsymbol{\beta}}$ 就是投影点在基底 $\mathbf{X}$ 下的坐标。一句话：**OLS = 找列空间中最逼近 $\mathbf{y}$ 的点，然后读出它在 $\mathbf{X}$ 各列方向上的坐标。** 这个几何图景统一了从一元回归到高维线性模型的所有 OLS 性质——$R^2$ 是投影长度平方与 $\mathbf{y}$ 长度平方之比，VIF 度量的是列之间夹角的尖锐程度，多重共线性意味着 $\mathbf{X}$ 的列几乎落在同一个低维子空间中（$\mathbf{X}'\mathbf{X}$ 接近奇异）。
+
 ### OLS估计的统计性质
 
 在高斯-马尔可夫假设下：
@@ -323,6 +325,8 @@ $$
 **3、高斯-马尔可夫定理**
 
 $\hat{\boldsymbol{\beta}}$是$\boldsymbol{\beta}$的最佳线性无偏估计（BLUE）：对任意$p$维向量$\mathbf{c}$，在所有线性无偏估计中，$\mathbf{c}'\hat{\boldsymbol{\beta}}$具有最小方差。
+
+> **高斯-马尔可夫定理的哲学含义**：BLUE 不依赖正态性——只要线性、独立、同方差、零均值四个条件成立，OLS 就在所有线性无偏估计中方差最小。这意味着 OLS 的优良性有一个**非参数的内核**：你不需要假设误差服从任何特定分布，就能获得"线性无偏类中最优"的保证。但"线性无偏"本身是一个受限的搜索空间——如果我们愿意放弃无偏性（接受有偏估计，如岭回归、Lasso），或者放弃线性性（用非线性方法，如树模型、神经网络），就可能在 MSE 意义上超越 OLS。这正是 Ch17 偏差-方差权衡在回归中的预演：**BLUE 是线性无偏世界里的最优解，但线性无偏世界不是唯一的世界。**
 
 **4、误差方差的无偏估计**
 
