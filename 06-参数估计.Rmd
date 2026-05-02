@@ -286,7 +286,6 @@ MLE通常具有渐近正态性。
 - **两大方法**：矩估计（简单直观但非最优）→ MLE（渐近最优，等价于最小化 KL 散度）
 - **核心理论**：C-R 下界（无偏估计方差的下限）→ Fisher 信息量（数据携带的"关于 $\theta$ 的信息"）→ 渐近正态性（$\sqrt{n}(\hat{\theta} - \theta) \xrightarrow{d} N(0, I^{-1}(\theta))$）
 - **R 命令**：`fitdistrplus::fitdist()`, `MASS::fitdistr()`, `bbmle::mle2()`
-- **参见**：Ch01（KL 散度）, Ch07（似然比检验）, Ch08（贝叶斯后验）, Ch15（Newton-Raphson 求解 MLE）
 
 
 

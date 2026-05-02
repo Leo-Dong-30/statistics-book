@@ -188,4 +188,3 @@ LDA 找到的判别方向恰好是 $\boldsymbol{\Sigma}^{-1} (\boldsymbol{\mu}_1
 - **三大任务**：降维（PCA/因子分析）、分组（聚类/判别分析）、相关结构建模
 - **关键方法**：PCA = SVD + 方差最大化；LDA = 最大化类间/类内方差比
 - **R命令**：`prcomp()`, `factanal()`, `kmeans()`, `hclust()`, `lda()` (MASS)
-- **参见**：Ch02（多元正态分布）, Ch16（SVD）, Ch17（无监督学习）

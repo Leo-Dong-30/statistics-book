@@ -455,4 +455,3 @@ summary(bmod, dispersion = phi)
 - **核心问题**：当响应变量不是连续正态变量时，如何建立回归模型？
 - **关键概念**：指数分散族（EDF） → 连接函数与典型连接 → IRLS算法 → 偏差统计量与偏差之差 → Pearson残差与偏差残差 → Logit/Probit/Cloglog连接 → 过度分散与准似然
 - **R命令**：`glm()`, `family = binomial() / poisson() / Gamma()`, `MASS::glm.nb()`, `faraway::troutegg` (示例)
-- **参见**：Ch10（线性回归基础）, Ch06（MLE）, Ch18（二分类方法）

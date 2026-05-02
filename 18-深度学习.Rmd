@@ -173,4 +173,3 @@ model %>% compile(
 - **关键概念**：激活函数（ReLU）、反向传播、Dropout、批归一化、注意力机制
 - **与统计的联系**：损失函数=负对数似然，正则化=先验，Dropout=集成
 - **R命令**：`keras::keras_model_sequential()`, `torch::nn_module()` (R torch)
-- **参见**：Ch08（贝叶斯）, Ch15（优化方法）, Ch19（集成学习）

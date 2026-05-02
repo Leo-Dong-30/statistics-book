@@ -182,4 +182,3 @@ $$Q(\beta) = (y - X\beta)' L L' (y - X\beta) = (\tilde{y} - \tilde{X}\beta)' (\t
 - **三大分解**：SVD（万能，PCA/图像压缩/推荐系统）→ QR（OLS 求解，避免法方程病态）→ Cholesky（正定矩阵最快分解，GLS/WLS/岭回归）
 - **核心思想**：每种分解都是一次坐标变换——将原始数据旋转到"信息最集中"的方向上
 - **R 命令**：`svd()`, `qr()`, `chol()`, `eigen()`, `solve()`
-- **参见**：Ch10（OLS 正规方程）, Ch11（IRLS）, Ch15（优化）, Ch21（PCA = SVD 的应用）

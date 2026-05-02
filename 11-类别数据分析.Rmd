@@ -214,4 +214,3 @@ $$
 - **核心问题**：如何量化、检验和建模类别变量之间的关联关系？
 - **关键概念**：列联表 → 卡方独立性检验/齐性检验 → 优势比（OR）→ Fisher 精确检验 → Mantel-Haenszel 分层检验（辛普森悖论）→ Ridit 检验 → 对数线性模型 → 累积 logit 模型
 - **R命令**：`chisq.test()`, `fisher.test()`, `mantelhaen.test()`, `glm(family = poisson)`, `MASS::polr()`
-- **参见**：Ch07（假设检验基础）, Ch11（GLM 框架）, Ch13（非参数统计——Ridit 的有序视角）

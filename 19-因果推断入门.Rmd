@@ -206,4 +206,3 @@ DiD 的核心假设是**平行趋势**（Parallel Trends）：如果没有处理
 - **关键概念**：反事实、混杂、中介、对撞、do-算子
 - **观察性研究方法**：匹配(PSM) → 加权(IPW) → 工具变量(IV) → 双重差分(DiD) → 断点回归(RD)
 - **R命令**：`MatchIt::matchit()`, `AER::ivreg()`, `rdrobust::rdrobust()`
-- **参见**：Ch07（假设检验）, Ch10（回归分析）, Ch11（GLM）

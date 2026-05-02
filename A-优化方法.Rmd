@@ -225,5 +225,4 @@ $$
 - **统计对应**：MLE 求解 → Newton-Raphson / Fisher Scoring；OLS → 正规方程 / 梯度下降；GLM → IRLS；深度学习 → SGD / Adam
 - **核心权衡**：收敛速度 vs 计算成本 vs 实现复杂度
 - **R 命令**：`nlm()`, `optim()`, `optimize()`
-- **参见**：Ch06（MLE）, Ch10（OLS）, Ch16（矩阵计算）, Ch20（深度学习）
 
