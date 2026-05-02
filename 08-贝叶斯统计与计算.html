@@ -1,0 +1,1465 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.37">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>贝叶斯统计与计算 – 乱中寻序：统计学的统一逻辑</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./09-回归分析.html" rel="next">
+<link href="./07-假设检验与方差分析.html" rel="prev">
+<script src="site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-7f8f88aac4f3542376d5c11b86a4c14d.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-b46385535caf84bc62f311a600ac5013.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body class="nav-sidebar docked quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./05-统计量与抽样分布.html">Part II: 经典统计推断</a></li><li class="breadcrumb-item"><a href="./08-贝叶斯统计与计算.html"><span class="chapter-title">贝叶斯统计与计算</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="./">乱中寻序：统计学的统一逻辑</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">乱中寻序：统计学的统一逻辑</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false">
+ <span class="menu-text">Part I: 概率论基础</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./01-概率初步与随机变量的分布.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">概率初步与随机变量的分布</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./02-多维随机变量及其分布.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">多维随机变量及其分布</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./03-大数定律和中心极限定理.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">大数定律和中心极限定理</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./04-概率不等式与收敛性.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">概率不等式与收敛性</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part II: 经典统计推断</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./05-统计量与抽样分布.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">统计量与抽样分布</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./06-参数估计.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">参数估计</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./07-假设检验与方差分析.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">假设检验与方差分析</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./08-贝叶斯统计与计算.html" class="sidebar-item-text sidebar-link active"><span class="chapter-title">贝叶斯统计与计算</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false">
+ <span class="menu-text">Part III: 现代统计方法</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./09-回归分析.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">回归分析</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./10-广义线性模型.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">广义线性回归</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./11-类别数据分析.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">类别数据分析</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./12-非参数统计.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">非参数统计</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./13-时间序列分析.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">时间序列分析</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./14-多元统计分析.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">多元统计分析</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false">
+ <span class="menu-text">Part IV: 机器学习</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./15-机器学习基础.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">机器学习基础</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./16-经典分类方法.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">经典分类方法</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./17-集成学习与模型选择.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">集成学习与模型选择</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./18-深度学习.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">深度学习</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./19-因果推断入门.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">因果推断入门</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="false">
+ <span class="menu-text">附录：统计计算工具</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./A-优化方法.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">优化方法</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./B-矩阵计算与数值方法.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">矩阵计算与数值方法</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#贝叶斯范式" id="toc-贝叶斯范式" class="nav-link active" data-scroll-target="#贝叶斯范式">贝叶斯范式</a>
+  <ul class="collapse">
+  <li><a href="#频率学派-vs-贝叶斯学派" id="toc-频率学派-vs-贝叶斯学派" class="nav-link" data-scroll-target="#频率学派-vs-贝叶斯学派">频率学派 vs 贝叶斯学派</a></li>
+  <li><a href="#贝叶斯定理回顾" id="toc-贝叶斯定理回顾" class="nav-link" data-scroll-target="#贝叶斯定理回顾">贝叶斯定理回顾</a></li>
+  <li><a href="#贝叶斯更新学习的形式化" id="toc-贝叶斯更新学习的形式化" class="nav-link" data-scroll-target="#贝叶斯更新学习的形式化">贝叶斯更新：学习的形式化</a></li>
+  </ul></li>
+  <li><a href="#先验分布的选择" id="toc-先验分布的选择" class="nav-link" data-scroll-target="#先验分布的选择">先验分布的选择</a>
+  <ul class="collapse">
+  <li><a href="#共轭先验" id="toc-共轭先验" class="nav-link" data-scroll-target="#共轭先验">共轭先验</a></li>
+  <li><a href="#无信息先验" id="toc-无信息先验" class="nav-link" data-scroll-target="#无信息先验">无信息先验</a></li>
+  <li><a href="#层次先验" id="toc-层次先验" class="nav-link" data-scroll-target="#层次先验">层次先验</a></li>
+  </ul></li>
+  <li><a href="#贝叶斯推断" id="toc-贝叶斯推断" class="nav-link" data-scroll-target="#贝叶斯推断">贝叶斯推断</a>
+  <ul class="collapse">
+  <li><a href="#点估计" id="toc-点估计" class="nav-link" data-scroll-target="#点估计">点估计</a></li>
+  <li><a href="#区间估计可信区间" id="toc-区间估计可信区间" class="nav-link" data-scroll-target="#区间估计可信区间">区间估计：可信区间</a></li>
+  <li><a href="#假设检验贝叶斯因子" id="toc-假设检验贝叶斯因子" class="nav-link" data-scroll-target="#假设检验贝叶斯因子">假设检验：贝叶斯因子</a></li>
+  </ul></li>
+  <li><a href="#贝叶斯预测" id="toc-贝叶斯预测" class="nav-link" data-scroll-target="#贝叶斯预测">贝叶斯预测</a></li>
+  <li><a href="#贝叶斯统计的优缺点" id="toc-贝叶斯统计的优缺点" class="nav-link" data-scroll-target="#贝叶斯统计的优缺点">贝叶斯统计的优缺点</a></li>
+  <li><a href="#贝叶斯计算当后验没有解析解" id="toc-贝叶斯计算当后验没有解析解" class="nav-link" data-scroll-target="#贝叶斯计算当后验没有解析解">贝叶斯计算：当后验没有解析解</a>
+  <ul class="collapse">
+  <li><a href="#高斯近似" id="toc-高斯近似" class="nav-link" data-scroll-target="#高斯近似">高斯近似</a></li>
+  <li><a href="#蒙特卡洛方法" id="toc-蒙特卡洛方法" class="nav-link" data-scroll-target="#蒙特卡洛方法">蒙特卡洛方法</a></li>
+  <li><a href="#马尔科夫链蒙特卡洛mcmc" id="toc-马尔科夫链蒙特卡洛mcmc" class="nav-link" data-scroll-target="#马尔科夫链蒙特卡洛mcmc">马尔科夫链蒙特卡洛（MCMC）</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./05-统计量与抽样分布.html">Part II: 经典统计推断</a></li><li class="breadcrumb-item"><a href="./08-贝叶斯统计与计算.html"><span class="chapter-title">贝叶斯统计与计算</span></a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title"><span class="chapter-title">贝叶斯统计与计算</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<blockquote class="blockquote">
+<p>频率学派问：“如果参数固定，数据出现的概率是多少？”贝叶斯学派问：“给定数据，参数取某个值的信念应该多少？”两个问题看似对称，却通向截然不同的统计哲学。本章以前半部分铺设理论地基，后半部分建造计算引擎——两者合一，才是完整的贝叶斯工具箱。</p>
+</blockquote>
+<section id="贝叶斯范式" class="level2">
+<h2 class="anchored" data-anchor-id="贝叶斯范式">贝叶斯范式</h2>
+<section id="频率学派-vs-贝叶斯学派" class="level3">
+<h3 class="anchored" data-anchor-id="频率学派-vs-贝叶斯学派">频率学派 vs 贝叶斯学派</h3>
+<p>前面几章（Ch05-07）介绍的参数估计和假设检验，本质上属于<strong>频率学派</strong>（Frequentist）的框架。在频率学派看来：</p>
+<ul>
+<li>参数 <span class="math inline">\(\theta\)</span> 是固定的、未知的常数。</li>
+<li>数据是随机的，来自 <span class="math inline">\(P(X \mid \theta)\)</span>。</li>
+<li>推断基于<strong>重复抽样</strong>的性质：无偏性、相合性、显著性水平等。</li>
+</ul>
+<p><strong>贝叶斯学派</strong>（Bayesian）则采取了完全不同的立场：</p>
+<ul>
+<li>参数 <span class="math inline">\(\theta\)</span> 本身也是<strong>随机的</strong>——它服从一个先验分布 <span class="math inline">\(P(\theta)\)</span>。</li>
+<li>数据一旦被观测到，就是固定的。</li>
+<li>推断基于<strong>给定数据下参数的条件分布</strong> <span class="math inline">\(P(\theta \mid \text{data})\)</span>，即后验分布。</li>
+</ul>
+<p>这两种范式的差异，根源在于对”概率是什么”这一元问题的不同回答。频率学派认为概率是长期频率的极限；贝叶斯学派则认为概率是信念（或知识状态）的量化。</p>
+</section>
+<section id="贝叶斯定理回顾" class="level3">
+<h3 class="anchored" data-anchor-id="贝叶斯定理回顾">贝叶斯定理回顾</h3>
+<p>贝叶斯定理在 Ch01 中已经出现。将其应用于统计推断：</p>
+<p><span class="math display">\[p(\theta \mid x) = \frac{p(x \mid \theta) \, p(\theta)}{p(x)} = \frac{p(x \mid \theta) \, p(\theta)}{\int p(x \mid \theta) \, p(\theta) \, d\theta}\]</span></p>
+<p>其中：</p>
+<ul>
+<li><span class="math inline">\(p(\theta)\)</span>：<strong>先验分布</strong>——在观测数据之前对 <span class="math inline">\(\theta\)</span> 的信念。</li>
+<li><span class="math inline">\(p(x \mid \theta)\)</span>：<strong>似然函数</strong>——在参数 <span class="math inline">\(\theta\)</span> 下观测到数据 <span class="math inline">\(x\)</span> 的概率。</li>
+<li><span class="math inline">\(p(\theta \mid x)\)</span>：<strong>后验分布</strong>——在观测数据之后对 <span class="math inline">\(\theta\)</span> 的更新信念。</li>
+<li><span class="math inline">\(p(x)\)</span>：<strong>边际似然</strong>（或证据）——归一化常数，确保后验是合法的概率分布。</li>
+</ul>
+<p>由于 <span class="math inline">\(p(x)\)</span> 不依赖于 <span class="math inline">\(\theta\)</span>，后验分布常常写为比例形式：</p>
+<p><span class="math display">\[p(\theta \mid x) \propto p(x \mid \theta) \, p(\theta)\]</span></p>
+<blockquote class="blockquote">
+<p>后验 ∝ 似然 × 先验。这就是贝叶斯学习的核心公式。</p>
+</blockquote>
+</section>
+<section id="贝叶斯更新学习的形式化" class="level3">
+<h3 class="anchored" data-anchor-id="贝叶斯更新学习的形式化">贝叶斯更新：学习的形式化</h3>
+<p>贝叶斯定理给出了一个精确的”学习”模型：</p>
+<p><span class="math display">\[P(\theta \mid \text{新数据}) \propto P(\text{新数据} \mid \theta) \cdot P(\theta)\]</span></p>
+<p>其中 <span class="math inline">\(P(\theta)\)</span> 是你在看到新数据之前的信念（先验）。关键递归：<strong>今天的后验 = 明天的先验</strong>。当你看到第二批数据时，昨天的后验自动成为今天的先验，贝叶斯更新不需要区分”旧数据”和”新数据”——它天然支持增量学习。</p>
+<blockquote class="blockquote">
+<p>频率学派问：“如果参数固定，这批数据出现的概率是多少？”贝叶斯学派问：“给定这批数据，我对参数的信念应该更新为多少？”前者是<strong>数据的概率</strong>，后者是<strong>信念的修正</strong>。两派的核心分歧，在于”概率”本身被视为客观频率还是主观信念。但无论你站在哪边，<strong>贝叶斯更新作为信息处理的数学模型，其优雅性无可争议</strong>。</p>
+</blockquote>
+</section>
+</section>
+<section id="先验分布的选择" class="level2">
+<h2 class="anchored" data-anchor-id="先验分布的选择">先验分布的选择</h2>
+<section id="共轭先验" class="level3">
+<h3 class="anchored" data-anchor-id="共轭先验">共轭先验</h3>
+<p>如果先验分布与后验分布属于同一分布族，则称该先验为<strong>共轭先验</strong>（Conjugate Prior）。共轭先验大大简化了后验的计算——观测者只需更新分布参数，无需重新推导整个后验形式。</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>似然（数据分布）</th>
+<th>参数</th>
+<th>共轭先验</th>
+<th>后验</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>二项 <span class="math inline">\(B(n, \theta)\)</span></td>
+<td><span class="math inline">\(\theta\)</span></td>
+<td>Beta<span class="math inline">\((\alpha, \beta)\)</span></td>
+<td>Beta<span class="math inline">\((\alpha + x, \beta + n - x)\)</span></td>
+</tr>
+<tr class="even">
+<td>泊松 <span class="math inline">\(P(\lambda)\)</span></td>
+<td><span class="math inline">\(\lambda\)</span></td>
+<td>Gamma<span class="math inline">\((\alpha, \beta)\)</span></td>
+<td>Gamma<span class="math inline">\((\alpha + \sum x_i, \beta + n)\)</span></td>
+</tr>
+<tr class="odd">
+<td>正态（均值，方差已知）</td>
+<td><span class="math inline">\(\mu\)</span></td>
+<td>Normal<span class="math inline">\((\mu_0, \tau_0^2)\)</span></td>
+<td>Normal（加权平均）</td>
+</tr>
+<tr class="even">
+<td>正态（方差，均值已知）</td>
+<td><span class="math inline">\(\sigma^2\)</span></td>
+<td>Inv-Gamma<span class="math inline">\((\alpha, \beta)\)</span></td>
+<td>Inv-Gamma（更新参数）</td>
+</tr>
+<tr class="odd">
+<td>多项分布</td>
+<td><span class="math inline">\(\mathbf{p}\)</span></td>
+<td>Dirichlet<span class="math inline">\((\boldsymbol{\alpha})\)</span></td>
+<td>Dirichlet<span class="math inline">\((\boldsymbol{\alpha} + \mathbf{n})\)</span></td>
+</tr>
+</tbody>
+</table>
+<p><strong>例子</strong>：硬币的公平性</p>
+<p>设抛一枚硬币 <span class="math inline">\(n = 20\)</span> 次，观察到 <span class="math inline">\(x = 13\)</span> 次正面。设先验为 <span class="math inline">\(\theta \sim \text{Beta}(2, 2)\)</span>（相当于事先”看过”2 正 2 反）。</p>
+<p>后验：<span class="math inline">\(\theta \mid x \sim \text{Beta}(2 + 13, 2 + 7) = \text{Beta}(15, 9)\)</span></p>
+<p>后验均值：<span class="math inline">\(E[\theta \mid x] = \frac{15}{15+9} = 0.625\)</span>。而 MLE 为 <span class="math inline">\(\hat{\theta} = 13/20 = 0.65\)</span>。先验的”收缩”效应将后验均值拉向先验均值 <span class="math inline">\(0.5\)</span>。</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="dv">20</span>; x <span class="ot">&lt;-</span> <span class="dv">13</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>alpha_prior <span class="ot">&lt;-</span> <span class="dv">2</span>; beta_prior <span class="ot">&lt;-</span> <span class="dv">2</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>alpha_post <span class="ot">&lt;-</span> alpha_prior <span class="sc">+</span> x; beta_post <span class="ot">&lt;-</span> beta_prior <span class="sc">+</span> n <span class="sc">-</span> x</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>theta <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">1</span>, <span class="at">length.out =</span> <span class="dv">200</span>)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(theta, <span class="fu">dbeta</span>(theta, alpha_post, beta_post), <span class="at">type =</span> <span class="st">"l"</span>, <span class="at">lwd =</span> <span class="dv">2</span>,</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>     <span class="at">xlab =</span> <span class="fu">expression</span>(theta), <span class="at">ylab =</span> <span class="st">"密度"</span>, <span class="at">main =</span> <span class="st">"先验、似然与后验"</span>)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="fu">lines</span>(theta, <span class="fu">dbeta</span>(theta, alpha_prior, beta_prior), <span class="at">lty =</span> <span class="dv">2</span>, <span class="at">col =</span> <span class="st">"blue"</span>)</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="fu">lines</span>(theta, <span class="fu">dbeta</span>(theta, x <span class="sc">+</span> <span class="dv">1</span>, n <span class="sc">-</span> x <span class="sc">+</span> <span class="dv">1</span>), <span class="at">lty =</span> <span class="dv">3</span>, <span class="at">col =</span> <span class="st">"red"</span>)</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="fu">legend</span>(<span class="st">"topright"</span>, <span class="fu">c</span>(<span class="st">"后验"</span>, <span class="st">"先验 Beta(2,2)"</span>, <span class="st">"似然"</span>), <span class="at">lty =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>, <span class="at">col =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="st">"blue"</span>, <span class="st">"red"</span>))</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="fu">abline</span>(<span class="at">v =</span> alpha_post <span class="sc">/</span> (alpha_post <span class="sc">+</span> beta_post), <span class="at">lty =</span> <span class="dv">4</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="08-贝叶斯统计与计算_files/figure-html/unnamed-chunk-1-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="无信息先验" class="level3">
+<h3 class="anchored" data-anchor-id="无信息先验">无信息先验</h3>
+<p>当我们缺乏先验知识时，可以使用<strong>无信息先验</strong>（Non-informative Prior），让数据”自己说话”。常见的无信息先验包括：</p>
+<ul>
+<li><strong>Laplace 先验</strong>（均匀分布）：<span class="math inline">\(p(\theta) \propto 1\)</span>。适用于参数空间有界的情况。</li>
+<li><strong>Jeffreys 先验</strong>：<span class="math inline">\(p(\theta) \propto \sqrt{I(\theta)}\)</span>，其中 <span class="math inline">\(I(\theta)\)</span> 为 Fisher 信息量。Jeffreys 先验在一对一变换下保持不变，具有良好的理论性质。</li>
+<li><strong>位置参数的均匀先验</strong>：<span class="math inline">\(p(\mu) \propto 1\)</span>。</li>
+<li><strong>尺度参数的倒数先验</strong>：<span class="math inline">\(p(\sigma) \propto 1/\sigma\)</span>。</li>
+</ul>
+<blockquote class="blockquote">
+<p>注意：无信息先验可能是<strong>非正常</strong>（improper）的——即积分不为 1。但只要后验是正常的，就不会出问题。</p>
+</blockquote>
+</section>
+<section id="层次先验" class="level3">
+<h3 class="anchored" data-anchor-id="层次先验">层次先验</h3>
+<p>当先验本身含有未知参数时，可以对这些超参数再设定先验，形成<strong>层次模型</strong>（Hierarchical Model）：</p>
+<p><span class="math display">\[p(\theta, \phi \mid x) \propto p(x \mid \theta) \, p(\theta \mid \phi) \, p(\phi)\]</span></p>
+<p>层次模型自然地处理了”不同组的参数之间存在相似性”的问题，在随机效应模型、多臂老虎机问题、贝叶斯优化等场景中应用广泛。</p>
+</section>
+</section>
+<section id="贝叶斯推断" class="level2">
+<h2 class="anchored" data-anchor-id="贝叶斯推断">贝叶斯推断</h2>
+<section id="点估计" class="level3">
+<h3 class="anchored" data-anchor-id="点估计">点估计</h3>
+<p>后验分布是一个完整的分布，而不是一个单点。但如果需要点估计，常用的选择是：</p>
+<ul>
+<li><strong>后验均值</strong>：<span class="math inline">\(\hat{\theta}_{\text{mean}} = E[\theta \mid x]\)</span>——最小化平方损失下的最优估计。</li>
+<li><strong>后验中位数</strong>：<span class="math inline">\(\hat{\theta}_{\text{med}}\)</span>——最小化绝对损失下的最优估计。</li>
+<li><strong>最大后验估计（MAP）</strong>：<span class="math inline">\(\hat{\theta}_{\text{MAP}} = \arg\max_\theta p(\theta \mid x)\)</span>——最大化后验密度。</li>
+</ul>
+<p>MAP 估计与 MLE 的关系：由于 <span class="math inline">\(p(\theta \mid x) \propto p(x \mid \theta) p(\theta)\)</span>，有</p>
+<p><span class="math display">\[\log p(\theta \mid x) = \log p(x \mid \theta) + \log p(\theta) + \text{const}\]</span></p>
+<p>因此，MAP 等价于在似然函数上加了一个来自先验的<strong>正则化项</strong>。这是连接频率学派与贝叶斯学派的重要桥梁——Ch06 提到的”用偏差换方差”在 MAP 估计中体现为”用先验收缩换取稳定性”。</p>
+</section>
+<section id="区间估计可信区间" class="level3">
+<h3 class="anchored" data-anchor-id="区间估计可信区间">区间估计：可信区间</h3>
+<p>贝叶斯的区间估计是<strong>可信区间</strong>（Credible Interval），与频率学派的置信区间有本质区别：</p>
+<ul>
+<li><strong>置信区间</strong>：<span class="math inline">\(P(\text{区间包含} \, \theta) = 0.95\)</span>——这个概率是对”区间”的随机性而言的（重复抽样下 95% 的置信区间包含 <span class="math inline">\(\theta\)</span>）。</li>
+<li><strong>可信区间</strong>：<span class="math inline">\(P(\theta \in \text{区间} \mid \text{data}) = 0.95\)</span>——这个概率直接是对”参数”的信念而言的（给定数据，<span class="math inline">\(\theta\)</span> 有 95% 的概率落在该区间内）。</li>
+</ul>
+<p>贝叶斯可以直接说：“我有 95% 的把握认为参数在 <span class="math inline">\([a, b]\)</span> 之间。”频率学派则不能说这句话——这是两种范式最直观的差异。</p>
+<p>常用的可信区间： - <strong>等尾可信区间</strong>：取后验的 <span class="math inline">\(\alpha/2\)</span> 和 <span class="math inline">\(1-\alpha/2\)</span> 分位数。 - <strong>最高后验密度（HPD）区间</strong>：在给定概率下，取后验密度最高的区域。HPD 区间是最短的可信区间。</p>
+</section>
+<section id="假设检验贝叶斯因子" class="level3">
+<h3 class="anchored" data-anchor-id="假设检验贝叶斯因子">假设检验：贝叶斯因子</h3>
+<p>贝叶斯假设检验不是通过 <span class="math inline">\(p\)</span> 值，而是通过比较两个模型的<strong>后验概率比</strong>来进行：</p>
+<p><span class="math display">\[\frac{P(H_1 \mid x)}{P(H_0 \mid x)} = \frac{P(x \mid H_1)}{P(x \mid H_0)} \cdot \frac{P(H_1)}{P(H_0)}\]</span></p>
+<p>其中，<span class="math inline">\(BF_{10} = \frac{P(x \mid H_1)}{P(x \mid H_0)} = \frac{\int p(x \mid \theta_1) p(\theta_1) d\theta_1}{\int p(x \mid \theta_0) p(\theta_0) d\theta_0}\)</span> 称为<strong>贝叶斯因子</strong>（Bayes Factor）。</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th><span class="math inline">\(\log_{10} BF_{10}\)</span></th>
+<th><span class="math inline">\(BF_{10}\)</span></th>
+<th>证据强度</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><span class="math inline">\(&lt; 0\)</span></td>
+<td><span class="math inline">\(&lt; 1\)</span></td>
+<td>支持 <span class="math inline">\(H_0\)</span></td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(0\)</span> — <span class="math inline">\(0.5\)</span></td>
+<td><span class="math inline">\(1\)</span> — <span class="math inline">\(3.2\)</span></td>
+<td>弱</td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(0.5\)</span> — <span class="math inline">\(1\)</span></td>
+<td><span class="math inline">\(3.2\)</span> — <span class="math inline">\(10\)</span></td>
+<td>中等</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(1\)</span> — <span class="math inline">\(2\)</span></td>
+<td><span class="math inline">\(10\)</span> — <span class="math inline">\(100\)</span></td>
+<td>强</td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(&gt; 2\)</span></td>
+<td><span class="math inline">\(&gt; 100\)</span></td>
+<td>决定性</td>
+</tr>
+</tbody>
+</table>
+<blockquote class="blockquote">
+<p>贝叶斯因子自动”惩罚”模型复杂度——复杂模型的先验预测分布更分散（它”预期”了更多种可能的数据），因此需要更强的数据支持才能获得大的贝叶斯因子。这体现了<strong>奥卡姆剃刀</strong>原则：如无必要，勿增实体。</p>
+<p>这一自动惩罚机制在信息论上对应的是：复杂模型需要更多的信息（更极端的证据）来证明自己的”必要性”。如果你的数据只是稍微偏离简单模型的预测，贝叶斯因子会判断这是抽样误差而非真实效应——从而保护你不被噪声诱惑去选择不必要的复杂模型。</p>
+</blockquote>
+</section>
+</section>
+<section id="贝叶斯预测" class="level2">
+<h2 class="anchored" data-anchor-id="贝叶斯预测">贝叶斯预测</h2>
+<p>贝叶斯方法自然地提供了预测分布。给定观测数据 <span class="math inline">\(x\)</span>，新观测 <span class="math inline">\(x^*\)</span> 的预测分布为：</p>
+<p><span class="math display">\[p(x^* \mid x) = \int p(x^* \mid \theta) \, p(\theta \mid x) \, d\theta\]</span></p>
+<p>这被称为<strong>后验预测分布</strong>（Posterior Predictive Distribution）。它<strong>不是</strong>用一个点估计 <span class="math inline">\(\hat{\theta}\)</span> 代入 <span class="math inline">\(p(x^* \mid \hat{\theta})\)</span>，而是<strong>对参数的不确定性做积分平均</strong>。这一区别意味着贝叶斯预测自然地包含了参数不确定性，通常比基于点估计的预测更稳健。</p>
+</section>
+<section id="贝叶斯统计的优缺点" class="level2">
+<h2 class="anchored" data-anchor-id="贝叶斯统计的优缺点">贝叶斯统计的优缺点</h2>
+<p><strong>优点</strong>： 1. 推断解释直觉自然（“参数有 95% 概率落在区间内”）。 2. 自然地融入先验知识。 3. 自动的正则化——先验防止过拟合。 4. 预测分布自然地包含了参数不确定性。 5. 在小样本下表现通常优于频率学派方法。</p>
+<p><strong>缺点</strong>： 1. 先验的选择可能主观，不同先验可能导致不同结论（敏感性分析是必要的）。 2. 计算复杂——后验往往没有解析形式，需要 MCMC 等数值方法。 3. 高维问题中的计算挑战。</p>
+<blockquote class="blockquote">
+<p><strong>所谓的真理，不过是不断修正的偏见。</strong> 先验是你的偏见——它来自于你已有的知识和经验。数据是修正力——它用客观证据不断打磨你的主观判断。贝叶斯统计不掩饰主观性，而是将它纳入形式化的框架：你明确写下你的偏见，然后用数据公开地修正它。</p>
+</blockquote>
+</section>
+<section id="贝叶斯计算当后验没有解析解" class="level2">
+<h2 class="anchored" data-anchor-id="贝叶斯计算当后验没有解析解">贝叶斯计算：当后验没有解析解</h2>
+<p>前面五节，观测者始终假设后验可以解析地写出——要么有共轭先验担保闭式，要么分布形式足够简单。但真实的统计建模远不总是如此。高维参数空间、非共轭先验、复杂的似然结构，都让后验 <span class="math inline">\(p(\theta \mid x)\)</span> 变成一个”写得出比例式但算不出归一化常数”的数学对象。</p>
+<p>观测者面临的核心挑战是：<strong>后验固定了（给定先验和数据），但无法直接求解它。</strong> 贝叶斯分析的本质工作——无论是点估计、区间估计还是预测——都归结为对后验分布做<strong>摘要</strong>（求期望、求分位数、求积分）。当闭式不存在时，观测者需要另一套武器：不是”推导”，而是”采样”。</p>
+<p>计算策略按近似精度与通用性递增排列：</p>
+<ul>
+<li><strong>高斯近似</strong>：用正态分布局部逼近后验峰——快速但有偏。</li>
+<li><strong>独立蒙特卡洛</strong>：从提议分布采样，用拒绝或加权修正——在低维有效。</li>
+<li><strong>MCMC</strong>：构造马尔可夫链使其平稳分布恰为目标后验——高维问题的通用解。</li>
+</ul>
+<section id="高斯近似" class="level3">
+<h3 class="anchored" data-anchor-id="高斯近似">高斯近似</h3>
+<p>当样本量足够大时，后验分布在 MAP 估计附近近似为正态分布。这就是<strong>贝叶斯中心极限定理</strong>：后验分布随样本量增大趋向于以 MAP 为中心、以 Fisher 信息量的逆为方差的正态分布。</p>
+<p><span class="math display">\[\theta \mid Y \sim \text{Normal}\left[\hat{\theta}_{\text{MAP}},\; I(\hat{\theta}_{\text{MAP}})^{-1}\right]\]</span></p>
+<p>其中 <span class="math inline">\(I_{jk} = -\frac{\partial^2}{\partial\theta_j\partial\theta_k} \log p(\theta \mid Y)\)</span> 是后验对数密度的负二阶导（观测信息矩阵）。</p>
+<p>这一近似的直觉来自 Ch06 的 MLE 渐近正态性：当 <span class="math inline">\(n\)</span> 很大时，先验的影响被似然碾压，后验的形状由似然函数在峰值处的曲率决定。优势在于计算极快——只需找到 MAP 点（数值优化一次）并计算该点的 Hessian 矩阵。代价是忽略了后验可能的多峰、厚尾或偏斜。</p>
+<p><strong>例</strong>：二项试验的胜率估计。一支队伍上赛季 38 场比赛赢了 30 场，观测者希望估计其真实胜率 <span class="math inline">\(\theta\)</span>。</p>
+<p>MLE 直接求解似然函数 <span class="math inline">\(L(\theta) = C_{38}^{30} \theta^{30} (1-\theta)^8\)</span>，导得 <span class="math inline">\(\hat{\theta}_{\text{MLE}} = 30/38 \approx 0.789\)</span>。当样本充足时没有问题。但如果赛季刚开始、只打了 5 场赢了 2 场呢？MLE 给出 <span class="math inline">\(0.4\)</span>，但观测者此前对这支队伍有了解——历史胜率约 50%。MAP 用 Beta 先验将这一外部知识注入：</p>
+<p>先验：<span class="math inline">\(\theta \sim \text{Beta}(10, 10)\)</span>（相当于事先”看过”10 胜 10 负，集中在 0.5 附近）</p>
+<p>后验：<span class="math inline">\(p(\theta \mid \text{data}) \propto \theta^{30}(1-\theta)^8 \cdot \theta^{9}(1-\theta)^{9} = \theta^{39}(1-\theta)^{17}\)</span></p>
+<p><span class="math display">\[\hat{\theta}_{\text{MAP}} = \frac{k + \alpha - 1}{n + \alpha + \beta - 2} = \frac{30 + 10 - 1}{38 + 10 + 10 - 2} = \frac{39}{56} \approx 0.696\]</span></p>
+<p>先验将估计从 MLE 的 0.789 拉回到 0.696——这就是先验的”收缩”效应。</p>
+<p><strong>例</strong>：设 <span class="math inline">\(Y \mid \theta \sim B(n, \theta)\)</span>，<span class="math inline">\(\theta \sim \text{Beta}(0.5, 0.5)\)</span>，求 <span class="math inline">\(p(\theta \mid Y)\)</span> 的高斯近似。</p>
+<p>后验：<span class="math inline">\(\theta \mid Y \sim \text{Beta}(Y + 1/2,\; n - Y + 1/2)\)</span>。令 <span class="math inline">\(A = Y - 0.5\)</span>，<span class="math inline">\(B = n - Y - 0.5\)</span>，则 MAP 估计 <span class="math inline">\(\hat{\theta} = A / (A + B)\)</span>，后验方差近似为 <span class="math inline">\(\left(\frac{A}{\hat{\theta}^2} + \frac{B}{(1-\hat{\theta})^2}\right)^{-1}\)</span>。</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>theta <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="fl">0.001</span>, <span class="fl">0.999</span>, .<span class="dv">001</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>Y <span class="ot">&lt;-</span> <span class="dv">30</span>; n <span class="ot">&lt;-</span> <span class="dv">100</span>  <span class="co"># 大样本下估计</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>A <span class="ot">&lt;-</span> Y <span class="sc">-</span> <span class="fl">0.5</span>; B <span class="ot">&lt;-</span> n <span class="sc">-</span> Y <span class="sc">-</span> <span class="fl">0.5</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>theta_MAP <span class="ot">&lt;-</span> A <span class="sc">/</span> (A <span class="sc">+</span> B)</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>Info <span class="ot">&lt;-</span> A <span class="sc">/</span> theta_MAP<span class="sc">^</span><span class="dv">2</span> <span class="sc">+</span> B <span class="sc">/</span> (<span class="dv">1</span> <span class="sc">-</span> theta_MAP)<span class="sc">^</span><span class="dv">2</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="co"># 精确后验与高斯近似对比</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>post1 <span class="ot">&lt;-</span> <span class="fu">dbinom</span>(Y, n, theta) <span class="sc">*</span> <span class="fu">dbeta</span>(theta, <span class="fl">0.5</span>, <span class="fl">0.5</span>)</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>post1 <span class="ot">&lt;-</span> post1 <span class="sc">/</span> <span class="fu">sum</span>(post1)</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>post2 <span class="ot">&lt;-</span> <span class="fu">dnorm</span>(theta, theta_MAP, <span class="fu">sqrt</span>(<span class="dv">1</span> <span class="sc">/</span> Info))</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>post2 <span class="ot">&lt;-</span> post2 <span class="sc">/</span> <span class="fu">sum</span>(post2)</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(theta, post1, <span class="at">type =</span> <span class="st">"l"</span>, <span class="at">lwd =</span> <span class="dv">2</span>,</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>     <span class="at">xlab =</span> <span class="fu">expression</span>(theta), <span class="at">ylab =</span> <span class="st">"后验密度"</span>)</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="fu">abline</span>(<span class="at">v =</span> theta_MAP, <span class="at">col =</span> <span class="dv">3</span>, <span class="at">lwd =</span> <span class="dv">2</span>)</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a><span class="fu">lines</span>(theta, post2, <span class="at">col =</span> <span class="dv">2</span>, <span class="at">lwd =</span> <span class="dv">2</span>)</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a><span class="fu">legend</span>(<span class="st">"topright"</span>, <span class="fu">c</span>(<span class="st">"精确后验"</span>, <span class="st">"高斯近似"</span>, <span class="st">"MAP"</span>), <span class="at">bty =</span> <span class="st">"n"</span>, <span class="at">col =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>, <span class="at">lwd =</span> <span class="dv">2</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="08-贝叶斯统计与计算_files/figure-html/unnamed-chunk-2-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="蒙特卡洛方法" class="level3">
+<h3 class="anchored" data-anchor-id="蒙特卡洛方法">蒙特卡洛方法</h3>
+<p>高斯近似用一条正态曲线代替整个后验——快速但丢失了分布的形状细节。蒙特卡洛方法的思路不同：不近似分布形式，而是<strong>从（或间接从）后验中抽取大量样本</strong>，然后用样本的经验分布逼近真实后验。样本越多，逼近越精确——这由 LLN（Ch03）担保。</p>
+<section id="逆cdf抽样" class="level4">
+<h4 class="anchored" data-anchor-id="逆cdf抽样">逆CDF抽样</h4>
+<p>如果目标分布的累积分布函数 <span class="math inline">\(F_X\)</span> 可求逆，抽样极其简单：从 <span class="math inline">\(U \sim U(0,1)\)</span> 中抽取均匀随机数，取 <span class="math inline">\(Y = F_X^{-1}(U)\)</span>，则 <span class="math inline">\(Y \sim F_X\)</span>。为什么成立？</p>
+<p><span class="math display">\[F_Y(y) = P(Y \leq y) = P(F_X^{-1}(U) \leq y) = P(U \leq F_X(y)) = F_X(y)\]</span></p>
+<p>反之也成立：对任意连续随机变量 <span class="math inline">\(X\)</span>，<span class="math inline">\(F_X(X) \sim U(0,1)\)</span>。这两个事实互为逆命题，构成了逆CDF抽样的全部数学基础。</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 逆CDF变换验证：从U(0,1)生成指数分布样本</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>lambda <span class="ot">&lt;-</span> <span class="dv">1</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>u <span class="ot">&lt;-</span> <span class="fu">runif</span>(<span class="dv">1000</span>)</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="sc">-</span><span class="dv">1</span> <span class="sc">/</span> lambda <span class="sc">*</span> <span class="fu">log</span>(<span class="dv">1</span> <span class="sc">-</span> u)</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="fu">hist</span>(x, <span class="at">main =</span> <span class="st">"逆CDF抽样：指数分布 Exp(1)"</span>, <span class="at">xlab =</span> <span class="st">"x"</span>,</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>     <span class="at">col =</span> <span class="st">"lightblue"</span>, <span class="at">border =</span> <span class="st">"white"</span>, <span class="at">freq =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="fu">curve</span>(<span class="fu">dexp</span>(x, lambda), <span class="at">add =</span> <span class="cn">TRUE</span>, <span class="at">col =</span> <span class="st">"steelblue"</span>, <span class="at">lwd =</span> <span class="dv">2</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="08-贝叶斯统计与计算_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="拒绝抽样" class="level4">
+<h4 class="anchored" data-anchor-id="拒绝抽样">拒绝抽样</h4>
+<p>如果 CDF 不可求逆呢？拒绝抽样（Rejection Sampling）提供了替代方案。它的核心思想是：找一个<strong>容易抽样的提议分布</strong> <span class="math inline">\(g(\theta)\)</span>，使放大后的提议分布能完全”包裹”目标分布 <span class="math inline">\(f(\theta \mid y)\)</span>，然后从 <span class="math inline">\(g\)</span> 中抽样，按规则拒绝一部分样本，使得保留的样本服从 <span class="math inline">\(f\)</span>。</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>符号</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><span class="math inline">\(f(\theta \mid y)\)</span></td>
+<td>目标分布（后验密度）</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(g(\theta)\)</span></td>
+<td>提议分布——容易抽样</td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(M = \max_\theta \frac{f(\theta \mid y)}{g(\theta)}\)</span></td>
+<td>包络常数——保证 <span class="math inline">\(M \cdot g(\theta) \geq f(\theta \mid y)\)</span></td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(\alpha = \frac{f(\theta \mid y)}{M \cdot g(\theta)} \in [0,1]\)</span></td>
+<td>接受概率</td>
+</tr>
+</tbody>
+</table>
+<p><strong>算法步骤</strong>：</p>
+<ol type="1">
+<li>从 <span class="math inline">\(g(\theta)\)</span> 中抽取候选样本 <span class="math inline">\(\theta^*\)</span>。</li>
+<li>从 <span class="math inline">\(U \sim U(0,1)\)</span> 中抽取随机阈值。</li>
+<li>若 <span class="math inline">\(U \leq \frac{f(\theta^* \mid y)}{M \cdot g(\theta^*)}\)</span>，接受 <span class="math inline">\(\theta^*\)</span>；否则拒绝，返回步骤 1。</li>
+<li>重复，直至收集到足够的接受样本。</li>
+</ol>
+<p><strong>几何直观</strong>：设想两条曲线——上方是放大后的提议分布 <span class="math inline">\(M \cdot g(\theta)\)</span>，下方是目标分布 <span class="math inline">\(f(\theta \mid y)\)</span>。从 <span class="math inline">\(g\)</span> 中抽一个点 <span class="math inline">\(\theta^*\)</span>（横坐标），再在纵轴上随机选一个高度 <span class="math inline">\(U \cdot M g(\theta^*)\)</span>。如果这个高度落在下方曲线之下，接受 <span class="math inline">\(\theta^*\)</span>；落在两条曲线之间，拒绝。正是通过这种随机阈值机制，目标分布密度高的区域接受概率高，密度低的区域接受概率低——最终接受样本的分布严格服从 <span class="math inline">\(f\)</span>。</p>
+<p>接受的样本比例恰好等于 <span class="math inline">\(1/M\)</span>。因此 <span class="math inline">\(M\)</span> 越接近 1，抽样效率越高。</p>
+<p><strong>如何选择提议分布</strong> <span class="math inline">\(g(\theta)\)</span>？ 提议分布应具有比目标分布更厚的尾部。例如，若目标为 <span class="math inline">\(N(0,1)\)</span>，可用 <span class="math inline">\(t_2\)</span> 分布作为提议——<span class="math inline">\(t\)</span> 分布的厚尾确保它能覆盖正态分布的远尾区域，避免在极端值处 <span class="math inline">\(M \cdot g(\theta) &lt; f(\theta \mid y)\)</span>。</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">curve</span>(<span class="fu">dnorm</span>(x), <span class="sc">-</span><span class="dv">6</span>, <span class="dv">6</span>, <span class="at">xlab =</span> <span class="fu">expression</span>(theta), <span class="at">ylab =</span> <span class="st">"密度"</span>, <span class="at">n =</span> <span class="dv">200</span>)</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="fu">curve</span>(<span class="fu">dt</span>(x, <span class="dv">2</span>), <span class="sc">-</span><span class="dv">6</span>, <span class="dv">6</span>, <span class="at">add =</span> <span class="cn">TRUE</span>, <span class="at">col =</span> <span class="dv">4</span>, <span class="at">n =</span> <span class="dv">200</span>)</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="fu">legend</span>(<span class="st">"topright"</span>, <span class="fu">c</span>(<span class="st">"目标: N(0,1)"</span>, <span class="st">"提议: t(2)"</span>), <span class="at">col =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">4</span>), <span class="at">bty =</span> <span class="st">"n"</span>, <span class="at">lty =</span> <span class="dv">1</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="08-贝叶斯统计与计算_files/figure-html/unnamed-chunk-4-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p><strong>拒绝抽样的局限</strong>：高维空间中，<span class="math inline">\(M\)</span> 以指数速度膨胀——这是维度灾难的又一次显现（Ch02 的高维几何直觉：高维球体的体积集中在薄球壳上，提议分布极难”包裹”目标分布）。这使得拒绝抽样在高维问题中几乎不可用。这引出了下一种方法：与其拒绝样本，不如给所有样本加权。</p>
+</section>
+<section id="重要性抽样" class="level4">
+<h4 class="anchored" data-anchor-id="重要性抽样">重要性抽样</h4>
+<p>重要性抽样（Importance Sampling）是拒绝抽样的进阶版——用”样本加权”替代”样本拒绝”。核心公式来自一个简单的期望恒等式：</p>
+<p><span class="math display">\[E_f[h(\theta) \mid y] = \int h(\theta) f(\theta \mid y) d\theta = \int h(\theta) \frac{f(\theta \mid y)}{g(\theta)} g(\theta) d\theta = E_g\left[\frac{f(\theta \mid y)}{g(\theta)} h(\theta)\right]\]</span></p>
+<p>也就是说：<strong>目标分布</strong> <span class="math inline">\(f\)</span> 下的期望，等于提议分布 <span class="math inline">\(g\)</span> 下加权版本的期望，权重 <span class="math inline">\(w_i = f(\theta_i \mid y) / g(\theta_i)\)</span>。</p>
+<p>若 <span class="math inline">\(\theta_1, \ldots, \theta_n \sim g\)</span>，则：</p>
+<p><span class="math display">\[\hat{\mu}_n = \frac{1}{n}\sum_{i=1}^n \frac{f(\theta_i \mid y)}{g(\theta_i)} h(\theta_i) = \frac{1}{n}\sum_{i=1}^n w_i \, h(\theta_i) \approx E_f[h(\theta) \mid y]\]</span></p>
+<p><span class="math inline">\(w_i\)</span> 称为<strong>重要性权重</strong>。与拒绝抽样不同，重要性抽样不丢弃任何样本——它只是根据每个样本在目标分布下的相对密度调整其贡献。这使得它在所有样本都被保留的意义上比拒绝抽样更”节俭”。但代价是，如果 <span class="math inline">\(g\)</span> 与 <span class="math inline">\(f\)</span> 差异过大，少数样本的权重会主导整个估计，导致有效样本量急剧下降。</p>
+</section>
+</section>
+<section id="马尔科夫链蒙特卡洛mcmc" class="level3">
+<h3 class="anchored" data-anchor-id="马尔科夫链蒙特卡洛mcmc">马尔科夫链蒙特卡洛（MCMC）</h3>
+<p>独立蒙特卡洛方法（逆CDF、拒绝、重要性）都依赖一个<strong>全局提议分布</strong>——需要你事先指定一个覆盖整个参数空间的 <span class="math inline">\(g(\theta)\)</span>。这在低维可行，在高维是灾难。MCMC 换了一种思路：不尝试一次性从目标分布中独立抽样，而是<strong>构造一条马尔可夫链，使其平稳分布恰好为目标后验</strong>。链运行足够长之后，链上的状态就近似为来自后验的样本。</p>
+<p><strong>什么是马尔可夫链？</strong> 马尔可夫链是一列随机变量 <span class="math inline">\(\theta^{(1)}, \theta^{(2)}, \ldots\)</span>，满足：对任意 <span class="math inline">\(t\)</span>，<span class="math inline">\(\theta^{(t)}\)</span> 在给定所有历史 <span class="math inline">\(\theta^{(1)}, \ldots, \theta^{(t-1)}\)</span> 下的条件分布，只依赖于最近的值 <span class="math inline">\(\theta^{(t-1)}\)</span>。换句话说，未来只依赖现在，不依赖过去——这是一种”无记忆”的随机过程。</p>
+<p>MCMC 的关键优势：每一步迭代，链的近似分布都在改进（在收敛到目标分布的意义上）。不需要全局提议——只需要在当前值附近做局部跳跃。</p>
+<section id="metropolis-算法" class="level4">
+<h4 class="anchored" data-anchor-id="metropolis-算法">Metropolis 算法</h4>
+<p>Metropolis 算法是 MCMC 的起点。目标是从 <span class="math inline">\(p(x)\)</span> 中采样。需要一个<strong>对称的提议分布</strong> <span class="math inline">\(q(x^{\text{new}} \mid x^{\text{old}})\)</span>，满足 <span class="math inline">\(q(x^{\text{new}} \mid x^{\text{old}}) = q(x^{\text{old}} \mid x^{\text{new}})\)</span>——典型的例子是以当前状态为中心的高斯随机游走。</p>
+<p><strong>算法步骤</strong>：</p>
+<ol type="1">
+<li>在第 <span class="math inline">\(i+1\)</span> 步，设当前状态 <span class="math inline">\(x^{\text{old}} = x^{(i)}\)</span>。</li>
+<li>从提议分布生成候选状态 <span class="math inline">\(x^{\text{new}} \sim q(\cdot \mid x^{\text{old}})\)</span>。计算接受概率： <span class="math display">\[\alpha = \min\left(1,\; \frac{p(x^{\text{new}})}{p(x^{\text{old}})}\right)\]</span></li>
+<li>以概率 <span class="math inline">\(\alpha\)</span> 接受 <span class="math inline">\(x^{\text{new}}\)</span>（<span class="math inline">\(x^{(i+1)} = x^{\text{new}}\)</span>）；以概率 <span class="math inline">\(1-\alpha\)</span> 拒绝（<span class="math inline">\(x^{(i+1)} = x^{\text{old}}\)</span>）。</li>
+</ol>
+<p>直观理解：如果候选状态的密度高于当前状态（<span class="math inline">\(p(x^{\text{new}}) &gt; p(x^{\text{old}})\)</span>），<span class="math inline">\(\alpha = 1\)</span>——总是接受（爬山）。如果候选密度更低，<span class="math inline">\(\alpha\)</span> 等于密度比——以一定概率”下山”，避免困在局部峰。</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 目标分布：双峰混合正态</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>p <span class="ot">&lt;-</span> <span class="fl">0.4</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>mu <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">1</span>, <span class="dv">2</span>)</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>sd <span class="ot">&lt;-</span> <span class="fu">c</span>(.<span class="dv">5</span>, <span class="dv">2</span>)</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>f <span class="ot">&lt;-</span> <span class="cf">function</span>(x) {</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>    p     <span class="sc">*</span> <span class="fu">dnorm</span>(x, mu[<span class="dv">1</span>], sd[<span class="dv">1</span>]) <span class="sc">+</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>    (<span class="dv">1</span><span class="sc">-</span>p) <span class="sc">*</span> <span class="fu">dnorm</span>(x, mu[<span class="dv">2</span>], sd[<span class="dv">2</span>])</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="fu">curve</span>(<span class="fu">f</span>(x), <span class="sc">-</span><span class="dv">4</span>, <span class="dv">8</span>, <span class="at">n =</span> <span class="dv">301</span>, <span class="at">las =</span> <span class="dv">1</span>, <span class="at">ylab =</span> <span class="st">"密度"</span>, <span class="at">xlab =</span> <span class="st">"x"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="08-贝叶斯统计与计算_files/figure-html/unnamed-chunk-5-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 对称提议分布（随机游走）</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>q <span class="ot">&lt;-</span> <span class="cf">function</span>(x) <span class="fu">rnorm</span>(<span class="dv">1</span>, x, <span class="dv">4</span>)</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="co"># 单步转移</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>step <span class="ot">&lt;-</span> <span class="cf">function</span>(x, f, q) {</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>  xp <span class="ot">&lt;-</span> <span class="fu">q</span>(x)                          <span class="co"># 生成候选状态</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>  alpha <span class="ot">&lt;-</span> <span class="fu">min</span>(<span class="dv">1</span>, <span class="fu">f</span>(xp) <span class="sc">/</span> <span class="fu">f</span>(x))       <span class="co"># 计算接受概率</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="fu">runif</span>(<span class="dv">1</span>) <span class="sc">&lt;</span> alpha) x <span class="ot">&lt;-</span> xp       <span class="co"># 按概率接受</span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>  x</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a><span class="co"># 迭代抽样</span></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>run <span class="ot">&lt;-</span> <span class="cf">function</span>(x, f, q, nsteps) {</span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>  res <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="cn">NA</span>, nsteps, <span class="fu">length</span>(x))</span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (i <span class="cf">in</span> <span class="fu">seq_len</span>(nsteps))</span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>    res[i,] <span class="ot">&lt;-</span> x <span class="ot">&lt;-</span> <span class="fu">step</span>(x, f, q)</span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(res)</span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a><span class="co"># 执行：初始 x=-10，迭代 1100 次，取后 1000 次（烧脑后）</span></span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>res <span class="ot">&lt;-</span> <span class="fu">run</span>(<span class="sc">-</span><span class="dv">10</span>, f, q, <span class="dv">1100</span>)</span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a><span class="fu">hist</span>(res[<span class="dv">101</span><span class="sc">:</span><span class="dv">1100</span>], <span class="dv">50</span>, <span class="at">freq =</span> <span class="cn">FALSE</span>, <span class="at">main =</span> <span class="st">""</span>, <span class="at">ylim =</span> <span class="fu">c</span>(<span class="dv">0</span>, .<span class="dv">4</span>), <span class="at">las =</span> <span class="dv">1</span>,</span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a>     <span class="at">xlab =</span> <span class="st">"x"</span>, <span class="at">ylab =</span> <span class="st">"概率密度"</span>)</span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a><span class="fu">curve</span>(<span class="fu">f</span>(x) <span class="sc">/</span> <span class="fu">integrate</span>(f, <span class="sc">-</span><span class="cn">Inf</span>, <span class="cn">Inf</span>)<span class="sc">$</span>value, <span class="at">add =</span> <span class="cn">TRUE</span>, <span class="at">col =</span> <span class="st">"red"</span>, <span class="at">n =</span> <span class="dv">200</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="08-贝叶斯统计与计算_files/figure-html/unnamed-chunk-5-2.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="收敛效率链混合得有多好" class="level4">
+<h4 class="anchored" data-anchor-id="收敛效率链混合得有多好">收敛效率：链混合得有多好？</h4>
+<p>MCMC 样本之间存在自相关——第 <span class="math inline">\(t\)</span> 个和第 <span class="math inline">\(t+1\)</span> 个样本不独立。因此样本均值 <span class="math inline">\(\bar{x}\)</span> 的方差不能简单地用 <span class="math inline">\(\text{Var}(X)/M\)</span> 计算。考虑自相关后的正确方差为：</p>
+<p><span class="math display">\[\text{Var}(\bar{x}) = \frac{\sigma^2}{M} \left(1 + 2\sum_{k=1}^{\infty} \rho_k \right)\]</span></p>
+<p>其中 <span class="math inline">\(\rho_k\)</span> 为滞后 <span class="math inline">\(k\)</span> 的自相关系数。定义<strong>积分自相关时间</strong>（IACT）<span class="math inline">\(\tau = 1 + 2\sum_{k=1}^{\infty} \rho_k\)</span>，则 <span class="math inline">\(\text{Var}(\bar{x}) = \sigma^2 \tau / M\)</span>。</p>
+<p>ACF（自相关函数）图展示了链在不同滞后距离下的自相关强度。若 ACF 随滞后快速衰减至零，说明链的混合性能好；若缓慢衰减，说明链”粘滞”在局部区域，有效样本量低。</p>
+<p><strong>有效样本量</strong>（ESS）：<span class="math inline">\(M_{\text{ESS}} = M / \tau\)</span>。ESS 告诉你：这条长度为 <span class="math inline">\(M\)</span> 的相关链，其估计精度等价于多少个独立样本。ESS 越高，蒙特卡洛估计越精确。收敛诊断是 MCMC 中最容易被忽视的环节——一条链”看起来收敛了”不等于真的收敛。实践中常使用多链初始化配合 Gelman-Rubin <span class="math inline">\(\hat{R}\)</span> 诊断：多链的组间方差显著大于组内方差时，说明链尚未收敛。</p>
+</section>
+<section id="metropolis-hastings-算法" class="level4">
+<h4 class="anchored" data-anchor-id="metropolis-hastings-算法">Metropolis-Hastings 算法</h4>
+<p>Metropolis 要求提议分布对称——这在很多场景中受限。Metropolis-Hastings（MH）将其推广到<strong>任意提议分布</strong>。接受概率修正为：</p>
+<p><span class="math display">\[\alpha(x^{\text{old}} \to x^{\text{new}}) = \min\left(1,\; \frac{p(x^{\text{new}}) \cdot q(x^{\text{old}} \mid x^{\text{new}})}{p(x^{\text{old}}) \cdot q(x^{\text{new}} \mid x^{\text{old}})}\right)\]</span></p>
+<p>关键点： - 当 <span class="math inline">\(q\)</span> 对称时（<span class="math inline">\(q(x' \mid x) = q(x \mid x')\)</span>），修正因子 <span class="math inline">\(q(x^{\text{old}} \mid x^{\text{new}}) / q(x^{\text{new}} \mid x^{\text{old}}) = 1\)</span>，MH 退化为 Metropolis。 - 修正因子被称为 <strong>Hastings 比率</strong>——它校正了非对称提议导致的采样偏差：如果从 <span class="math inline">\(x^{\text{old}}\)</span> 跳到 <span class="math inline">\(x^{\text{new}}\)</span> 比反方向更容易，接受概率需要打折扣，以补偿这种”方向偏好”。 - MH 保证了马尔可夫链的平稳分布恰好为目标分布 <span class="math inline">\(p(x)\)</span>——无论提议分布是什么（只要覆盖整个支撑集）。</p>
+<p><strong>二维示例</strong>：从双峰混合二元正态分布中采样。</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 构造多元正态密度函数</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>make.mvn <span class="ot">&lt;-</span> <span class="cf">function</span>(mean, vcv) {</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  logdet <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(<span class="fu">determinant</span>(vcv, <span class="cn">TRUE</span>)<span class="sc">$</span>modulus)</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  tmp <span class="ot">&lt;-</span> <span class="fu">length</span>(mean) <span class="sc">*</span> <span class="fu">log</span>(<span class="dv">2</span> <span class="sc">*</span> pi) <span class="sc">+</span> logdet</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>  vcv.i <span class="ot">&lt;-</span> <span class="fu">solve</span>(vcv)</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>  <span class="cf">function</span>(x) {</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>    dx <span class="ot">&lt;-</span> x <span class="sc">-</span> mean</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">exp</span>(<span class="sc">-</span>(tmp <span class="sc">+</span> <span class="fu">rowSums</span>((dx <span class="sc">%*%</span> vcv.i) <span class="sc">*</span> dx)) <span class="sc">/</span> <span class="dv">2</span>)</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a><span class="co"># 双峰混合二元正态（目标分布）</span></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>mu1 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">1</span>, <span class="dv">1</span>); mu2 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">2</span>, <span class="sc">-</span><span class="dv">2</span>)</span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>vcv1 <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="fu">c</span>(<span class="dv">1</span>, .<span class="dv">25</span>, .<span class="dv">25</span>, <span class="fl">1.5</span>), <span class="dv">2</span>, <span class="dv">2</span>)</span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>vcv2 <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="fu">c</span>(<span class="dv">2</span>, <span class="sc">-</span>.<span class="dv">5</span>, <span class="sc">-</span>.<span class="dv">5</span>, <span class="dv">2</span>), <span class="dv">2</span>, <span class="dv">2</span>)</span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>f1 <span class="ot">&lt;-</span> <span class="fu">make.mvn</span>(mu1, vcv1); f2 <span class="ot">&lt;-</span> <span class="fu">make.mvn</span>(mu2, vcv2)</span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>f <span class="ot">&lt;-</span> <span class="cf">function</span>(x) <span class="fu">f1</span>(x) <span class="sc">+</span> <span class="fu">f2</span>(x)</span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a><span class="co"># 提议分布：对称均匀随机游走</span></span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a>q <span class="ot">&lt;-</span> <span class="cf">function</span>(x, <span class="at">d =</span> <span class="dv">8</span>) x <span class="sc">+</span> <span class="fu">runif</span>(<span class="fu">length</span>(x), <span class="sc">-</span>d<span class="sc">/</span><span class="dv">2</span>, d<span class="sc">/</span><span class="dv">2</span>)</span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a><span class="co"># 执行 MH 采样（100000 次迭代）</span></span>
+<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a>x0 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">4</span>, <span class="sc">-</span><span class="dv">4</span>)</span>
+<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1</span>)</span>
+<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a>samples <span class="ot">&lt;-</span> <span class="fu">run</span>(x0, f, q, <span class="dv">100000</span>)</span>
+<span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a><span class="fu">smoothScatter</span>(samples, <span class="at">main =</span> <span class="st">"MH采样：双峰混合二元正态"</span>)</span>
+<span id="cb7-27"><a href="#cb7-27" aria-hidden="true" tabindex="-1"></a><span class="co"># 叠加真实分布的等高线</span></span>
+<span id="cb7-28"><a href="#cb7-28" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="sc">-</span><span class="dv">5</span>, <span class="dv">6</span>, <span class="at">length =</span> <span class="dv">71</span>); y <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="sc">-</span><span class="dv">7</span>, <span class="dv">6</span>, <span class="at">length =</span> <span class="dv">61</span>)</span>
+<span id="cb7-29"><a href="#cb7-29" aria-hidden="true" tabindex="-1"></a>xy <span class="ot">&lt;-</span> <span class="fu">expand.grid</span>(<span class="at">x =</span> x, <span class="at">y =</span> y)</span>
+<span id="cb7-30"><a href="#cb7-30" aria-hidden="true" tabindex="-1"></a>z <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="fu">apply</span>(<span class="fu">as.matrix</span>(xy), <span class="dv">1</span>, f), <span class="fu">length</span>(x), <span class="fu">length</span>(y))</span>
+<span id="cb7-31"><a href="#cb7-31" aria-hidden="true" tabindex="-1"></a><span class="fu">contour</span>(x, y, z, <span class="at">add =</span> <span class="cn">TRUE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="08-贝叶斯统计与计算_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p><strong>间接抽样法（拒绝/重要性）与 MH 的对比</strong>：</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th></th>
+<th>独立蒙特卡洛</th>
+<th>MCMC (MH)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>样本独立性</td>
+<td>独立</td>
+<td>自相关</td>
+</tr>
+<tr class="even">
+<td>高维适用性</td>
+<td>差（<span class="math inline">\(M\)</span> 指数膨胀）</td>
+<td>好（局部跳跃）</td>
+</tr>
+<tr class="odd">
+<td>是否需要全局上界</td>
+<td>拒绝抽样需要 <span class="math inline">\(M\)</span></td>
+<td>不需要</td>
+</tr>
+<tr class="even">
+<td>提议分布要求</td>
+<td>需覆盖整个支撑集</td>
+<td>局部即可</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="gibbs-采样" class="level4">
+<h4 class="anchored" data-anchor-id="gibbs-采样">Gibbs 采样</h4>
+<p>Gibbs 采样将 MH 的逻辑推向极致——它把高维采样问题拆解为一系列<strong>一维条件分布</strong>的采样。每一步只改变参数向量的一个分量，从该分量在给定所有其他分量当前值下的<strong>条件分布</strong>中抽样。</p>
+<p>以二维为例，设目标分布为 <span class="math inline">\(p(x, y)\)</span>，条件分布 <span class="math inline">\(p(x \mid y)\)</span> 和 <span class="math inline">\(p(y \mid x)\)</span> 均可直接采样：</p>
+<ol type="1">
+<li>初始化 <span class="math inline">\(y^{(0)}\)</span>。</li>
+<li>第 <span class="math inline">\(t\)</span> 次迭代：从 <span class="math inline">\(p(x \mid y^{(t-1)})\)</span> 中采样 <span class="math inline">\(x^{(t)}\)</span>；从 <span class="math inline">\(p(y \mid x^{(t)})\)</span> 中采样 <span class="math inline">\(y^{(t)}\)</span>。</li>
+<li>重复，烧脑后样本对 <span class="math inline">\((x^{(t)}, y^{(t)})\)</span> 近似来自联合分布 <span class="math inline">\(p(x, y)\)</span>。</li>
+</ol>
+<p>Gibbs 是 MH 的特例——其提议分布是目标分布的条件分布本身，因此接受概率恒等于 1：</p>
+<p><span class="math display">\[\alpha = \min\left(1,\; \frac{f(x^{(i+1)}, y) \, f(x^{(i)} \mid y)}{f(x^{(i)}, y) \, f(x^{(i+1)} \mid y)}\right) = 1\]</span></p>
+<ul>
+<li><strong>优点</strong>：无需调优提议分布，提议总是被接受。</li>
+<li><strong>缺点</strong>：依赖条件分布的可采样性；当参数高度相关时，每次只沿坐标轴移动，采样极慢（链在参数空间中”爬行”）。</li>
+</ul>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>rho <span class="ot">&lt;-</span> <span class="fl">0.8</span>; n <span class="ot">&lt;-</span> <span class="dv">5000</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>X <span class="ot">&lt;-</span> Y <span class="ot">&lt;-</span> <span class="fu">numeric</span>(n)</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>X[<span class="dv">1</span>] <span class="ot">&lt;-</span> <span class="dv">0</span>; Y[<span class="dv">1</span>] <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>sd <span class="ot">&lt;-</span> <span class="fu">sqrt</span>(<span class="dv">1</span> <span class="sc">-</span> rho<span class="sc">^</span><span class="dv">2</span>)</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Gibbs 核心迭代</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (t <span class="cf">in</span> <span class="dv">2</span><span class="sc">:</span>n) {</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>  X[t] <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(<span class="dv">1</span>, <span class="at">mean =</span> rho <span class="sc">*</span> Y[t<span class="dv">-1</span>], <span class="at">sd =</span> sd)  <span class="co"># X | Y</span></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>  Y[t] <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(<span class="dv">1</span>, <span class="at">mean =</span> rho <span class="sc">*</span> X[t],   <span class="at">sd =</span> sd)  <span class="co"># Y | X</span></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(X, Y, <span class="at">pch =</span> <span class="dv">20</span>, <span class="at">col =</span> <span class="fu">rgb</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">1</span>, <span class="fl">0.4</span>),</span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>     <span class="at">main =</span> <span class="st">"Gibbs采样：二元正态 (ρ = 0.8)"</span>,</span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>     <span class="at">xlab =</span> <span class="st">"X"</span>, <span class="at">ylab =</span> <span class="st">"Y"</span>)</span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a><span class="co"># 叠加真实二元正态等高线</span></span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(mvtnorm)</span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>xg <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="fu">min</span>(X)<span class="sc">-</span><span class="dv">1</span>, <span class="fu">max</span>(X)<span class="sc">+</span><span class="dv">1</span>, <span class="at">length =</span> <span class="dv">80</span>)</span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a>yg <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="fu">min</span>(Y)<span class="sc">-</span><span class="dv">1</span>, <span class="fu">max</span>(Y)<span class="sc">+</span><span class="dv">1</span>, <span class="at">length =</span> <span class="dv">80</span>)</span>
+<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a>Sigma <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="fu">c</span>(<span class="dv">1</span>, rho, rho, <span class="dv">1</span>), <span class="dv">2</span>, <span class="dv">2</span>)</span>
+<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a>grid <span class="ot">&lt;-</span> <span class="fu">expand.grid</span>(<span class="at">x =</span> xg, <span class="at">y =</span> yg)</span>
+<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a>dens <span class="ot">&lt;-</span> <span class="fu">dmvnorm</span>(grid, <span class="at">mean =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">0</span>), <span class="at">sigma =</span> Sigma)</span>
+<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a><span class="fu">contour</span>(xg, yg, <span class="fu">matrix</span>(dens, <span class="dv">80</span>, <span class="dv">80</span>), <span class="at">add =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a>        <span class="at">drawlabels =</span> <span class="cn">FALSE</span>, <span class="at">col =</span> <span class="st">"red"</span>, <span class="at">lwd =</span> <span class="dv">2</span>)</span>
+<span id="cb8-26"><a href="#cb8-26" aria-hidden="true" tabindex="-1"></a><span class="fu">legend</span>(<span class="st">"bottomright"</span>,</span>
+<span id="cb8-27"><a href="#cb8-27" aria-hidden="true" tabindex="-1"></a>       <span class="at">legend =</span> <span class="fu">c</span>(<span class="st">"Gibbs样本"</span>, <span class="st">"真实等高线"</span>),</span>
+<span id="cb8-28"><a href="#cb8-28" aria-hidden="true" tabindex="-1"></a>       <span class="at">col =</span> <span class="fu">c</span>(<span class="fu">rgb</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">1</span>, <span class="fl">0.4</span>), <span class="st">"red"</span>),</span>
+<span id="cb8-29"><a href="#cb8-29" aria-hidden="true" tabindex="-1"></a>       <span class="at">pch =</span> <span class="fu">c</span>(<span class="dv">20</span>, <span class="cn">NA</span>), <span class="at">lty =</span> <span class="fu">c</span>(<span class="cn">NA</span>, <span class="dv">1</span>), <span class="at">lwd =</span> <span class="fu">c</span>(<span class="cn">NA</span>, <span class="dv">2</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="08-贝叶斯统计与计算_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="metropolis-within-gibbs" class="level4">
+<h4 class="anchored" data-anchor-id="metropolis-within-gibbs">Metropolis within Gibbs</h4>
+<p>当某个条件分布不易直接采样时，可在该 Gibbs 步骤中用一次 MH 采样替代。这保留了 Gibbs”高维拆低维”的核心优势，同时用 MH 弥补条件分布需可采样的缺陷，适配现实中任意复杂的后验结构。</p>
+</section>
+<section id="应用贝叶斯线性回归" class="level4">
+<h4 class="anchored" data-anchor-id="应用贝叶斯线性回归">应用：贝叶斯线性回归</h4>
+<p>把 MCMC 放在一个具体的统计模型中收束。线性回归模型：</p>
+<p><span class="math display">\[y_i = \beta_0 + \beta_1 x_i + \epsilon_i, \quad \epsilon_i \sim N(0, \sigma^2)\]</span></p>
+<p>贝叶斯框架下的后验：</p>
+<p><span class="math display">\[p(\beta_0, \beta_1, \sigma^2 \mid y, x) \propto p(y \mid \beta_0, \beta_1, \sigma^2, x) \, p(\beta_0, \beta_1, \sigma^2)\]</span></p>
+<p>给定无信息先验 <span class="math inline">\(p(\beta, \sigma^2) \propto 1/\sigma^2\)</span>，后验条件分布恰好有解析形式——这使 Gibbs 采样可以直接使用：</p>
+<ol type="1">
+<li><span class="math inline">\(\beta \mid \sigma^2, y, X \sim N\left(\hat{\beta}_{\text{OLS}},\; \sigma^2 (X'X)^{-1}\right)\)</span></li>
+<li><span class="math inline">\(\sigma^2 \mid \beta, y, X \sim \text{Scale-Inv-}\chi^2(n, s^2)\)</span>，其中 <span class="math inline">\(s^2 = \frac{1}{n}\sum_{i=1}^n (y_i - x_i'\beta)^2\)</span></li>
+</ol>
+<p>Gibbs 迭代交替从这两个条件分布中抽样，收敛后获得 <span class="math inline">\((\beta, \sigma^2)\)</span> 的联合后验样本——无需解析积分，即可计算回归系数的后验均值、可信区间和预测分布。这正是 Ch10（回归分析）贝叶斯路径的数学地基。</p>
+<hr>
+<p><strong>速查卡片</strong>：</p>
+<ul>
+<li><strong>核心问题</strong>：如何用概率量化信念，并用数据更新信念？当后验没有解析形式时，如何用计算机求解？</li>
+<li><strong>核心公式</strong>：后验 <span class="math inline">\(\propto\)</span> 似然 × 先验；Metropolis-Hastings 接受率；Gibbs 采样</li>
+<li><strong>关键概念</strong>：共轭先验、MAP 估计、可信区间、贝叶斯因子、后验预测分布、逆CDF 抽样、拒绝抽样、重要性抽样、MCMC、Metropolis-Hastings、Gibbs 采样、有效样本量（ESS）</li>
+<li><strong>R 命令</strong>：<code>rstanarm::stan_glm()</code>, <code>brms::brm()</code>, <code>LearnBayes::</code> 系列函数</li>
+</ul>
+<hr>
+<p><strong>深度思考</strong>：</p>
+<ol type="1">
+<li><p>贝叶斯更新的核心是”今天的后验 = 明天的先验”。如果数据是分批到达的，频率学派需要重新跑整个估计，而贝叶斯只需用新数据更新旧后验。在流式数据场景（实时推荐、金融风控）中，这种”增量学习”的能力意味着什么？</p></li>
+<li><p>共轭先验简化了计算，但也限制了先验的选择自由。在什么情况下你愿意放弃共轭的便利，选择一个更能反映真实知识但不共轭的先验？代价是什么？</p></li>
+<li><p>贝叶斯因子自动惩罚模型复杂度——这个性质与 AIC/BIC（Ch10）的惩罚项、Lasso（Ch10）的 L1 正则化、以及奥卡姆剃刀原则共享同一个哲学内核：<strong>信息不是免费的。</strong> 你能找到这三个方法在数学上的共同结构吗？</p></li>
+<li><p>MCMC 的收敛诊断是贝叶斯计算中最容易被忽视的环节。一条马尔可夫链”看起来收敛了”不等于它真的收敛了——你怎么知道自己没有被困在局部模态中？提示：多链初始化、Gelman-Rubin <span class="math inline">\(\hat{R}\)</span> 诊断、有效样本量 ESS。</p></li>
+<li><p>拒绝抽样的效率由 <span class="math inline">\(M\)</span> 控制，<span class="math inline">\(M\)</span> 越接近 1 越好。在高维问题中，<span class="math inline">\(M\)</span> 会以指数速度膨胀——这是维度灾难在贝叶斯计算中的表现。为什么高维空间中提议分布很难”包裹”目标分布？（提示：Ch02 的高维几何直觉——高维球体的体积集中在薄球壳上。）</p></li>
+<li><p>Metropolis 算法接受候选状态的概率为 <span class="math inline">\(\min(1, p(x^{\text{new}})/p(x^{\text{old}}))\)</span>。为什么不是 <span class="math inline">\(\min(1, p(x^{\text{old}})/p(x^{\text{new}}))\)</span>？如果分子分母颠倒，马尔可夫链的平稳分布会是什么？——提示：考虑细致平衡条件（Detailed Balance）以及为什么 <span class="math inline">\(\alpha\)</span> 的这一特定形式恰好使 <span class="math inline">\(p(x)\)</span> 成为平稳分布。</p></li>
+</ol>
+
+
+</section>
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="./07-假设检验与方差分析.html" class="pagination-link" aria-label="假设检验与方差分析">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-title">假设检验与方差分析</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="./09-回归分析.html" class="pagination-link" aria-label="回归分析">
+        <span class="nav-page-text"><span class="chapter-title">回归分析</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

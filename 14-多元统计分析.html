@@ -1,0 +1,1039 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.37">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>多元统计分析 – 乱中寻序：统计学的统一逻辑</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./15-机器学习基础.html" rel="next">
+<link href="./13-时间序列分析.html" rel="prev">
+<script src="site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-7f8f88aac4f3542376d5c11b86a4c14d.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-b46385535caf84bc62f311a600ac5013.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body class="nav-sidebar docked quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./09-回归分析.html">Part III: 现代统计方法</a></li><li class="breadcrumb-item"><a href="./14-多元统计分析.html"><span class="chapter-title">多元统计分析</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="./">乱中寻序：统计学的统一逻辑</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">乱中寻序：统计学的统一逻辑</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false">
+ <span class="menu-text">Part I: 概率论基础</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./01-概率初步与随机变量的分布.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">概率初步与随机变量的分布</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./02-多维随机变量及其分布.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">多维随机变量及其分布</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./03-大数定律和中心极限定理.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">大数定律和中心极限定理</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./04-概率不等式与收敛性.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">概率不等式与收敛性</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false">
+ <span class="menu-text">Part II: 经典统计推断</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./05-统计量与抽样分布.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">统计量与抽样分布</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./06-参数估计.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">参数估计</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./07-假设检验与方差分析.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">假设检验与方差分析</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./08-贝叶斯统计与计算.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">贝叶斯统计与计算</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part III: 现代统计方法</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./09-回归分析.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">回归分析</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./10-广义线性模型.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">广义线性回归</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./11-类别数据分析.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">类别数据分析</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./12-非参数统计.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">非参数统计</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./13-时间序列分析.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">时间序列分析</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./14-多元统计分析.html" class="sidebar-item-text sidebar-link active"><span class="chapter-title">多元统计分析</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false">
+ <span class="menu-text">Part IV: 机器学习</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./15-机器学习基础.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">机器学习基础</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./16-经典分类方法.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">经典分类方法</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./17-集成学习与模型选择.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">集成学习与模型选择</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./18-深度学习.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">深度学习</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./19-因果推断入门.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">因果推断入门</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="false">
+ <span class="menu-text">附录：统计计算工具</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./A-优化方法.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">优化方法</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./B-矩阵计算与数值方法.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">矩阵计算与数值方法</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#多元数据的描述" id="toc-多元数据的描述" class="nav-link active" data-scroll-target="#多元数据的描述">多元数据的描述</a>
+  <ul class="collapse">
+  <li><a href="#样本均值向量与协方差矩阵" id="toc-样本均值向量与协方差矩阵" class="nav-link" data-scroll-target="#样本均值向量与协方差矩阵">样本均值向量与协方差矩阵</a></li>
+  <li><a href="#多元正态分布" id="toc-多元正态分布" class="nav-link" data-scroll-target="#多元正态分布">多元正态分布</a></li>
+  </ul></li>
+  <li><a href="#主成分分析pca" id="toc-主成分分析pca" class="nav-link" data-scroll-target="#主成分分析pca">主成分分析（PCA）</a>
+  <ul class="collapse">
+  <li><a href="#基本思想" id="toc-基本思想" class="nav-link" data-scroll-target="#基本思想">基本思想</a></li>
+  <li><a href="#数学推导" id="toc-数学推导" class="nav-link" data-scroll-target="#数学推导">数学推导</a></li>
+  <li><a href="#方差解释比例" id="toc-方差解释比例" class="nav-link" data-scroll-target="#方差解释比例">方差解释比例</a></li>
+  <li><a href="#pca-与-svd-的联系" id="toc-pca-与-svd-的联系" class="nav-link" data-scroll-target="#pca-与-svd-的联系">PCA 与 SVD 的联系</a></li>
+  <li><a href="#pca-与信息压缩" id="toc-pca-与信息压缩" class="nav-link" data-scroll-target="#pca-与信息压缩">PCA 与信息压缩</a></li>
+  </ul></li>
+  <li><a href="#因子分析" id="toc-因子分析" class="nav-link" data-scroll-target="#因子分析">因子分析</a></li>
+  <li><a href="#聚类分析" id="toc-聚类分析" class="nav-link" data-scroll-target="#聚类分析">聚类分析</a>
+  <ul class="collapse">
+  <li><a href="#k-means-聚类" id="toc-k-means-聚类" class="nav-link" data-scroll-target="#k-means-聚类">K-means 聚类</a></li>
+  <li><a href="#层次聚类" id="toc-层次聚类" class="nav-link" data-scroll-target="#层次聚类">层次聚类</a></li>
+  </ul></li>
+  <li><a href="#判别分析" id="toc-判别分析" class="nav-link" data-scroll-target="#判别分析">判别分析</a>
+  <ul class="collapse">
+  <li><a href="#线性判别分析lda" id="toc-线性判别分析lda" class="nav-link" data-scroll-target="#线性判别分析lda">线性判别分析（LDA）</a></li>
+  </ul></li>
+  <li><a href="#与本书其他章节的联系" id="toc-与本书其他章节的联系" class="nav-link" data-scroll-target="#与本书其他章节的联系">与本书其他章节的联系</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./09-回归分析.html">Part III: 现代统计方法</a></li><li class="breadcrumb-item"><a href="./14-多元统计分析.html"><span class="chapter-title">多元统计分析</span></a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title"><span class="chapter-title">多元统计分析</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<blockquote class="blockquote">
+<p>当数据从”每个个体一个指标”扩展到”每个个体多个指标”时，变量之间的相关性成为了信息的核心来源。多元统计分析的目标正是揭示和利用这种变量之间的结构。</p>
+</blockquote>
+<p>前面各章主要关注单个响应变量与若干自变量之间的关系（Ch10, Ch11）。多元统计分析则将所有变量放在同等的地位上，同时研究变量之间的相关结构、降维方式和分组模式。它横跨了经典统计学与机器学习之间的桥梁。</p>
+<section id="多元数据的描述" class="level2">
+<h2 class="anchored" data-anchor-id="多元数据的描述">多元数据的描述</h2>
+<section id="样本均值向量与协方差矩阵" class="level3">
+<h3 class="anchored" data-anchor-id="样本均值向量与协方差矩阵">样本均值向量与协方差矩阵</h3>
+<p>设有 <span class="math inline">\(n\)</span> 个观测，每个观测有 <span class="math inline">\(p\)</span> 个变量：<span class="math inline">\(\mathbf{x}_i = (x_{i1}, x_{i2}, \ldots, x_{ip})'\)</span>。</p>
+<p><strong>样本均值向量</strong>：</p>
+<p><span class="math display">\[\bar{\mathbf{x}} = \frac{1}{n} \sum_{i=1}^n \mathbf{x}_i\]</span></p>
+<p><strong>样本协方差矩阵</strong>：</p>
+<p><span class="math display">\[\mathbf{S} = \frac{1}{n-1} \sum_{i=1}^n (\mathbf{x}_i - \bar{\mathbf{x}})(\mathbf{x}_i - \bar{\mathbf{x}})'\]</span></p>
+<p><span class="math inline">\(\mathbf{S}\)</span> 是一个 <span class="math inline">\(p \times p\)</span> 的对称正定矩阵。对角线元素是各变量的样本方差，非对角线元素是两两变量之间的样本协方差。</p>
+<p><strong>样本相关矩阵</strong>：</p>
+<p><span class="math display">\[\mathbf{R} = \mathbf{D}^{-1/2} \mathbf{S} \mathbf{D}^{-1/2}\]</span></p>
+<p>其中 <span class="math inline">\(\mathbf{D} = \text{diag}(s_1^2, \ldots, s_p^2)\)</span>。<span class="math inline">\(\mathbf{R}\)</span> 的 <span class="math inline">\((i, j)\)</span> 元即为 <span class="math inline">\(X_i\)</span> 与 <span class="math inline">\(X_j\)</span> 的样本相关系数。</p>
+</section>
+<section id="多元正态分布" class="level3">
+<h3 class="anchored" data-anchor-id="多元正态分布">多元正态分布</h3>
+<p><span class="math inline">\(p\)</span> 维随机向量 <span class="math inline">\(\mathbf{X}\)</span> 服从多元正态分布 <span class="math inline">\(N_p(\boldsymbol{\mu}, \boldsymbol{\Sigma})\)</span>，如果其密度函数为：</p>
+<p><span class="math display">\[f(\mathbf{x}) = \frac{1}{(2\pi)^{p/2} |\boldsymbol{\Sigma}|^{1/2}} \exp\left(-\frac{1}{2} (\mathbf{x} - \boldsymbol{\mu})' \boldsymbol{\Sigma}^{-1} (\mathbf{x} - \boldsymbol{\mu})\right)\]</span></p>
+<p><strong>核心性质</strong>：</p>
+<ol type="1">
+<li>边缘分布：<span class="math inline">\(\mathbf{X}\)</span> 的任意子向量也服从正态分布。</li>
+<li>条件分布：给定部分变量后，其余变量的条件分布也是正态分布。</li>
+<li>线性变换：<span class="math inline">\(\mathbf{Y} = \mathbf{A}\mathbf{X} + \mathbf{b} \sim N_q(\mathbf{A}\boldsymbol{\mu} + \mathbf{b}, \mathbf{A}\boldsymbol{\Sigma}\mathbf{A}')\)</span>。</li>
+<li>独立性与不相关性等价：在多元正态下，<span class="math inline">\(\text{Cov}(X_i, X_j) = 0 \Leftrightarrow X_i\)</span> 与 <span class="math inline">\(X_j\)</span> 独立。</li>
+</ol>
+<blockquote class="blockquote">
+<p>性质 4 对多元正态成立，但对一般分布不成立——这是 Ch02 中反复强调的”不相关 ≠ 独立”在多元正态中的例外。</p>
+</blockquote>
+</section>
+</section>
+<section id="主成分分析pca" class="level2">
+<h2 class="anchored" data-anchor-id="主成分分析pca">主成分分析（PCA）</h2>
+<section id="基本思想" class="level3">
+<h3 class="anchored" data-anchor-id="基本思想">基本思想</h3>
+<p>主成分分析的目标是找到变量的线性组合，使得这些组合： 1. 方差尽可能大（保留尽可能多的信息）。 2. 彼此之间不相关（去冗余）。</p>
+<p>从几何上看，PCA 等价于对数据做<strong>坐标旋转</strong>，使得新坐标轴的方向与数据最大变异方向对齐。</p>
+</section>
+<section id="数学推导" class="level3">
+<h3 class="anchored" data-anchor-id="数学推导">数学推导</h3>
+<p>问题：寻找方向 <span class="math inline">\(\mathbf{a}\)</span>（<span class="math inline">\(\|\mathbf{a}\| = 1\)</span>），使得投影 <span class="math inline">\(\mathbf{a}'\mathbf{X}\)</span> 的方差最大化：</p>
+<p><span class="math display">\[\max_{\|\mathbf{a}\|=1} \text{Var}(\mathbf{a}'\mathbf{X}) = \max_{\|\mathbf{a}\|=1} \mathbf{a}' \boldsymbol{\Sigma} \mathbf{a}\]</span></p>
+<p>解：<span class="math inline">\(\mathbf{a}\)</span> 是 <span class="math inline">\(\boldsymbol{\Sigma}\)</span> 的最大特征值对应的特征向量。这就是<strong>第一主成分</strong>。</p>
+<p>第二主成分在与第一主成分正交的约束下最大化方差，对应第二大的特征向量。以此类推。</p>
+</section>
+<section id="方差解释比例" class="level3">
+<h3 class="anchored" data-anchor-id="方差解释比例">方差解释比例</h3>
+<p>第 <span class="math inline">\(k\)</span> 个主成分的方差解释比例为：</p>
+<p><span class="math display">\[\lambda_k \Big/ \sum_{j=1}^p \lambda_j\]</span></p>
+<p>其中 <span class="math inline">\(\lambda_1 \geq \lambda_2 \geq \cdots \geq \lambda_p \geq 0\)</span> 是 <span class="math inline">\(\boldsymbol{\Sigma}\)</span>（或 <span class="math inline">\(\mathbf{S}\)</span>）的特征值。</p>
+<blockquote class="blockquote">
+<p>实践中，通常选取前几个主成分，使得累积方差解释比例达到 80%-90%。这既实现了降维，又保留了大部分信息。</p>
+</blockquote>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># PCA 示例：iris 数据集</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(iris)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>pca <span class="ot">&lt;-</span> <span class="fu">prcomp</span>(iris[, <span class="dv">1</span><span class="sc">:</span><span class="dv">4</span>], <span class="at">scale. =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(pca)          <span class="co"># 方差解释</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>Importance of components:
+                          PC1    PC2     PC3     PC4
+Standard deviation     1.7084 0.9560 0.38309 0.14393
+Proportion of Variance 0.7296 0.2285 0.03669 0.00518
+Cumulative Proportion  0.7296 0.9581 0.99482 1.00000</code></pre>
+</div>
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>pca<span class="sc">$</span>rotation           <span class="co"># 载荷（特征向量）</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>                    PC1         PC2        PC3        PC4
+Sepal.Length  0.5210659 -0.37741762  0.7195664  0.2612863
+Sepal.Width  -0.2693474 -0.92329566 -0.2443818 -0.1235096
+Petal.Length  0.5804131 -0.02449161 -0.1421264 -0.8014492
+Petal.Width   0.5648565 -0.06694199 -0.6342727  0.5235971</code></pre>
+</div>
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">biplot</span>(pca)            <span class="co"># 双标图</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="14-多元统计分析_files/figure-html/unnamed-chunk-1-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="pca-与-svd-的联系" class="level3">
+<h3 class="anchored" data-anchor-id="pca-与-svd-的联系">PCA 与 SVD 的联系</h3>
+<p>对中心化的数据矩阵 <span class="math inline">\(\tilde{\mathbf{X}}\)</span>（<span class="math inline">\(n \times p\)</span>），其样本协方差矩阵为 <span class="math inline">\(\mathbf{S} = \frac{1}{n-1} \tilde{\mathbf{X}}'\tilde{\mathbf{X}}\)</span>。</p>
+<p>若对 <span class="math inline">\(\tilde{\mathbf{X}}\)</span> 做 SVD：<span class="math inline">\(\tilde{\mathbf{X}} = \mathbf{U} \boldsymbol{\Sigma} \mathbf{V}'\)</span>，则：</p>
+<ul>
+<li><span class="math inline">\(\mathbf{V}\)</span> 的列就是主成分方向（<span class="math inline">\(\mathbf{S}\)</span> 的特征向量）。</li>
+<li><span class="math inline">\(\sigma_i^2 / (n-1)\)</span> 就是第 <span class="math inline">\(i\)</span> 个特征值。</li>
+</ul>
+<p>这一联系（Ch16 中也有讨论）意味着 PCA 的计算本质上就是一个 SVD 分解。</p>
+</section>
+<section id="pca-与信息压缩" class="level3">
+<h3 class="anchored" data-anchor-id="pca-与信息压缩">PCA 与信息压缩</h3>
+<p>回到 Ch01 的熵和 Ch16 的 SVD：PCA 本质上是一次<strong>有保证的最优信息压缩</strong>。在所有可能的 <span class="math inline">\(k\)</span> 维线性投影中，PCA 保留了最大的方差——而方差是信息含量的度量（在高斯假设下，方差 = 熵）。因此：</p>
+<blockquote class="blockquote">
+<p><strong>PCA = 在给定降维维度 <span class="math inline">\(k\)</span> 的约束下，最大化保留原始数据的熵</strong>。</p>
+</blockquote>
+<p>这也是为什么 PCA 被广泛用于可视化和预处理：在扔掉最少信息的前提下，把高维数据投影到人类可以理解的 2D 或 3D 空间。</p>
+</section>
+</section>
+<section id="因子分析" class="level2">
+<h2 class="anchored" data-anchor-id="因子分析">因子分析</h2>
+<p>因子分析（Factor Analysis）与 PCA 不同：PCA 是纯变量变换，而因子分析假设存在<strong>隐变量</strong>驱动观测变量之间的相关性。</p>
+<p><span class="math display">\[X_i = \lambda_{i1} F_1 + \lambda_{i2} F_2 + \cdots + \lambda_{im} F_m + \varepsilon_i, \quad m &lt; p\]</span></p>
+<p>其中： - <span class="math inline">\(F_1, \ldots, F_m\)</span> 是公共因子（不可观测）。 - <span class="math inline">\(\lambda_{ij}\)</span> 是<strong>因子载荷</strong>（Factor Loading）。 - <span class="math inline">\(\varepsilon_i\)</span> 是特殊因子（变量 <span class="math inline">\(X_i\)</span> 独有的部分）。</p>
+<blockquote class="blockquote">
+<p>PCA 和因子分析的区别：PCA 想的是”如何用少数组合作替原始变量”，因子分析想的是”有没有少量隐变量可以解释观测变量间的相关性”。</p>
+</blockquote>
+<p><strong>PCA 与因子分析的核心区别</strong>：</p>
+<ul>
+<li>PCA：<span class="math inline">\(\text{PC}_k = a_{k1}X_1 + \cdots + a_{kp}X_p\)</span>——主成分是原始变量的<strong>线性组合</strong>，目标是”用少数组合作替原始变量”。</li>
+<li>因子分析：<span class="math inline">\(X_i = \lambda_{i1}F_1 + \cdots + \lambda_{im}F_m + \varepsilon_i\)</span>——因子是驱动观测变量的<strong>隐变量</strong>，目标是”找到观测相关性的潜在来源”。</li>
+</ul>
+<p>PCA 做的是<strong>数据压缩</strong>，因子分析做的是<strong>因果解释</strong>。在信息论上，PCA 最小化的是重构误差，因子分析最小化的是”消除公共因子后残差相关性”。</p>
+</section>
+<section id="聚类分析" class="level2">
+<h2 class="anchored" data-anchor-id="聚类分析">聚类分析</h2>
+<p>聚类分析（Cluster Analysis）将相似的观测归入同一组，使得组内尽可能同质、组间尽可能异质。</p>
+<section id="k-means-聚类" class="level3">
+<h3 class="anchored" data-anchor-id="k-means-聚类">K-means 聚类</h3>
+<p><strong>算法步骤</strong>：</p>
+<ol type="1">
+<li>随机初始化 <span class="math inline">\(K\)</span> 个聚类中心 <span class="math inline">\(\mathbf{c}_1, \ldots, \mathbf{c}_K\)</span>。</li>
+<li>将每个样本分配到最近的中心。</li>
+<li>重新计算每个聚类的中心（均值）。</li>
+<li>重复步骤 2-3 直至收敛。</li>
+</ol>
+<p>K-means 最小化的是组内平方和：<span class="math inline">\(W(C) = \sum_{k=1}^K \sum_{i \in C_k} \|\mathbf{x}_i - \mathbf{c}_k\|^2\)</span>。</p>
+<p><strong>注意事项</strong>：K-means 需要预先指定 <span class="math inline">\(K\)</span>；对初始值敏感；只能发现球形聚类。</p>
+</section>
+<section id="层次聚类" class="level3">
+<h3 class="anchored" data-anchor-id="层次聚类">层次聚类</h3>
+<p>层次聚类不需要预先指定聚类数，而是构建一个树状结构（系统树图）：</p>
+<ul>
+<li><strong>凝聚法</strong>（Agglomerative）：从每个样本各自为一类开始，逐步合并最近的类。</li>
+<li><strong>分裂法</strong>（Divisive）：从所有样本为一类开始，逐步分裂。</li>
+</ul>
+<p>类间距离的定义方式（单连接、全连接、平均连接、Ward 方法）会影响聚类结果。</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># K-means 与层次聚类示例</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(iris)</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>scaled_iris <span class="ot">&lt;-</span> <span class="fu">scale</span>(iris[, <span class="dv">1</span><span class="sc">:</span><span class="dv">4</span>])</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="co"># K-means</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>km <span class="ot">&lt;-</span> <span class="fu">kmeans</span>(scaled_iris, <span class="at">centers =</span> <span class="dv">3</span>)</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(km<span class="sc">$</span>cluster, iris<span class="sc">$</span>Species)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>   
+    setosa versicolor virginica
+  1     50          0         0
+  2      0         11        36
+  3      0         39        14</code></pre>
+</div>
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 层次聚类</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>hc <span class="ot">&lt;-</span> <span class="fu">hclust</span>(<span class="fu">dist</span>(scaled_iris), <span class="at">method =</span> <span class="st">"ward.D2"</span>)</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(hc, <span class="at">labels =</span> <span class="cn">FALSE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="14-多元统计分析_files/figure-html/unnamed-chunk-2-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="判别分析" class="level2">
+<h2 class="anchored" data-anchor-id="判别分析">判别分析</h2>
+<p>与聚类分析不同，判别分析是有监督的分类方法——已知每个样本的类别标签，目标是找到能将不同类别最好地分开的方向。</p>
+<section id="线性判别分析lda" class="level3">
+<h3 class="anchored" data-anchor-id="线性判别分析lda">线性判别分析（LDA）</h3>
+<p>LDA 假设各类别服从多元正态分布，且具有相同的协方差矩阵（但均值不同）。分类规则为：</p>
+<p>将 <span class="math inline">\(\mathbf{x}\)</span> 分配到使后验概率 <span class="math inline">\(P(Y = k \mid \mathbf{x})\)</span> 最大的类别。</p>
+<p>LDA 找到的判别方向恰好是 <span class="math inline">\(\boldsymbol{\Sigma}^{-1} (\boldsymbol{\mu}_1 - \boldsymbol{\mu}_2)\)</span>（二分类情况），也就是<strong>最大化类间方差与类内方差之比</strong>的方向。</p>
+<blockquote class="blockquote">
+<p>LDA 既可以用于分类，也可以用于降维（找到最具判别力的投影方向）。</p>
+</blockquote>
+</section>
+</section>
+<section id="与本书其他章节的联系" class="level2">
+<h2 class="anchored" data-anchor-id="与本书其他章节的联系">与本书其他章节的联系</h2>
+<ul>
+<li>PCA 的计算依赖 Ch16 中的 SVD 分解。</li>
+<li>判别分析与 Ch11（GLM 的二分类）和 Ch18（分类方法）密切相关。</li>
+<li>聚类与 Ch17 中的无监督学习主题重叠。</li>
+<li>协方差矩阵的估计与检验依赖于 Ch07 中的多元检验理论。</li>
+</ul>
+<hr>
+<p><strong>速查卡片</strong>：</p>
+<ul>
+<li><strong>核心问题</strong>：如何在多变量数据的复杂结构中提取简化的、可解释的模式？</li>
+<li><strong>三大任务</strong>：降维（PCA/因子分析）、分组（聚类/判别分析）、相关结构建模</li>
+<li><strong>关键方法</strong>：PCA = SVD + 方差最大化；LDA = 最大化类间/类内方差比</li>
+<li><strong>R命令</strong>：<code>prcomp()</code>, <code>factanal()</code>, <code>kmeans()</code>, <code>hclust()</code>, <code>lda()</code> (MASS)</li>
+</ul>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="./13-时间序列分析.html" class="pagination-link" aria-label="时间序列分析">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-title">时间序列分析</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="./15-机器学习基础.html" class="pagination-link" aria-label="机器学习基础">
+        <span class="nav-page-text"><span class="chapter-title">机器学习基础</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

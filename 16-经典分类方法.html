@@ -1,0 +1,960 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.37">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>经典分类方法 – 乱中寻序：统计学的统一逻辑</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./17-集成学习与模型选择.html" rel="next">
+<link href="./15-机器学习基础.html" rel="prev">
+<script src="site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-7f8f88aac4f3542376d5c11b86a4c14d.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-b46385535caf84bc62f311a600ac5013.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body class="nav-sidebar docked quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./15-机器学习基础.html">Part IV: 机器学习</a></li><li class="breadcrumb-item"><a href="./16-经典分类方法.html"><span class="chapter-title">经典分类方法</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="./">乱中寻序：统计学的统一逻辑</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">乱中寻序：统计学的统一逻辑</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false">
+ <span class="menu-text">Part I: 概率论基础</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./01-概率初步与随机变量的分布.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">概率初步与随机变量的分布</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./02-多维随机变量及其分布.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">多维随机变量及其分布</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./03-大数定律和中心极限定理.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">大数定律和中心极限定理</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./04-概率不等式与收敛性.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">概率不等式与收敛性</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false">
+ <span class="menu-text">Part II: 经典统计推断</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./05-统计量与抽样分布.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">统计量与抽样分布</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./06-参数估计.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">参数估计</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./07-假设检验与方差分析.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">假设检验与方差分析</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./08-贝叶斯统计与计算.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">贝叶斯统计与计算</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false">
+ <span class="menu-text">Part III: 现代统计方法</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./09-回归分析.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">回归分析</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./10-广义线性模型.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">广义线性回归</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./11-类别数据分析.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">类别数据分析</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./12-非参数统计.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">非参数统计</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./13-时间序列分析.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">时间序列分析</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./14-多元统计分析.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">多元统计分析</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part IV: 机器学习</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./15-机器学习基础.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">机器学习基础</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./16-经典分类方法.html" class="sidebar-item-text sidebar-link active"><span class="chapter-title">经典分类方法</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./17-集成学习与模型选择.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">集成学习与模型选择</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./18-深度学习.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">深度学习</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./19-因果推断入门.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">因果推断入门</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="false">
+ <span class="menu-text">附录：统计计算工具</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./A-优化方法.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">优化方法</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./B-矩阵计算与数值方法.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">矩阵计算与数值方法</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#决策树" id="toc-决策树" class="nav-link active" data-scroll-target="#决策树">决策树</a></li>
+  <li><a href="#支持向量机svm" id="toc-支持向量机svm" class="nav-link" data-scroll-target="#支持向量机svm">支持向量机（SVM）</a></li>
+  <li><a href="#朴素贝叶斯分类器" id="toc-朴素贝叶斯分类器" class="nav-link" data-scroll-target="#朴素贝叶斯分类器">朴素贝叶斯分类器</a></li>
+  <li><a href="#k-近邻k-nn" id="toc-k-近邻k-nn" class="nav-link" data-scroll-target="#k-近邻k-nn">k-近邻（k-NN）</a></li>
+  <li><a href="#分类器的信息论统一视角" id="toc-分类器的信息论统一视角" class="nav-link" data-scroll-target="#分类器的信息论统一视角">分类器的信息论统一视角</a></li>
+  <li><a href="#分类器对比" id="toc-分类器对比" class="nav-link" data-scroll-target="#分类器对比">分类器对比</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./15-机器学习基础.html">Part IV: 机器学习</a></li><li class="breadcrumb-item"><a href="./16-经典分类方法.html"><span class="chapter-title">经典分类方法</span></a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title"><span class="chapter-title">经典分类方法</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<blockquote class="blockquote">
+<p>分类是监督学习的核心任务。从直觉驱动的决策树到核化的支持向量机，再到基于概率的朴素贝叶斯——每种方法都在偏差-方差光谱上占据不同的位置。理解它们的位置，比记住它们的公式更重要。</p>
+</blockquote>
+<section id="决策树" class="level2">
+<h2 class="anchored" data-anchor-id="决策树">决策树</h2>
+<p>设有训练数据 <span class="math inline">\(\{(x_i, y_i)\}_{i=1}^n\)</span>，其中 <span class="math inline">\(y_i\)</span> 是类别标签，<span class="math inline">\(x_i\)</span> 是特征向量。决策树的基本思想是从根节点开始，根据属性的不同取值设置分支条件，希望每次分裂后各子节点内的样本尽可能”纯净”。</p>
+<p><strong>分裂条件的选择</strong>是决策树的核心问题。两个常用的度量指标为：</p>
+<ul>
+<li><strong>基尼系数</strong>（Gini Index）：</li>
+</ul>
+<p><span class="math display">\[
+Gini(D) = 1 - \sum_{k=1}^{K} p_k^2
+\]</span></p>
+<p>其中 <span class="math inline">\(p_k\)</span> 是第 <span class="math inline">\(k\)</span> 类在节点 <span class="math inline">\(D\)</span> 中所占的比例。基尼系数越小，节点越纯。决策树遍历所有可能的分裂条件，选择使加权基尼系数下降最多的分裂。</p>
+<ul>
+<li><strong>信息熵</strong>（Entropy）：</li>
+</ul>
+<p><span class="math display">\[
+Ent(D) = -\sum_{k=1}^{K} p_k \log_2 p_k
+\]</span></p>
+<p>信息增益越大，说明使用该属性进行分裂的效果越好。这一视角与 Ch01 中信息熵的讨论一脉相承——决策树的每次分裂，本质上是在本地做一次”熵减”，逐步将不确定性转化为确定性。</p>
+<blockquote class="blockquote">
+<p>用 ID 这样的唯一标识进行分裂，每个节点将只有单个样本，看上去完全纯净，但这样的树没有任何泛化能力——这就是过拟合的直观体现（偏差-方差分解的详细讨论见 Ch17）。</p>
+</blockquote>
+<p><strong>停止条件与剪枝</strong>：为防止过拟合，需要设置停止分裂的条件，如最小基尼系数阈值、最大深度限制、节点最小样本数等。决策树是一种<strong>贪婪算法</strong>：每次选择当前最优的分裂条件，但不保证得到全局最优的树结构。</p>
+<p><strong>剪枝策略</strong>：</p>
+<ul>
+<li><p><strong>预剪枝（Pre-pruning）</strong>：在分裂前判断——如果分裂带来的信息增益低于阈值，或节点样本数过少，则不分裂。优点是训练快，缺点是可能过早停止（“视野短浅”）。</p></li>
+<li><p><strong>后剪枝（Post-pruning）</strong>：先让树充分生长，再自底向上剪除不重要的分支。<strong>代价复杂度剪枝（Cost-Complexity Pruning）</strong> 引入惩罚参数 <span class="math inline">\(\alpha\)</span> 平衡树的拟合度与复杂度：</p>
+<p><span class="math display">\[R_\alpha(T) = R(T) + \alpha |T|\]</span></p>
+<p>其中 <span class="math inline">\(R(T)\)</span> 是树的误分类代价，<span class="math inline">\(|T|\)</span> 是叶节点数。<span class="math inline">\(\alpha\)</span> 越大，树越小——这正是偏差-方差权衡在决策树中的操作化。</p></li>
+</ul>
+<p><strong>CART vs C4.5</strong>：CART 使用基尼系数，只能二分；C4.5 使用信息增益比，允许多路分支。实践中 CART 更常见，因为二分结构更易于编码和集成。</p>
+</section>
+<section id="支持向量机svm" class="level2">
+<h2 class="anchored" data-anchor-id="支持向量机svm">支持向量机（SVM）</h2>
+<p>支持向量机的核心目标是寻找一个最大间隔超平面来分离两类样本。其优化问题可形式化为：</p>
+<p><span class="math display">\[
+\begin{aligned}
+\min_{w, b} \quad &amp; \frac{1}{2} \|w\|^2 \\
+\text{s.t.} \quad &amp; y_i (w' x_i + b) \geq 1, \quad i = 1, \ldots, n
+\end{aligned}
+\]</span></p>
+<p>通过拉格朗日乘子法转化为对偶问题，再利用 KKT 条件求解。根据互补松弛条件，只有位于间隔边界上的支持向量对应的乘子不为零——最终的分割超平面仅由少数支持向量决定。</p>
+<p><strong>序列最小优化算法</strong>（SMO）：每次仅选择两个乘子 <span class="math inline">\(\alpha_i, \alpha_j\)</span> 进行优化，固定其余所有乘子，大大简化了每次迭代的计算。</p>
+<p><strong>软间隔</strong>（Soft Margin）：为允许一定的分类错误，引入松弛变量 <span class="math inline">\(\xi_i\)</span> 和惩罚参数 <span class="math inline">\(C\)</span>：</p>
+<p><span class="math display">\[
+\begin{aligned}
+\min_{w, b, \xi} \quad &amp; \frac{1}{2} \|w\|^2 + C \sum_{i=1}^{n} \xi_i \\
+\text{s.t.} \quad &amp; y_i (w' x_i + b) \geq 1 - \xi_i, \quad \xi_i \geq 0
+\end{aligned}
+\]</span></p>
+<p>超参数 <span class="math inline">\(C\)</span> 控制对误分类的惩罚力度：<span class="math inline">\(C\)</span> 越大，对误分类的容忍度越低。从统计视角看，这一正则化策略等价于在经验风险上添加对模型复杂度的惩罚。</p>
+<p><strong>核函数</strong>：对于线性不可分的数据，通过映射 <span class="math inline">\(\phi: \mathcal{X} \to \mathcal{H}\)</span> 将数据升维至高维空间。核函数 <span class="math inline">\(K(x_i, x_j) = \langle \phi(x_i), \phi(x_j) \rangle\)</span> 相当于在原始空间中直接计算升维后的内积——<strong>核技巧</strong>避免了显式高维计算的困难。常用核函数：</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 36%">
+<col style="width: 36%">
+<col style="width: 27%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>核名称</th>
+<th>表达式</th>
+<th>特点</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>线性核</td>
+<td><span class="math inline">\(K(x_i, x_j) = x_i \cdot x_j\)</span></td>
+<td>无额外超参数，等价于原始空间的线性分类</td>
+</tr>
+<tr class="even">
+<td>多项式核</td>
+<td><span class="math inline">\(K(x_i, x_j) = (x_i \cdot x_j + c)^d\)</span></td>
+<td>可控制映射的复杂度（参数 <span class="math inline">\(d\)</span>）</td>
+</tr>
+<tr class="odd">
+<td>RBF 核</td>
+<td><span class="math inline">\(K(x_i, x_j) = \exp(-\gamma\|x_i - x_j\|^2)\)</span></td>
+<td>最常用，相当于无限维映射</td>
+</tr>
+</tbody>
+</table>
+<p><strong>核函数的几何直觉</strong>：为什么 RBF 核如此有效？考虑两个样本 <span class="math inline">\(\mathbf{x}_i\)</span> 和 <span class="math inline">\(\mathbf{x}_j\)</span>：</p>
+<p><span class="math display">\[K_{RBF}(\mathbf{x}_i, \mathbf{x}_j) = \exp(-\gamma \|\mathbf{x}_i - \mathbf{x}_j\|^2)\]</span></p>
+<p>当两点很近时，<span class="math inline">\(K \approx 1\)</span>（高度相似）；当两点很远时，<span class="math inline">\(K \approx 0\)</span>（几乎无关）。RBF 核在说一句话：<strong>“相似的样本应该有相似的标签”</strong>。<span class="math inline">\(\gamma\)</span> 控制”多远算远”——<span class="math inline">\(\gamma\)</span> 大则影响范围小（复杂决策边界，低偏差高方差），<span class="math inline">\(\gamma\)</span> 小则影响范围大（平滑决策边界，高偏差低方差）。</p>
+<p>这本质上是将 SVM 解释为一个<strong>局部加权投票机制</strong>——每个支持向量对其邻域内的测试点施加”引力”，核函数决定了引力的衰减速度。</p>
+</section>
+<section id="朴素贝叶斯分类器" class="level2">
+<h2 class="anchored" data-anchor-id="朴素贝叶斯分类器">朴素贝叶斯分类器</h2>
+<p>朴素贝叶斯分类器基于贝叶斯定理：</p>
+<p><span class="math display">\[
+P(Y = k \mid X = x) = \frac{P(Y = k) P(X = x \mid Y = k)}{P(X = x)}
+\]</span></p>
+<p>其”朴素”之处在于假设各特征在给定类别的条件下相互独立：</p>
+<p><span class="math display">\[
+P(X = x \mid Y = k) = \prod_{j=1}^{p} P(X_j = x_j \mid Y = k)
+\]</span></p>
+<p>在这一假设下，分类器的训练本质上是一个计数过程，因此特别适合处理离散型数据。对于文本分类（如垃圾邮件检测）表现尤为出色。对于连续型特征，通常需假设其服从正态分布。</p>
+<blockquote class="blockquote">
+<p>若条件独立假设不成立，可以进一步刻画变量之间的依赖关系，即构建<strong>贝叶斯网络</strong>（Bayesian Network）。</p>
+</blockquote>
+<p><strong>朴素贝叶斯与逻辑回归的联系</strong>：当特征服从正态分布且各类别协方差矩阵相等时，朴素贝叶斯的后验概率 <span class="math inline">\(P(Y=k|X=x)\)</span> 恰好等于逻辑回归的预测概率。差异在于：朴素贝叶斯是<strong>生成式模型</strong>——它对 <span class="math inline">\(P(X,Y)\)</span> 建模后反推 <span class="math inline">\(P(Y|X)\)</span>；逻辑回归是<strong>判别式模型</strong>——直接对 <span class="math inline">\(P(Y|X)\)</span> 建模。生成式模型在数据较少时更稳定（利用了分布假设），判别式模型在数据充裕时更准确（不需要正确的分布假设）。</p>
+</section>
+<section id="k-近邻k-nn" class="level2">
+<h2 class="anchored" data-anchor-id="k-近邻k-nn">k-近邻（k-NN）</h2>
+<p>k-近邻是最直观的非参数分类方法——它甚至连模型都不显式训练。对于新样本 <span class="math inline">\(x^*\)</span>，k-NN 在训练集中寻找距离最近的 <span class="math inline">\(k\)</span> 个点，以多数投票决定 <span class="math inline">\(x^*\)</span> 的类别：</p>
+<p><span class="math display">\[\hat{y} = \arg\max_{c} \sum_{i \in \mathcal{N}_k(x^*)} I(y_i = c)\]</span></p>
+<p>k-NN 天然与 Ch13 的非参数统计理念相通：不做分布假设，让数据自己说话。距离度量的选择（欧氏距离、曼哈顿距离、马氏距离）和 <span class="math inline">\(k\)</span> 的选择是其两个核心决策。<span class="math inline">\(k\)</span> 太小则方差大（过拟合），<span class="math inline">\(k\)</span> 太大则偏差大（欠拟合）——这是偏差-方差权衡（Ch17）的直观展现。</p>
+<p><strong>维数灾难（Curse of Dimensionality）</strong>：k-NN 在高维空间中会失效。原因：随着维度 <span class="math inline">\(p\)</span> 增加，空间中”最近的点”和”最远的点”之间的距离差异越来越小——所有点都变得差不多远。在 <span class="math inline">\(p=100\)</span> 维空间中，“邻域”这个概念已经失去了意义。这意味着：</p>
+<ul>
+<li>k-NN 通常只适用于低维数据（<span class="math inline">\(p &lt; 20\)</span>）。</li>
+<li>如果想在高维场景下使用 k-NN，必须先降维（PCA, Ch21）或特征选择。</li>
+<li>维数灾难不是 k-NN 独有的——它影响所有基于距离的方法（包括 SVM 的 RBF 核）。</li>
+</ul>
+</section>
+<section id="分类器的信息论统一视角" class="level2">
+<h2 class="anchored" data-anchor-id="分类器的信息论统一视角">分类器的信息论统一视角</h2>
+<p>回到 Ch01 的核心洞察：<strong>信息熵是”无知”的度量，而分类是在做”熵减”</strong>。</p>
+<ul>
+<li><strong>决策树</strong>：每次分裂选择使子节点熵（基尼系数）下降最多的属性——显式地以”信息增益”为优化目标。</li>
+<li><strong>朴素贝叶斯</strong>：用贝叶斯公式更新后验概率 <span class="math inline">\(P(Y|X)\)</span>，等价于用特征 <span class="math inline">\(X\)</span> 的信息将 <span class="math inline">\(Y\)</span> 的熵从 <span class="math inline">\(H(Y)\)</span> 缩小到 <span class="math inline">\(H(Y|X)\)</span>。</li>
+<li><strong>SVM</strong>：寻找使两类间隔最大的超平面，等价于在特征空间中寻找使分类不确定性最小的分界线。</li>
+<li><strong>k-NN</strong>：用局部邻域的标签分布来近似 <span class="math inline">\(P(Y|X=x)\)</span>——一种非参数的条件概率估计。</li>
+</ul>
+<p>四种方法的共同目标：<strong>给定 <span class="math inline">\(X\)</span>，最小化 <span class="math inline">\(Y\)</span> 剩余的不确定性。</strong> 这正是条件熵 <span class="math inline">\(H(Y|X)\)</span> 的定义。分类器越好，<span class="math inline">\(H(Y|X)\)</span> 越接近于零——给定特征后，标签几乎是确定的。</p>
+</section>
+<section id="分类器对比" class="level2">
+<h2 class="anchored" data-anchor-id="分类器对比">分类器对比</h2>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>方法</th>
+<th>偏差</th>
+<th>方差</th>
+<th>可解释性</th>
+<th>计算复杂度</th>
+<th>适用场景</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>决策树</td>
+<td>中</td>
+<td>中</td>
+<td>高</td>
+<td>低（训练）</td>
+<td>需要解释性规则</td>
+</tr>
+<tr class="even">
+<td>SVM (RBF核)</td>
+<td>低</td>
+<td>低-中</td>
+<td>低</td>
+<td>中</td>
+<td>高维、非线性分类</td>
+</tr>
+<tr class="odd">
+<td>朴素贝叶斯</td>
+<td>高</td>
+<td>低</td>
+<td>中</td>
+<td>极低</td>
+<td>文本分类、小样本</td>
+</tr>
+<tr class="even">
+<td>k-NN</td>
+<td>中</td>
+<td>高</td>
+<td>中</td>
+<td>高（预测）</td>
+<td>小数据、非参数场景</td>
+</tr>
+</tbody>
+</table>
+<p>各方法的集成版本（随机森林、梯度提升）将在 Ch19 中详细讨论。</p>
+<hr>
+<p><strong>速查卡片</strong>：</p>
+<ul>
+<li><strong>核心问题</strong>：给定特征 <span class="math inline">\(X\)</span>，如何预测类别 <span class="math inline">\(Y\)</span>？每种方法在偏差-方差光谱的哪个位置？</li>
+<li><strong>决策树</strong>：可解释性最优，贪婪分裂 + 剪枝防过拟合</li>
+<li><strong>SVM</strong>：最大间隔 + 核技巧 → 高维非线性分类的最强工具之一</li>
+<li><strong>朴素贝叶斯</strong>：条件独立假设 + 贝叶斯定理 → 文本分类的首选</li>
+<li><strong>k-NN</strong>：零训练代价，但高预测代价 + 维度灾难</li>
+<li><strong>统一视角</strong>：所有分类器都在最小化 <span class="math inline">\(H(Y|X)\)</span>——用特征压缩标签的不确定性</li>
+<li><strong>R 命令</strong>：<code>rpart::rpart()</code>, <code>e1071::svm()</code>, <code>e1071::naiveBayes()</code>, <code>class::knn()</code></li>
+</ul>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="./15-机器学习基础.html" class="pagination-link" aria-label="机器学习基础">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-title">机器学习基础</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="./17-集成学习与模型选择.html" class="pagination-link" aria-label="集成学习与模型选择">
+        <span class="nav-page-text"><span class="chapter-title">集成学习与模型选择</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

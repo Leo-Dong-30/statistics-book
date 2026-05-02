@@ -1,0 +1,1385 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.37">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>广义线性回归 – 乱中寻序：统计学的统一逻辑</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./11-类别数据分析.html" rel="next">
+<link href="./09-回归分析.html" rel="prev">
+<script src="site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-7f8f88aac4f3542376d5c11b86a4c14d.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-b46385535caf84bc62f311a600ac5013.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body class="nav-sidebar docked quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./09-回归分析.html">Part III: 现代统计方法</a></li><li class="breadcrumb-item"><a href="./10-广义线性模型.html"><span class="chapter-title">广义线性回归</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="./">乱中寻序：统计学的统一逻辑</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">乱中寻序：统计学的统一逻辑</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false">
+ <span class="menu-text">Part I: 概率论基础</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./01-概率初步与随机变量的分布.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">概率初步与随机变量的分布</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./02-多维随机变量及其分布.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">多维随机变量及其分布</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./03-大数定律和中心极限定理.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">大数定律和中心极限定理</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./04-概率不等式与收敛性.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">概率不等式与收敛性</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false">
+ <span class="menu-text">Part II: 经典统计推断</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./05-统计量与抽样分布.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">统计量与抽样分布</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./06-参数估计.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">参数估计</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./07-假设检验与方差分析.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">假设检验与方差分析</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./08-贝叶斯统计与计算.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">贝叶斯统计与计算</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part III: 现代统计方法</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./09-回归分析.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">回归分析</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./10-广义线性模型.html" class="sidebar-item-text sidebar-link active"><span class="chapter-title">广义线性回归</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./11-类别数据分析.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">类别数据分析</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./12-非参数统计.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">非参数统计</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./13-时间序列分析.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">时间序列分析</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./14-多元统计分析.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">多元统计分析</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false">
+ <span class="menu-text">Part IV: 机器学习</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./15-机器学习基础.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">机器学习基础</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./16-经典分类方法.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">经典分类方法</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./17-集成学习与模型选择.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">集成学习与模型选择</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./18-深度学习.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">深度学习</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./19-因果推断入门.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">因果推断入门</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="false">
+ <span class="menu-text">附录：统计计算工具</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./A-优化方法.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">优化方法</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./B-矩阵计算与数值方法.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">矩阵计算与数值方法</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#引言" id="toc-引言" class="nav-link active" data-scroll-target="#引言">引言</a></li>
+  <li><a href="#统一方法" id="toc-统一方法" class="nav-link" data-scroll-target="#统一方法">统一方法</a>
+  <ul class="collapse">
+  <li><a href="#指数族-ef" id="toc-指数族-ef" class="nav-link" data-scroll-target="#指数族-ef">指数族 EF</a></li>
+  <li><a href="#指数分散族-edf" id="toc-指数分散族-edf" class="nav-link" data-scroll-target="#指数分散族-edf">指数分散族 EDF</a></li>
+  </ul></li>
+  <li><a href="#模型简介" id="toc-模型简介" class="nav-link" data-scroll-target="#模型简介">模型简介</a>
+  <ul class="collapse">
+  <li><a href="#定义" id="toc-定义" class="nav-link" data-scroll-target="#定义">定义</a></li>
+  <li><a href="#典型连接" id="toc-典型连接" class="nav-link" data-scroll-target="#典型连接">典型连接</a></li>
+  </ul></li>
+  <li><a href="#估计" id="toc-估计" class="nav-link" data-scroll-target="#估计">估计</a>
+  <ul class="collapse">
+  <li><a href="#newton-raphson算法" id="toc-newton-raphson算法" class="nav-link" data-scroll-target="#newton-raphson算法">Newton-Raphson算法</a></li>
+  <li><a href="#极大似然估计" id="toc-极大似然估计" class="nav-link" data-scroll-target="#极大似然估计">极大似然估计</a></li>
+  </ul></li>
+  <li><a href="#推断" id="toc-推断" class="nav-link" data-scroll-target="#推断">推断</a>
+  <ul class="collapse">
+  <li><a href="#wald检验" id="toc-wald检验" class="nav-link" data-scroll-target="#wald检验">Wald检验</a></li>
+  <li><a href="#偏差统计量" id="toc-偏差统计量" class="nav-link" data-scroll-target="#偏差统计量">偏差统计量</a></li>
+  <li><a href="#偏差之差" id="toc-偏差之差" class="nav-link" data-scroll-target="#偏差之差">偏差之差</a></li>
+  <li><a href="#残差" id="toc-残差" class="nav-link" data-scroll-target="#残差">残差</a></li>
+  </ul></li>
+  <li><a href="#模型应用" id="toc-模型应用" class="nav-link" data-scroll-target="#模型应用">模型应用</a>
+  <ul class="collapse">
+  <li><a href="#二分类响应" id="toc-二分类响应" class="nav-link" data-scroll-target="#二分类响应">二分类响应</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./09-回归分析.html">Part III: 现代统计方法</a></li><li class="breadcrumb-item"><a href="./10-广义线性模型.html"><span class="chapter-title">广义线性回归</span></a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title"><span class="chapter-title">广义线性回归</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="引言" class="level2">
+<h2 class="anchored" data-anchor-id="引言">引言</h2>
+</section>
+<section id="统一方法" class="level2">
+<h2 class="anchored" data-anchor-id="统一方法">统一方法</h2>
+<section id="指数族-ef" class="level3">
+<h3 class="anchored" data-anchor-id="指数族-ef">指数族 EF</h3>
+<p><strong>1、指数族的定义</strong></p>
+<p>设<span class="math inline">\(\mathcal{F} =\{f(x,\theta):\theta\in\Theta\}\)</span>是分布族，若其概率函数<span class="math inline">\(f(x,\theta)\)</span>可以表示成如下形式 <span class="math display">\[
+f(x,\theta) = A(\theta)exp\{\sum_{i=1}^k\ Q_i(\theta)\ T_i(x)\}h(x)
+\]</span> 则称此分布族为指数型分布族（简称指数族），其中<span class="math inline">\(A(\theta),Q_i(\theta)\)</span>是定义在参数空间上的函数，<span class="math inline">\(h(x),T_i(x)\)</span>是定义在样本空间上的函数。</p>
+<p>由概率函数的积分为1，可知：</p>
+<p><span class="math display">\[
+0&lt;\int_{\mathcal{X}}exp\{\sum_{i=1}^k\ Q_i(\theta)\ T_i(x) \}h(x)dx = \frac{1}{A(\theta)}&lt;\infty
+\]</span></p>
+<p>称<span class="math inline">\(G(x)\)</span>为概率函数<span class="math inline">\(f(x,\theta)\)</span>的支撑集，若<span class="math inline">\(G(x) = \{x:f(x,\theta)&gt;0\}\)</span>。指数族中所有分布具有相同的支撑集。</p>
+<p><strong>2、指数族的自然形式</strong></p>
+<p><span class="math display">\[
+f(x,\theta) = C(\theta)exp\{\sum_{i=1}^k\theta_iT_i(x) \}h(x)
+\]</span></p>
+<p>自然参数空间表示如下：</p>
+<p><span class="math display">\[
+\Theta^* = \{(\theta_1,\theta_2,\cdots,\theta_k):\int_{\mathcal{X}}exp\{\sum_{i=1}^k\theta_iT_i(x) \}h(x)dx&lt;\infty \}
+\]</span></p>
+<p><strong>3、正态分布族和二项分布族</strong></p>
+<p>正态分布族的例子：</p>
+<p><span class="math display">\[
+f(x,\theta) = \frac{1}{\sqrt{2\pi}\sigma} e^{-\frac{(x-\mu)^2}{2\sigma^2}} = \frac{1}{\sqrt{2\pi}\sigma} e^{-\frac{\mu^2}{2\sigma^2}} e^{\frac{\mu}{\sigma^2}x-\frac{1}{2\sigma^2}x^2}
+\]</span></p>
+<p>令<span class="math inline">\(\phi_1 = \frac{\mu}{\sigma^2},\phi_2 =-\frac{1}{2\sigma^2}\)</span>，则 <span class="math display">\[
+\frac{1}{\sqrt{2\pi}\sigma}e^{-\frac{\mu^2}{2\sigma^2}} = \sqrt{-\frac{\phi_2}{\pi}}e^{\frac{\phi_1^2}{4\phi_2}} = C(\phi)
+\]</span> 因此，正态分布的自然形式为：</p>
+<p><span class="math display">\[
+f(x,\phi) = \sqrt{-\frac{\phi_2}{\pi}}e^{\frac{\phi_1^2}{4\phi_2}} e^{\phi_1x + \phi_2x^2} = C(\phi)e^{\phi_1t_1(x)+\phi_2t_2(x)}h(x)
+\]</span></p>
+<p>二项分布族的例子：</p>
+<p><span class="math display">\[
+f(x,\theta) = C_n^x\theta^x(1-\theta)^{1-x} = (1-\theta)^n\cdot e^{log(\frac{\theta}{1-\theta}\cdot x)}\cdot C_n^x
+\]</span></p>
+<p>令<span class="math inline">\(log(\frac{\theta}{1-\theta}) = \phi\)</span>，则</p>
+<p><span class="math display">\[
+f(x,\phi) = \frac{1}{(1+e^\phi)^n}\cdot e^{\phi x}\cdot C_n^x = C(\phi)\cdot e^{\phi t_1(x)}h(x)
+\]</span></p>
+<p>值得注意，均匀分布和t分布不是指数族分布。</p>
+<p><strong>4、指数族的性质</strong></p>
+<ul>
+<li><p>性质1：在指数族的自然形式下，自然参数空间为凸集。</p></li>
+<li><p>性质2：设指数族的自然形式中，自然参数空间有内点，<span class="math inline">\(g(x)\)</span>是任一有界可积函数，则对 <span class="math inline">\(G(\theta) = \int g(x)exp\{\sum\theta_jT_j(x) \}h(x)dx\)</span>，积分和求导顺序可以互换。 <span class="math display">\[
+  \frac{\partial^mG(\theta)}{\partial\theta_1^{m_1}\cdots \partial\theta_k^{m_k}} = \int\frac{\partial^m}{\partial\theta_1^{m_1}\cdots \partial\theta_k^{m_k}}[g(x)exp\{\sum\theta_jT_j(x) \}h(x)]dx
+\]</span></p></li>
+<li><p>推论1：以<span class="math inline">\(\Theta_0\)</span>记自然参数空间的内点集，则指数族自然形式表达式中的<span class="math inline">\(C(\theta)\)</span>在<span class="math inline">\(\Theta_0\)</span>上解析，其对各<span class="math inline">\(\theta_j\)</span>的偏导数可通过在积分号下求导算出。</p></li>
+<li><p>推论2：若<span class="math inline">\(\theta\in\Theta_0\)</span>，则在分布<span class="math inline">\(P_{\theta}\)</span>下，<span class="math inline">\(T_j(x)\)</span>的各阶矩都存在有限，且可通过积分号下求导算出。</p></li>
+</ul>
+</section>
+<section id="指数分散族-edf" class="level3">
+<h3 class="anchored" data-anchor-id="指数分散族-edf">指数分散族 EDF</h3>
+<p><strong>1、指数分散族定义</strong></p>
+<p>对<strong>单一兴趣参数</strong>的指数族分布，其随机变量Y的概率函数可表示为：</p>
+<p><span class="math display">\[
+p(y,\theta)=exp[\eta(\theta)t(y)+log(s(\theta))+log(h(y))]
+\]</span> 经过转换，可以得到：</p>
+<p><span class="math display">\[
+p(y,\theta) = exp[\theta y-b(\theta)+c(y)]
+\]</span></p>
+<p>如果还有冗余参数不能简单忽略，则可以进一步改写为更一般的形式：</p>
+<p><span class="math display">\[
+p(y;\theta,\phi)=exp[\frac{y\theta-b(\theta)}{\phi}+c(y,\phi)]
+\]</span></p>
+<p>其中：</p>
+<ul>
+<li><p><span class="math inline">\(\theta\)</span>为典型参数，常为兴趣参数或均值参数的函数。与Y的均值密切关联。</p></li>
+<li><p><span class="math inline">\(b(\theta)\)</span>称为累积量函数，因其不含Y也常称为归一化常数，在计算分布的矩方面有重要作用。</p></li>
+<li><p><span class="math inline">\(\phi\)</span>为分散参数，其常与Y的方差密切相关。</p></li>
+</ul>
+<p><strong>2、指数分散族的性质</strong></p>
+<p>设指数族随机变量Y的概率函数表示为<span class="math inline">\(p(y;\theta,\phi)=exp[\frac{y\theta-b(\theta)}{\phi}+c(y,\phi)]\)</span>，对数似然函数<span class="math inline">\(l(\theta,\phi;y)= \frac{y\theta-b(\theta)}{\phi}+c(y,\phi)\)</span>，则有：</p>
+<p><span class="math display">\[
+a.\ E(\frac{\partial l}{\partial\theta})=0;\ \ b.E(\frac{\partial^2l}{\partial\theta^2})+E((\frac{\partial l }{\partial\theta})^2)=0;\ \ c.Var(\frac{\partial l }{\partial\theta})=-E[\frac{\partial^2 l }{\partial\theta^2}]
+\]</span></p>
+<p>指数分散族得分函数的性质推导如下：</p>
+<p>对对数似然函数求导：<span class="math inline">\(\frac{\partial l}{\partial \theta} = \frac{y - b'(\theta)}{\phi}\)</span>。</p>
+<p>由<span class="math inline">\(E(\frac{\partial l}{\partial \theta}) = 0\)</span>可得<span class="math inline">\(E(Y) = b'(\theta)\)</span>。</p>
+<p>由<span class="math inline">\(\frac{\partial^2 l}{\partial \theta^2} = -\frac{b''(\theta)}{\phi}\)</span>可得<span class="math inline">\(Var(\frac{\partial l}{\partial \theta}) = -E(\frac{\partial^2 l}{\partial \theta^2}) = \frac{b''(\theta)}{\phi}\)</span>，因此<span class="math inline">\(Var(Y) = \phi b''(\theta)\)</span>。</p>
+<p>进一步，<span class="math inline">\(b(\theta)\)</span>与归一化常数的关系为：<span class="math inline">\(b(\theta) = \phi \log \int \exp\left(\frac{y\theta}{\phi} + c(y,\phi)\right) dy\)</span>。对<span class="math inline">\(b(\theta)\)</span>求导：<span class="math inline">\(b'(\theta) = E(Y)\)</span>，<span class="math inline">\(b''(\theta) = Var(Y)/\phi\)</span>。<span class="math inline">\(b''(\theta)\)</span>被称为方差函数，记为<span class="math inline">\(V(\mu)\)</span>，它刻画了均值-方差关系。</p>
+<p><span class="math display">\[
+(a)\frac{b(\theta)}{\phi}=log[\int exp(\frac{y\theta}{\phi}+c(y,\phi))dy];\ \ (b)E(Y)=b'(\theta);\ \ (c)Var(Y)=\phi b''(\theta)
+\]</span></p>
+<p><strong>指数分散族常见分布汇总表：</strong></p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 16%">
+<col style="width: 16%">
+<col style="width: 16%">
+<col style="width: 16%">
+<col style="width: 16%">
+<col style="width: 16%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>分布</th>
+<th><span class="math inline">\(\theta\)</span></th>
+<th><span class="math inline">\(\phi\)</span></th>
+<th><span class="math inline">\(b(\theta)\)</span></th>
+<th><span class="math inline">\(b'(\theta) = \mu\)</span></th>
+<th><span class="math inline">\(b''(\theta) = V(\mu)\)</span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>正态 <span class="math inline">\(N(\mu, \sigma^2)\)</span></td>
+<td><span class="math inline">\(\mu\)</span></td>
+<td><span class="math inline">\(\sigma^2\)</span></td>
+<td><span class="math inline">\(\theta^2/2\)</span></td>
+<td><span class="math inline">\(\theta\)</span></td>
+<td><span class="math inline">\(1\)</span></td>
+</tr>
+<tr class="even">
+<td>二项 <span class="math inline">\(B(m, p)/m\)</span></td>
+<td><span class="math inline">\(\log\frac{p}{1-p}\)</span></td>
+<td><span class="math inline">\(1/m\)</span></td>
+<td><span class="math inline">\(\log(1+e^\theta)\)</span></td>
+<td><span class="math inline">\(\frac{e^\theta}{1+e^\theta}\)</span></td>
+<td><span class="math inline">\(\mu(1-\mu)\)</span></td>
+</tr>
+<tr class="odd">
+<td>泊松 <span class="math inline">\(P(\lambda)\)</span></td>
+<td><span class="math inline">\(\log\lambda\)</span></td>
+<td><span class="math inline">\(1\)</span></td>
+<td><span class="math inline">\(e^\theta\)</span></td>
+<td><span class="math inline">\(e^\theta\)</span></td>
+<td><span class="math inline">\(\mu\)</span></td>
+</tr>
+<tr class="even">
+<td>伽马 <span class="math inline">\(G(\mu, \nu)\)</span></td>
+<td><span class="math inline">\(-1/\mu\)</span></td>
+<td><span class="math inline">\(1/\nu\)</span></td>
+<td><span class="math inline">\(-\log(-\theta)\)</span></td>
+<td><span class="math inline">\(-1/\theta\)</span></td>
+<td><span class="math inline">\(\mu^2\)</span></td>
+</tr>
+<tr class="odd">
+<td>逆高斯</td>
+<td><span class="math inline">\(-1/(2\mu^2)\)</span></td>
+<td><span class="math inline">\(\phi\)</span></td>
+<td><span class="math inline">\(-\sqrt{-2\theta}\)</span></td>
+<td><span class="math inline">\(1/\sqrt{-2\theta}\)</span></td>
+<td><span class="math inline">\(\mu^3\)</span></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="模型简介" class="level2">
+<h2 class="anchored" data-anchor-id="模型简介">模型简介</h2>
+<section id="定义" class="level3">
+<h3 class="anchored" data-anchor-id="定义">定义</h3>
+<p>广义线性模型具有以下三个部分：</p>
+<ul>
+<li><p>随机成分：被解释变量<span class="math inline">\(Y_1,Y_2,\cdots,Y_n\)</span> 来自指数族的同一分布族，具有相同形式的概率函数</p></li>
+<li><p>系统成分：线性结构<span class="math inline">\(\eta_i=x_i'\beta\)</span> 是线性预测的系统成分。</p></li>
+<li><p>连接函数：单调连接函数<span class="math inline">\(g(\cdot)\)</span> 连接随机部分的均值参数或兴趣参数和系统成分</p></li>
+</ul>
+</section>
+<section id="典型连接" class="level3">
+<h3 class="anchored" data-anchor-id="典型连接">典型连接</h3>
+<p>典型连接<span class="math inline">\(g=b'^{-1}\)</span> 使得线性系统成分<span class="math inline">\(\eta\)</span>直接等于典型参数<span class="math inline">\(\theta\)</span>。</p>
+<blockquote class="blockquote">
+<p><strong>连接函数：GLM 的灵魂。</strong> 普通线性回归做的是 <span class="math inline">\(\mu = \mathbf{x}^T\boldsymbol{\beta}\)</span>——线性预测子直接等于均值。但这要求 <span class="math inline">\(\mu\)</span> 的范围是 <span class="math inline">\(\mathbb{R}\)</span>，而很多响应变量天然有界：概率必须在 <span class="math inline">\([0,1]\)</span>，计数必须 <span class="math inline">\(\geq 0\)</span>。连接函数 <span class="math inline">\(g(\mu) = \eta = \mathbf{x}^T\boldsymbol{\beta}\)</span> 做了一件事：<strong>把线性预测子 <span class="math inline">\(\eta\)</span>（取值 <span class="math inline">\(\mathbb{R}\)</span>）映射到均值 <span class="math inline">\(\mu\)</span> 的合法取值空间。</strong> Logit 连接把 <span class="math inline">\((-\infty, \infty)\)</span> 映射到 <span class="math inline">\((0,1)\)</span>；Log 连接把 <span class="math inline">\((-\infty, \infty)\)</span> 映射到 <span class="math inline">\((0, \infty)\)</span>。这就是”广义”二字的实质——不是抛弃线性，而是给线性套上一层”翻译器”，让线性结构可以在不同尺度的响应空间中都适用。Ch18 的逻辑回归和 Ch20 的 softmax 分类，都是这个思想的不同面孔。</p>
+</blockquote>
+<ol type="1">
+<li>二项分布的例子
+<ol type="1">
+<li><span class="math display">\[
+f(y;p,m)=C_m^yp^y(1-p)^{m-y}=exp[ylog(\frac{p}{1-p})+mlog(1-p)+log(C_m^y)]
+\]</span></li>
+<li>典型参数<span class="math inline">\(\theta = log(\frac{p}{1-p})\)</span> ；分散参数<span class="math inline">\(\phi=1\)</span> ；累计函数<span class="math inline">\(b(\theta)=-mlog(1-p)=mlog(1+e^{\theta})\)</span></li>
+<li>均值<span class="math inline">\(\mu = b'(\theta) = m\frac{e^{\theta}}{1+e^{\theta}}=mp\)</span> ；方差函数<span class="math inline">\(v(\mu)=b''(\theta)=mp(1-p)\)</span> ；方差<span class="math inline">\(Var(Y)=mp(1-p)\)</span></li>
+<li>典型连接：<span class="math inline">\(\mu=\theta=b'^{-1}(\mu)=log(\frac{p}{1-p})=logit(p)\)</span>；</li>
+<li><span class="math display">\[
+Y_i\sim B(m_i,p_i),l(\beta)=\sum_{i=1}^n[y_i\eta_i-m_ilog(1+e_i^{\eta})+log(C_{m_i}^{y_i})]
+\]</span></li>
+</ol></li>
+</ol>
+</section>
+</section>
+<section id="估计" class="level2">
+<h2 class="anchored" data-anchor-id="估计">估计</h2>
+<section id="newton-raphson算法" class="level3">
+<h3 class="anchored" data-anchor-id="newton-raphson算法">Newton-Raphson算法</h3>
+<p>迭代方程：</p>
+<p><span class="math display">\[
+\beta^{(m)}=\beta^{(m-1)}+[J(\beta^{m-1})]^{-1}U(\beta^{m-1})
+\]</span></p>
+<p>其中，<span class="math inline">\(U(\beta)=l'(\beta)\)</span> 是对数似然函数关于参数向量的一阶导数（得分函数，记分函数）;<span class="math inline">\(J(\beta)=-E[U'(\beta)]\)</span> 为信息矩阵</p>
+</section>
+<section id="极大似然估计" class="level3">
+<h3 class="anchored" data-anchor-id="极大似然估计">极大似然估计</h3>
+<p>对于所有观测值的对数似然函数为：</p>
+<p><span class="math display">\[
+l=\sum_{i=1}^nl_i=\sum_{i=1}^n[\frac{y_i\theta_i-b(\theta_i)}{\phi}+c(y_i,\phi)]
+\]</span></p>
+<p>对数似然函数关于参数<span class="math inline">\(\beta_j\)</span> 的得分函数为：</p>
+<p><span class="math display">\[
+U_j=\frac{\partial l}{\partial \beta_j}=\sum_{i=1}^n\frac{\partial l_i}{\partial\beta_j}=\sum_{i=1}^n\frac{\partial l_i}{\partial\theta_i}\frac{\partial\theta_i}{\partial\mu_i}\frac{\partial\mu_i}{\partial \eta_i}\frac{\partial\eta_i}{\partial\beta_j}=\sum_{i=1}^n\frac{y_i-\mu_i}{\phi b''(\theta_i)}\frac{d\mu_i}{d\eta_i}x_{ij}
+\]</span></p>
+<p>得分向量的期望为零，则信息矩阵可表示为：</p>
+<p><span class="math display">\[
+J_{jk}=E(U_jU_k)=\sum_{i=1}^n\frac{x_{ij}x_{ik}}{\phi b''(\theta_i)}(\frac{d\mu_i}{d\eta_i})^2
+\]</span></p>
+<p>进一步，可写成矩阵形式：</p>
+<p><span class="math display">\[
+U=\frac{1}{\phi}X'WD\ \ ;\ \ J=\frac{1}{\phi}X'WX
+\]</span></p>
+<p>其中，<span class="math inline">\(W\)</span>为对角权重矩阵，其对角元素为<span class="math inline">\(w_i = \frac{1}{\phi b''(\theta_i)} \left(\frac{d\mu_i}{d\eta_i}\right)^2\)</span>；<span class="math inline">\(D\)</span>为偏差向量，其分量为<span class="math inline">\(D_i = (y_i - \mu_i) \frac{d\eta_i}{d\mu_i}\)</span>。注意<span class="math inline">\(W\)</span>依赖于当前的参数估计值，因此需要迭代求解。</p>
+<p>得到最终的迭代方程：</p>
+<p><span class="math display">\[
+\beta^{(m)}=(X'W^{m-1}X)^{-1}X'W^{m-1}Z^{m-1},Z^{m-1}=X\beta^{m-1}+D^{m-1}
+\]</span></p>
+<p>该迭代过程即为<strong>迭代再加权最小二乘法（IRLS）</strong>。其核心思想是：每一步迭代，使用当前的参数估计值计算加权矩阵<span class="math inline">\(W\)</span>和调整响应变量<span class="math inline">\(Z\)</span>，然后求解加权最小二乘问题更新<span class="math inline">\(\beta\)</span>。该过程不断重复，直到参数估计收敛。这一算法的优雅之处在于将非线性极大似然估计问题转化为一系列加权线性回归问题。</p>
+</section>
+</section>
+<section id="推断" class="level2">
+<h2 class="anchored" data-anchor-id="推断">推断</h2>
+<section id="wald检验" class="level3">
+<h3 class="anchored" data-anchor-id="wald检验">Wald检验</h3>
+<p>问题：对于指数分散族形式的概率函数，分散参数𝜙已知，如何基于近似得分函数得到极大似然估计的抽样分布？</p>
+<p><span class="math inline">\(\hat{\beta}\)</span>的渐进分布为：<span class="math inline">\((\hat{\beta}-\beta)'J(\beta)(\hat{\beta}-\beta)\sim \chi^2(p)\)</span></p>
+</section>
+<section id="偏差统计量" class="level3">
+<h3 class="anchored" data-anchor-id="偏差统计量">偏差统计量</h3>
+<p>首先引入兴趣模型和饱和模型的概念。定义对数似然比：</p>
+<p><span class="math display">\[
+log\lambda = l(\hat{\beta}_m;y)-l(\hat{\beta};y)
+\]</span></p>
+<p>显然，<strong>饱和模型对数据的描述最全面</strong>，对数似然比越大说明兴趣模型对数据的描述相对更差。</p>
+<p>含分散参数<span class="math inline">\(\phi\)</span>的定标偏差定义为（偏差D不含<span class="math inline">\(\phi\)</span>）：</p>
+<p><span class="math display">\[
+D^*=\frac{D}{\phi}=2log(\lambda) = 2(l(\hat{\beta}_m;y)-l(\hat{\beta};y))
+\]</span></p>
+<p>定标偏差服从非中心卡方分布：</p>
+<p><span class="math display">\[
+D^*\sim \chi^2(n-p,v),D\sim \phi \chi^2(n-p,v)
+\]</span></p>
+</section>
+<section id="偏差之差" class="level3">
+<h3 class="anchored" data-anchor-id="偏差之差">偏差之差</h3>
+<p>对于两个嵌套关系模型，其中一个模型<span class="math inline">\(M_0\)</span>是另一个更一般化模型<span class="math inline">\(M_1\)</span>的特殊形式（它们有共同得饱和模型），可以通过偏差之差判定哪个模型对数据拟合得更好。</p>
+<p>定标偏差之差： <span class="math display">\[
+\Delta D^*=D_0^*-D_1^*=2(l(\hat{\beta}_m;y)-l(\hat{\beta_0};y))-2(l(\hat{\beta}_m;y)-l(\hat{\beta_1};y))=2(l(\hat{\beta}_0;y)-l(\hat{\beta_1};y))
+\]</span></p>
+<p>统计假设：</p>
+<p><span class="math display">\[
+H_0:\beta_{q+1}=\beta_{q+2}=\cdots=\beta_p=0
+\]</span></p>
+<p>如果模型<span class="math inline">\(M_0\)</span> 和<span class="math inline">\(M_1\)</span> 对数据描述都较好，一般选择对应原假设<span class="math inline">\(H_0\)</span> 的简洁模型<span class="math inline">\(M_0\)</span>。</p>
+<p>如果模型<span class="math inline">\(M_0\)</span> 对数据描述不好，同时模型<span class="math inline">\(M_1\)</span> 对数据描述较好，此时认为模型<span class="math inline">\(M_1\)</span> 明显更适合描述数据。</p>
+</section>
+<section id="残差" class="level3">
+<h3 class="anchored" data-anchor-id="残差">残差</h3>
+<section id="pearson残差" class="level4">
+<h4 class="anchored" data-anchor-id="pearson残差">Pearson残差</h4>
+<p><span class="math display">\[
+r_i^P=\frac{y_i-\hat{\mu_i}}{\sqrt{v(\hat{\mu}_i)}}=\frac{y_i-b'(\hat{\theta}_i)}{\sqrt{b''(\hat{\theta}_i)}}
+\]</span></p>
+<p>正态分布：</p>
+<p>二项分布：</p>
+<p>泊松分布：</p>
+<p>负二项分布：</p>
+<p>伽马分布：</p>
+</section>
+<section id="偏差残差" class="level4">
+<h4 class="anchored" data-anchor-id="偏差残差">偏差残差</h4>
+<p><span class="math display">\[
+r_i^D=sign(y_i-\hat{\mu}_i)\sqrt{D_i}
+\]</span></p>
+<p>其中，<span class="math inline">\(sign(y_i-\hat{\mu}_i)=\frac{y_i-\hat{\mu}_i}{|y_i-\hat{\mu}_i|}\)</span>，</p>
+<p>各常见分布的偏差残差分量<span class="math inline">\(D_i\)</span>（满足<span class="math inline">\(D = \sum D_i\)</span>）的计算公式：</p>
+<ul>
+<li><strong>正态分布</strong>：<span class="math inline">\(D_i = (y_i - \hat{\mu}_i)^2\)</span></li>
+<li><strong>二项分布</strong>：<span class="math inline">\(D_i = 2\left[y_i \log\frac{y_i}{\hat{\mu}_i} + (m_i - y_i) \log\frac{m_i - y_i}{m_i - \hat{\mu}_i}\right]\)</span></li>
+<li><strong>泊松分布</strong>：<span class="math inline">\(D_i = 2\left[y_i \log\frac{y_i}{\hat{\mu}_i} - (y_i - \hat{\mu}_i)\right]\)</span></li>
+<li><strong>负二项分布</strong>：<span class="math inline">\(D_i = 2\left[y_i \log\frac{y_i}{\hat{\mu}_i} - (y_i + \kappa) \log\frac{y_i + \kappa}{\hat{\mu}_i + \kappa}\right]\)</span></li>
+<li><strong>伽马分布</strong>：<span class="math inline">\(D_i = 2\left[-\log\frac{y_i}{\hat{\mu}_i} + \frac{y_i - \hat{\mu}_i}{\hat{\mu}_i}\right]\)</span></li>
+</ul>
+</section>
+</section>
+</section>
+<section id="模型应用" class="level2">
+<h2 class="anchored" data-anchor-id="模型应用">模型应用</h2>
+<p>常用广义线性模型包括二分类响应，计数响应，比例响应以及多分类响应模型。</p>
+<section id="二分类响应" class="level3">
+<h3 class="anchored" data-anchor-id="二分类响应">二分类响应</h3>
+<section id="二点响应" class="level4">
+<h4 class="anchored" data-anchor-id="二点响应">二点响应</h4>
+<p>二点响应模型（Bernoulli响应）：设<span class="math inline">\(Y_i \in \{0, 1\}\)</span>，<span class="math inline">\(P(Y_i = 1) = p_i\)</span>。其概率函数可写为指数分散族形式：</p>
+<p><span class="math display">\[f(y_i; p_i) = p_i^{y_i}(1-p_i)^{1-y_i} = \exp\left[y_i \log\frac{p_i}{1-p_i} + \log(1-p_i)\right]\]</span></p>
+<p>其中，典型参数<span class="math inline">\(\theta_i = \log\frac{p_i}{1-p_i}\)</span>，<span class="math inline">\(b(\theta_i) = \log(1+e^{\theta_i})\)</span>，<span class="math inline">\(\phi = 1\)</span>。均值<span class="math inline">\(\mu_i = p_i\)</span>，方差函数<span class="math inline">\(V(\mu_i) = p_i(1-p_i)\)</span>。</p>
+</section>
+<section id="二项响应" class="level4">
+<h4 class="anchored" data-anchor-id="二项响应">二项响应</h4>
+<p>二项响应模型：设<span class="math inline">\(Y_i \sim B(m_i, p_i)\)</span>，其中<span class="math inline">\(m_i\)</span>为第<span class="math inline">\(i\)</span>次观测的试验次数。其概率函数为：</p>
+<p><span class="math display">\[f(y_i; p_i, m_i) = \binom{m_i}{y_i} p_i^{y_i} (1-p_i)^{m_i - y_i} = \exp\left[y_i \log\frac{p_i}{1-p_i} + m_i \log(1-p_i) + \log\binom{m_i}{y_i}\right]\]</span></p>
+<p>此时<span class="math inline">\(\theta_i = \log\frac{p_i}{1-p_i}\)</span>，<span class="math inline">\(b(\theta_i) = m_i \log(1+e^{\theta_i})\)</span>，<span class="math inline">\(\phi = 1\)</span>。均值<span class="math inline">\(\mu_i = m_i p_i\)</span>，方差函数<span class="math inline">\(V(\mu_i) = m_i p_i (1-p_i) = \mu_i(1 - \mu_i/m_i)\)</span>。在实际建模中，通常对比例<span class="math inline">\(\hat{p}_i = Y_i/m_i\)</span>建模，使用权重<span class="math inline">\(m_i\)</span>处理不等精度。</p>
+<p>挑战者算例回顾。</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 数据导入</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(orings, <span class="at">package =</span> <span class="st">"faraway"</span>)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>orings<span class="sc">$</span>total <span class="ot">&lt;-</span> <span class="dv">6</span>  <span class="co">#定义每个观测的 O 型环总数为 6</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co"># 拟合二项式GLM</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>lmod <span class="ot">&lt;-</span> <span class="fu">glm</span>(<span class="fu">cbind</span>(damage, total<span class="sc">-</span>damage) <span class="sc">~</span> <span class="dv">1</span> <span class="sc">+</span> temp, <span class="at">family=</span>binomial, orings)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(lmod)<span class="co">#输出系数、标准误、z 统计量、p 值，以及残差偏差、AIC 等</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+glm(formula = cbind(damage, total - damage) ~ 1 + temp, family = binomial, 
+    data = orings)
+
+Coefficients:
+            Estimate Std. Error z value Pr(&gt;|z|)    
+(Intercept) 11.66299    3.29626   3.538 0.000403 ***
+temp        -0.21623    0.05318  -4.066 4.78e-05 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+(Dispersion parameter for binomial family taken to be 1)
+
+    Null deviance: 38.898  on 22  degrees of freedom
+Residual deviance: 16.912  on 21  degrees of freedom
+AIC: 33.675
+
+Number of Fisher Scoring iterations: 6</code></pre>
+</div>
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"##########"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>##########</code></pre>
+</div>
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 手动计算拟合值</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>beta <span class="ot">&lt;-</span> <span class="fu">coef</span>(lmod)<span class="co">#提取系数</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="dv">1</span>, <span class="at">nrow =</span> <span class="dv">23</span>, <span class="at">ncol =</span> <span class="dv">2</span>)<span class="co">#构造设计矩阵</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>x[ ,<span class="dv">2</span>] <span class="ot">&lt;-</span> orings<span class="sc">$</span>temp</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>eta <span class="ot">&lt;-</span> x<span class="sc">%*%</span>beta</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>phat <span class="ot">&lt;-</span> <span class="fu">exp</span>(eta)<span class="sc">/</span>(<span class="dv">1</span> <span class="sc">+</span> <span class="fu">exp</span>(eta)) <span class="do">## fitted(lmod)</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="co"># 计算偏差残差</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>d1 <span class="ot">&lt;-</span> orings<span class="sc">$</span>damage<span class="sc">*</span><span class="fu">log</span>(<span class="fu">ifelse</span>(orings<span class="sc">$</span>damage<span class="sc">!=</span><span class="dv">0</span>,orings<span class="sc">$</span>damage<span class="sc">/</span>(orings<span class="sc">$</span>total<span class="sc">*</span>phat), <span class="dv">1</span>))</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>d2 <span class="ot">&lt;-</span> (orings<span class="sc">$</span>total<span class="sc">-</span>orings<span class="sc">$</span>damage)<span class="sc">*</span><span class="fu">log</span>(<span class="fu">ifelse</span>(</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>orings<span class="sc">$</span>damage<span class="sc">!=</span>orings<span class="sc">$</span>total,</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>(orings<span class="sc">$</span>total<span class="sc">-</span>orings<span class="sc">$</span>damage)<span class="sc">/</span>(orings<span class="sc">$</span>total<span class="sc">-</span>orings<span class="sc">$</span>total<span class="sc">*</span>phat), <span class="dv">1</span>))</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>devres <span class="ot">&lt;-</span> <span class="fu">sign</span>(orings<span class="sc">$</span>damage <span class="sc">-</span> orings<span class="sc">$</span>total<span class="sc">*</span>phat) <span class="sc">*</span> <span class="fu">sqrt</span>(<span class="dv">2</span> <span class="sc">*</span> (d1<span class="sc">+</span>d2))</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a><span class="co"># 计算偏差残差的分位数</span></span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a><span class="fu">quantile</span>(devres, <span class="fu">c</span>(<span class="dv">0</span>, <span class="fl">0.25</span>, <span class="fl">0.5</span>, <span class="fl">0.75</span>, <span class="dv">1</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>        0%        25%        50%        75%       100% 
+-0.9529154 -0.7345040 -0.4392853 -0.2079417  1.9565043 </code></pre>
+</div>
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 计算总偏差（所有偏差残差平方和）</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>dev <span class="ot">&lt;-</span> <span class="fu">sum</span>(devres<span class="sc">^</span><span class="dv">2</span>)</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>dev</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 16.91228</code></pre>
+</div>
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 手动计算系数p值（z检验）</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>pvalue <span class="ot">&lt;-</span> <span class="dv">2</span> <span class="sc">*</span> (<span class="dv">1</span> <span class="sc">-</span> <span class="fu">pnorm</span>(<span class="fu">abs</span>(<span class="fu">summary</span>(lmod)<span class="sc">$</span>coef[ ,<span class="dv">1</span>]<span class="sc">/</span><span class="fu">summary</span>(lmod)<span class="sc">$</span>coef[ ,<span class="dv">2</span>])))</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>pvalue</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code> (Intercept)         temp 
+4.027947e-04 4.776581e-05 </code></pre>
+</div>
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 手动计算AIC（模型选择指标）</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>aic <span class="ot">&lt;-</span> <span class="sc">-</span><span class="dv">2</span><span class="sc">*</span><span class="fu">sum</span>(orings<span class="sc">$</span>damage<span class="sc">*</span>eta <span class="sc">-</span> orings<span class="sc">$</span>total<span class="sc">*</span><span class="fu">log</span>(<span class="dv">1</span><span class="sc">+</span><span class="fu">exp</span>(eta))</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="sc">+</span> <span class="fu">log</span>(<span class="fu">choose</span>(orings<span class="sc">$</span>total,orings<span class="sc">$</span>damage))) <span class="sc">+</span> <span class="dv">2</span> <span class="sc">*</span> <span class="dv">2</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>aic</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 33.67479</code></pre>
+</div>
+</div>
+</section>
+<section id="公差分布" class="level4">
+<h4 class="anchored" data-anchor-id="公差分布">公差分布</h4>
+<p>公差分布模型的基本设定为：存在一个潜在的连续公差变量<span class="math inline">\(Y^*\)</span>，当<span class="math inline">\(Y^*\)</span>超过某个阈值时，响应为1。设<span class="math inline">\(Y^*\)</span>的CDF为<span class="math inline">\(F\)</span>，则有</p>
+<p><span class="math display">\[P(Y=1 | x) = P(Y^* &gt; \gamma | x) = 1 - F(\gamma - x^T\beta)\]</span></p>
+<p>若<span class="math inline">\(F\)</span>为对称分布，可写为<span class="math inline">\(P(Y=1 | x) = F(x^T\beta - \gamma)\)</span>。将<span class="math inline">\(\gamma\)</span>吸收进截距项，得：</p>
+<p><span class="math display">\[g(p) = \eta = x^T\beta\]</span></p>
+<p>其中<span class="math inline">\(g = F^{-1}\)</span>为连接函数。不同<span class="math inline">\(F\)</span>的选择对应不同的连接函数。</p>
+<p>下面是三种常见的，<strong>基于不同公差分布</strong>的二分类模型连接函数。</p>
+<ol type="1">
+<li><p>Logit连接</p>
+<p><span class="math display">\[
+f(s)=\frac{e^s}{(1+e^s)^2},\eta=F^{-1}(p)=log(\frac{p}{1-p})
+\]</span></p></li>
+<li><p>Probit连接</p>
+<p><span class="math display">\[
+f(s)=\frac{1}{\sqrt{2\pi}}e^{-s^2/2} ,\eta=\Phi^{-1}(p)
+\]</span></p></li>
+<li><p>Cloglog连接</p>
+<p><span class="math display">\[
+f(s)=exp(s-exp(s)),\eta=F^{-1}(p)=log(-log(1-p))
+\]</span></p></li>
+</ol>
+</section>
+<section id="潜变量" class="level4">
+<h4 class="anchored" data-anchor-id="潜变量">潜变量</h4>
+<p>除了公差分布，也可以用潜变量构造二元响应概率和线性系统成分之间的连接函数。</p>
+<p>潜变量方法假设存在一个不可观测的连续变量<span class="math inline">\(Y^* = x^T\beta + \epsilon\)</span>，其中<span class="math inline">\(\epsilon\)</span>的分布决定了连接函数：</p>
+<ol type="1">
+<li><p><strong>Logit连接</strong>：<span class="math inline">\(\epsilon\)</span>服从标准Logistic分布，其CDF为<span class="math inline">\(F(s) = \frac{e^s}{1+e^s}\)</span>，PDF为<span class="math inline">\(f(s) = \frac{e^s}{(1+e^s)^2}\)</span>。</p></li>
+<li><p><strong>Probit连接</strong>：<span class="math inline">\(\epsilon\)</span>服从标准正态分布，其CDF为<span class="math inline">\(F(s) = \Phi(s)\)</span>，PDF为<span class="math inline">\(f(s) = \frac{1}{\sqrt{2\pi}} e^{-s^2/2}\)</span>。</p></li>
+<li><p><strong>互补双对数(Cloglog)连接</strong>：<span class="math inline">\(\epsilon\)</span>服从极值分布，其CDF为<span class="math inline">\(F(s) = 1 - \exp(-e^s)\)</span>，PDF为<span class="math inline">\(f(s) = \exp(s - e^s)\)</span>。</p></li>
+</ol>
+<p>观察二分类响应<span class="math inline">\(Y = I(Y^* &gt; \gamma)\)</span>，则<span class="math inline">\(P(Y=1|x) = P(Y^* &gt; \gamma|x) = F(x^T\beta - \gamma)\)</span>。</p>
+<ol type="1">
+<li>Logit连接</li>
+<li>Probit连接</li>
+<li>互补双对数连接</li>
+</ol>
+<p>下面是一个昆虫试剂浓度的算例。</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 加载数据：五种不同浓度下昆虫死亡数和存活数</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(bliss, <span class="at">package =</span> <span class="st">"faraway"</span>)</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="co"># 3中连接函数下的拟合</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>mlogit <span class="ot">&lt;-</span> <span class="fu">glm</span>(<span class="fu">cbind</span>(dead, alive) <span class="sc">~</span> conc, <span class="at">family =</span> binomial, bliss)</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>mprobit <span class="ot">&lt;-</span> <span class="fu">glm</span>(<span class="fu">cbind</span>(dead, alive) <span class="sc">~</span> conc, <span class="at">family =</span> <span class="fu">binomial</span>(<span class="at">link=</span>probit), bliss)</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>mcloglog <span class="ot">&lt;-</span> <span class="fu">glm</span>(<span class="fu">cbind</span>(dead, alive) <span class="sc">~</span> conc, <span class="at">family =</span> <span class="fu">binomial</span>(<span class="at">link=</span>cloglog), bliss)</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a><span class="co"># 提取并整理各模型的拟合值</span></span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>predval <span class="ot">&lt;-</span> <span class="fu">sapply</span>(<span class="fu">list</span>(mlogit,mprobit,mcloglog), fitted)</span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a><span class="fu">dimnames</span>(predval) <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>, <span class="fu">c</span>(<span class="st">"logit"</span>,<span class="st">"probit"</span>,<span class="st">"cloglog"</span>))</span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a><span class="fu">round</span>(predval, <span class="dv">3</span>)<span class="co"># 不同浓度下，三种连接函数拟合的昆虫死亡概率。</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>  logit probit cloglog
+1 0.089  0.084   0.127
+2 0.238  0.245   0.250
+3 0.500  0.498   0.455
+4 0.762  0.752   0.722
+5 0.911  0.914   0.933</code></pre>
+</div>
+</div>
+</section>
+<section id="过度分散" class="level4">
+<h4 class="anchored" data-anchor-id="过度分散">过度分散</h4>
+<p>现实数据经常发生过度分散，表现为数据方差膨胀，其对结果可解释性造成负面影响，常见原因是存在模型未能捕捉到的变异性，从而观测值方差大于模型的估计方差。</p>
+<p>下面是一个鳟鱼卵箱的算例。</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(troutegg, <span class="at">package =</span> <span class="st">"faraway"</span>)</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="co">#ftable(xtabs(cbind(survive,total) ~ location + period, troutegg))</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>bmod <span class="ot">&lt;-</span> <span class="fu">glm</span>(<span class="fu">cbind</span>(survive, total<span class="sc">-</span>survive) <span class="sc">~</span> location <span class="sc">+</span> period,</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="at">family =</span> binomial, troutegg)</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(bmod)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+glm(formula = cbind(survive, total - survive) ~ location + period, 
+    family = binomial, data = troutegg)
+
+Coefficients:
+            Estimate Std. Error z value Pr(&gt;|z|)    
+(Intercept)   4.6358     0.2813  16.479  &lt; 2e-16 ***
+location2    -0.4168     0.2461  -1.694   0.0903 .  
+location3    -1.2421     0.2194  -5.660 1.51e-08 ***
+location4    -0.9509     0.2288  -4.157 3.23e-05 ***
+location5    -4.6138     0.2502 -18.439  &lt; 2e-16 ***
+period7      -2.1702     0.2384  -9.103  &lt; 2e-16 ***
+period8      -2.3256     0.2429  -9.573  &lt; 2e-16 ***
+period11     -2.4500     0.2341 -10.466  &lt; 2e-16 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+(Dispersion parameter for binomial family taken to be 1)
+
+    Null deviance: 1021.469  on 19  degrees of freedom
+Residual deviance:   64.495  on 12  degrees of freedom
+AIC: 157.03
+
+Number of Fisher Scoring iterations: 5</code></pre>
+</div>
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>beta <span class="ot">&lt;-</span> <span class="fu">coef</span>(bmod)</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="dv">1</span>, <span class="at">nrow =</span> <span class="dv">20</span>, <span class="at">ncol =</span> <span class="dv">8</span>)</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>x[ ,<span class="dv">2</span>] <span class="ot">&lt;-</span> troutegg<span class="sc">$</span>location <span class="sc">==</span> <span class="dv">2</span></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>x[ ,<span class="dv">3</span>] <span class="ot">&lt;-</span> troutegg<span class="sc">$</span>location <span class="sc">==</span> <span class="dv">3</span></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>x[ ,<span class="dv">4</span>] <span class="ot">&lt;-</span> troutegg<span class="sc">$</span>location <span class="sc">==</span> <span class="dv">4</span></span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>x[ ,<span class="dv">5</span>] <span class="ot">&lt;-</span> troutegg<span class="sc">$</span>location <span class="sc">==</span> <span class="dv">5</span></span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>x[ ,<span class="dv">6</span>] <span class="ot">&lt;-</span> troutegg<span class="sc">$</span>period <span class="sc">==</span> <span class="dv">7</span></span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>x[ ,<span class="dv">7</span>] <span class="ot">&lt;-</span> troutegg<span class="sc">$</span>period <span class="sc">==</span> <span class="dv">8</span></span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>x[ ,<span class="dv">8</span>] <span class="ot">&lt;-</span> troutegg<span class="sc">$</span>period <span class="sc">==</span> <span class="dv">11</span></span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>phat <span class="ot">&lt;-</span> <span class="fu">exp</span>(x<span class="sc">%*%</span>beta)<span class="sc">/</span>(<span class="dv">1</span> <span class="sc">+</span> <span class="fu">exp</span>(x<span class="sc">%*%</span>beta))</span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>peares <span class="ot">&lt;-</span> (troutegg<span class="sc">$</span>survive<span class="sc">-</span>troutegg<span class="sc">$</span>total<span class="sc">*</span>phat)<span class="sc">/</span><span class="fu">sqrt</span>(troutegg<span class="sc">$</span>total<span class="sc">*</span>phat<span class="sc">*</span>(<span class="dv">1</span><span class="sc">-</span>phat))</span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a><span class="co">#residuals(bmod, type = "pearson")</span></span>
+<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a>phi <span class="ot">&lt;-</span> <span class="fu">sum</span>(peares<span class="sc">^</span><span class="dv">2</span>)<span class="sc">/</span>(<span class="dv">20-8</span>)</span>
+<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a>phi</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 5.330322</code></pre>
+</div>
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(bmod, <span class="at">dispersion =</span> phi)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+glm(formula = cbind(survive, total - survive) ~ location + period, 
+    family = binomial, data = troutegg)
+
+Coefficients:
+            Estimate Std. Error z value Pr(&gt;|z|)    
+(Intercept)   4.6358     0.6495   7.138 9.49e-13 ***
+location2    -0.4168     0.5682  -0.734   0.4632    
+location3    -1.2421     0.5066  -2.452   0.0142 *  
+location4    -0.9509     0.5281  -1.800   0.0718 .  
+location5    -4.6138     0.5777  -7.987 1.39e-15 ***
+period7      -2.1702     0.5504  -3.943 8.05e-05 ***
+period8      -2.3256     0.5609  -4.146 3.38e-05 ***
+period11     -2.4500     0.5405  -4.533 5.82e-06 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+(Dispersion parameter for binomial family taken to be 5.330322)
+
+    Null deviance: 1021.469  on 19  degrees of freedom
+Residual deviance:   64.495  on 12  degrees of freedom
+AIC: 157.03
+
+Number of Fisher Scoring iterations: 5</code></pre>
+</div>
+</div>
+<hr>
+<p><strong>速查卡片</strong>：</p>
+<ul>
+<li><strong>核心问题</strong>：当响应变量不是连续正态变量时，如何建立回归模型？</li>
+<li><strong>关键概念</strong>：指数分散族（EDF） → 连接函数与典型连接 → IRLS算法 → 偏差统计量与偏差之差 → Pearson残差与偏差残差 → Logit/Probit/Cloglog连接 → 过度分散与准似然</li>
+<li><strong>R命令</strong>：<code>glm()</code>, <code>family = binomial() / poisson() / Gamma()</code>, <code>MASS::glm.nb()</code>, <code>faraway::troutegg</code> (示例)</li>
+</ul>
+
+
+</section>
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="./09-回归分析.html" class="pagination-link" aria-label="回归分析">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-title">回归分析</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="./11-类别数据分析.html" class="pagination-link" aria-label="类别数据分析">
+        <span class="nav-page-text"><span class="chapter-title">类别数据分析</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

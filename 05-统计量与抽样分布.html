@@ -1,0 +1,953 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.37">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>统计量与抽样分布 – 乱中寻序：统计学的统一逻辑</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./06-参数估计.html" rel="next">
+<link href="./04-概率不等式与收敛性.html" rel="prev">
+<script src="site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-7f8f88aac4f3542376d5c11b86a4c14d.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-b46385535caf84bc62f311a600ac5013.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body class="nav-sidebar docked quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./05-统计量与抽样分布.html">Part II: 经典统计推断</a></li><li class="breadcrumb-item"><a href="./05-统计量与抽样分布.html"><span class="chapter-title">统计量与抽样分布</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="./">乱中寻序：统计学的统一逻辑</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">乱中寻序：统计学的统一逻辑</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false">
+ <span class="menu-text">Part I: 概率论基础</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./01-概率初步与随机变量的分布.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">概率初步与随机变量的分布</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./02-多维随机变量及其分布.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">多维随机变量及其分布</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./03-大数定律和中心极限定理.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">大数定律和中心极限定理</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./04-概率不等式与收敛性.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">概率不等式与收敛性</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part II: 经典统计推断</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./05-统计量与抽样分布.html" class="sidebar-item-text sidebar-link active"><span class="chapter-title">统计量与抽样分布</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./06-参数估计.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">参数估计</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./07-假设检验与方差分析.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">假设检验与方差分析</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./08-贝叶斯统计与计算.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">贝叶斯统计与计算</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false">
+ <span class="menu-text">Part III: 现代统计方法</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./09-回归分析.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">回归分析</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./10-广义线性模型.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">广义线性回归</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./11-类别数据分析.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">类别数据分析</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./12-非参数统计.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">非参数统计</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./13-时间序列分析.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">时间序列分析</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./14-多元统计分析.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">多元统计分析</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false">
+ <span class="menu-text">Part IV: 机器学习</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./15-机器学习基础.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">机器学习基础</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./16-经典分类方法.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">经典分类方法</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./17-集成学习与模型选择.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">集成学习与模型选择</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./18-深度学习.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">深度学习</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./19-因果推断入门.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">因果推断入门</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="false">
+ <span class="menu-text">附录：统计计算工具</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./A-优化方法.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">优化方法</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./B-矩阵计算与数值方法.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">矩阵计算与数值方法</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#从概率论到数理统计" id="toc-从概率论到数理统计" class="nav-link active" data-scroll-target="#从概率论到数理统计">从概率论到数理统计</a></li>
+  <li><a href="#充分统计量信息无损的压缩" id="toc-充分统计量信息无损的压缩" class="nav-link" data-scroll-target="#充分统计量信息无损的压缩">充分统计量：信息无损的压缩</a></li>
+  <li><a href="#经验分布函数" id="toc-经验分布函数" class="nav-link" data-scroll-target="#经验分布函数">经验分布函数</a></li>
+  <li><a href="#次序统计量与边缘分布" id="toc-次序统计量与边缘分布" class="nav-link" data-scroll-target="#次序统计量与边缘分布">次序统计量与边缘分布</a></li>
+  <li><a href="#三大抽样分布推断工具" id="toc-三大抽样分布推断工具" class="nav-link" data-scroll-target="#三大抽样分布推断工具">三大抽样分布：推断工具</a></li>
+  <li><a href="#样本统计量的基本性质" id="toc-样本统计量的基本性质" class="nav-link" data-scroll-target="#样本统计量的基本性质">样本统计量的基本性质</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./05-统计量与抽样分布.html">Part II: 经典统计推断</a></li><li class="breadcrumb-item"><a href="./05-统计量与抽样分布.html"><span class="chapter-title">统计量与抽样分布</span></a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title"><span class="chapter-title">统计量与抽样分布</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<blockquote class="blockquote">
+<p>你有一组数据。你相信它背后藏着一个更深的真相——某个未知的参数 <span class="math inline">\(\theta\)</span>。你的任务，是从可观测的 <span class="math inline">\(n\)</span> 个数字逆推出那个不可见的源头。本章建立这个”逆推”所需的全部数学地基。</p>
+</blockquote>
+<section id="从概率论到数理统计" class="level2">
+<h2 class="anchored" data-anchor-id="从概率论到数理统计">从概率论到数理统计</h2>
+<p><strong>概率论与数理统计是一对镜像。</strong></p>
+<p>概率论回答：已知参数 <span class="math inline">\(\theta\)</span>，数据 <span class="math inline">\(X\)</span> 会呈现什么行为？这是<strong>演绎</strong>——从原因推结果。你设定骰子是均匀的（<span class="math inline">\(p = 1/6\)</span>），然后推导连掷 10 次出现 3 次六点的概率。</p>
+<p>数理统计回答相反的提问：已知观测数据 <span class="math inline">\(X\)</span>，<span class="math inline">\(\theta\)</span> 最可能是什么？这是<strong>归纳</strong>——从结果反推原因。你拿到了 100 次掷骰子的记录，需要推断这枚骰子是否均匀。</p>
+<p><span class="math display">\[\text{概率论（演绎）}: \theta \longrightarrow X \qquad \text{数理统计（归纳）}: X \longrightarrow \theta\]</span></p>
+<p>这两个学科共享同一套数学对象，但方向相反。概率论以分布函数 <span class="math inline">\(F(x;\theta)\)</span> 为武器从参数推向数据；数理统计以样本为起点从数据追溯参数。</p>
+<p>在这个框架下，<strong>总体</strong>就是一个分布——当我们说”从总体中抽样”，精确的数学含义是”从分布 <span class="math inline">\(F\)</span> 中独立地抽取 <span class="math inline">\(n\)</span> 个随机变量”。这 <span class="math inline">\(n\)</span> 个随机变量构成的向量 <span class="math inline">\((X_1, \ldots, X_n)\)</span> 是 <span class="math inline">\(n\)</span> 维空间中的一个点，其联合分布为 <span class="math inline">\(\prod_{i=1}^n F(x_i)\)</span>。</p>
+<p>但 <span class="math inline">\(n\)</span> 可能很大——几百、几千、几百万。而控制这些数据的参数 <span class="math inline">\(\theta\)</span> 往往只是区区几个实数。信息高度冗余。<strong>统计量</strong>正是为消除这个冗余而定义的：</p>
+<p><span class="math display">\[T = T(X_1, \ldots, X_n): \mathbb{R}^n \to \mathbb{R}^k \quad (k \ll n)\]</span></p>
+<p>统计量是不含任何未知参数的样本函数。它将 <span class="math inline">\(n\)</span> 维的原始数据压缩为 <span class="math inline">\(k\)</span> 维的摘要——样本均值是一个统计量（<span class="math inline">\(k=1\)</span>），样本均值和样本方差在一起是两个统计量（<span class="math inline">\(k=2\)</span>）。统计量的分布称为<strong>抽样分布</strong>——它刻画了这个压缩过程本身的随机波动规律。</p>
+<blockquote class="blockquote">
+<p>数理统计的全部逻辑起点在一个问题里：<strong>我们能否只通过一个低维统计量，就完整地”读到”样本中关于</strong> <span class="math inline">\(\theta\)</span> 的全部信息？ 如果答案是肯定的，所有后续推断——估计、检验、预测——都可以在这个压缩后的低维空间中进行。这就是下一层的核心命题。</p>
+</blockquote>
+</section>
+<section id="充分统计量信息无损的压缩" class="level2">
+<h2 class="anchored" data-anchor-id="充分统计量信息无损的压缩">充分统计量：信息无损的压缩</h2>
+<p>样本 <span class="math inline">\((X_1, \ldots, X_n)\)</span> 是信息的原始载体。统计量 <span class="math inline">\(T\)</span> 是一个压缩映射——它扔掉了一些东西。问题是：扔掉的，是噪声还是信号？</p>
+<p><strong>充分统计量</strong>（Sufficient Statistic）的概念精确地回答了这个问题。设样本来自分布 <span class="math inline">\(F(x;\theta)\)</span>，统计量 <span class="math inline">\(T\)</span> 称为 <span class="math inline">\(\theta\)</span> 的<strong>充分统计量</strong>，如果给定 <span class="math inline">\(T\)</span> 的取值后，样本的条件分布不再依赖于 <span class="math inline">\(\theta\)</span>：</p>
+<p><span class="math display">\[P(X_1, \ldots, X_n \mid T = t; \theta) = P(X_1, \ldots, X_n \mid T = t)\]</span></p>
+<p>这个定义的物理直觉是：一旦你知道了 <span class="math inline">\(T\)</span>，原始样本中就不再含有任何关于 <span class="math inline">\(\theta\)</span> 的额外信息。<span class="math inline">\(T\)</span> 已经”榨干”了样本中与 <span class="math inline">\(\theta\)</span> 相关的一切——剩余的只是纯噪声。从信息论的角度看，<span class="math inline">\(T\)</span> 是对样本的<strong>无损压缩</strong>：降维的同时，截断了所有与 <span class="math inline">\(\theta\)</span> 无关的方向，保留了包含 <span class="math inline">\(\theta\)</span> 信息的子空间。</p>
+<blockquote class="blockquote">
+<p>全样本本身永远是充分的——但它没有压缩。<strong>最小充分统计量</strong>（Minimal Sufficient Statistic）追求的是压缩比的极限：在所有充分统计量中，它是”最粗”的那个——将数据压缩到了”刚好不丢失 <span class="math inline">\(\theta\)</span> 信息”的临界点。任何进一步的压缩都会切断通往 <span class="math inline">\(\theta\)</span> 的信息通道。</p>
+</blockquote>
+<p><strong>因子分解定理</strong>（Fisher–Neyman Factorization Theorem）提供了判定充分统计量的实用工具。设样本的联合密度为 <span class="math inline">\(f(x_1,\ldots,x_n;\theta)\)</span>，则 <span class="math inline">\(T\)</span> 为充分统计量的充要条件是存在两个函数 <span class="math inline">\(g\)</span> 和 <span class="math inline">\(h\)</span>，使得：</p>
+<p><span class="math display">\[f(x_1,\ldots,x_n;\theta) = g(T(x_1,\ldots,x_n), \theta) \cdot h(x_1,\ldots,x_n)\]</span></p>
+<p>其中 <span class="math inline">\(g\)</span> 依赖于样本<strong>仅通过</strong> <span class="math inline">\(T\)</span> 的取值，<span class="math inline">\(h\)</span> 与 <span class="math inline">\(\theta\)</span> 无关。这个分解的结构信息极其清晰：<span class="math inline">\(g\)</span> 是似然函数中”与 <span class="math inline">\(\theta\)</span> 有关的部分”——它完全经由 <span class="math inline">\(T\)</span> 这个瓶颈流动；<span class="math inline">\(h\)</span> 是纯数据内禀因子——它在推断 <span class="math inline">\(\theta\)</span> 时可以忽略。</p>
+<blockquote class="blockquote">
+<p>因子分解定理揭示了充分性的本质不在于 <span class="math inline">\(T\)</span> 本身是什么，而在于<strong>似然函数的因子化结构</strong>。一旦 <span class="math inline">\(f(x;\theta)\)</span> 可以写成”仅依赖 <span class="math inline">\(T\)</span> 的部分 × 与 <span class="math inline">\(\theta\)</span> 无关的部分”，<span class="math inline">\(T\)</span> 就自动成为充分统计量。这个结构的极端体现是指数型分布族。</p>
+</blockquote>
+<p><strong>指数型分布族</strong>与充分统计量之间存在天然的对应关系。Ch01 中引入了指数族的一般形式：</p>
+<p><span class="math display">\[f(x;\theta) = h(x)\exp\left(\eta(\theta)^T T(x) - A(\theta)\right)\]</span></p>
+<p>对比因子分解定理的 <span class="math inline">\(g(T,\theta) \cdot h(x)\)</span> 结构，可以立刻读出：<span class="math inline">\(T(x)\)</span> 就是 <span class="math inline">\(\theta\)</span> 的充分统计量。指数族<strong>自动为你提供了充分统计量</strong>——这就是为什么正态分布中 <span class="math inline">\(\sum x_i\)</span> 是 <span class="math inline">\(\mu\)</span> 的充分统计量，泊松分布中同样的 <span class="math inline">\(\sum x_i\)</span> 是 <span class="math inline">\(\lambda\)</span> 的充分统计量。Ch11（广义线性模型）中，GLM 将响应变量限定在指数族内，正是为了继承这套天然的充分统计量结构。</p>
+</section>
+<section id="经验分布函数" class="level2">
+<h2 class="anchored" data-anchor-id="经验分布函数">经验分布函数</h2>
+<p>在进入具体的参数推断之前，一个更根本的问题值得追问：我们能不能<strong>根本不知道</strong> <span class="math inline">\(F(x)\)</span> 的函数形式，却依然逼近它？</p>
+<p><strong>经验分布函数</strong>（Empirical Distribution Function）给出了肯定的回答。设样本有序排列为 <span class="math inline">\(x_{(1)} \leq x_{(2)} \leq \cdots \leq x_{(n)}\)</span>，定义：</p>
+<p><span class="math display">\[F_n(x) = \frac{\#\{i: x_i \leq x\}}{n} = \begin{cases} 0, &amp; x &lt; x_{(1)} \\ k/n, &amp; x_{(k)} \leq x &lt; x_{(k+1)} \\ 1, &amp; x \geq x_{(n)} \end{cases}\]</span></p>
+<p><span class="math inline">\(F_n(x)\)</span> 是一个阶梯函数——在每个数据点处向上跳 <span class="math inline">\(1/n\)</span>。它不假设任何参数形式，只忠实地用样本的比例去近似总体的累积概率。</p>
+<p><strong>格利文科定理</strong>（Glivenko–Cantelli Theorem）给出了这个逼近的数学担保：</p>
+<p><span class="math display">\[P\left(\sup_{-\infty &lt; x &lt; \infty} |F_n(x) - F(x)| \to 0\right) = 1, \quad n \to \infty\]</span></p>
+<p>经验分布函数<strong>一致地</strong>收敛于真实分布——不只是逐点的，而是在整个实数轴上，最大偏差也趋于零。这个定理是统计学中最被低估的深刻结果：<strong>你不需要知道真实分布的任何函数形式。只要不断抽样，样本的经验分布就会一致地逼近它。</strong> 这是所有非参数统计方法（Ch13）的逻辑许可证——你可以直接从数据本身学习分布的形状，而不必假设它来自正态、指数或任何特定的参数族。</p>
+<blockquote class="blockquote">
+<p>格利文科定理是”渐近承诺”——它说 <span class="math inline">\(n \to \infty\)</span> 时一切完美。但现实中的 <span class="math inline">\(n\)</span> 永远是有限的。Ch04 的 <strong>DKW 不等式</strong>给出了有限样本下的非渐近界：<span class="math inline">\(P(\sup_x |F_n(x) - F(x)| &gt; \epsilon) \leq 2e^{-2n\epsilon^2}\)</span>。它不仅保证”最终会准”，而且对给定的 <span class="math inline">\(n\)</span> 和 <span class="math inline">\(\epsilon\)</span>，失败概率以指数速率衰减。从格利文科到 DKW，统计学完成了从哲学到工程的跃迁。</p>
+</blockquote>
+</section>
+<section id="次序统计量与边缘分布" class="level2">
+<h2 class="anchored" data-anchor-id="次序统计量与边缘分布">次序统计量与边缘分布</h2>
+<p>经验分布函数是对分布<strong>整体</strong>的逼近。但有时观测者只关心分布的<strong>边缘</strong>——最悲观的底线在哪里？最高可能触及何处？中位观测者处于什么水平？</p>
+<p><strong>次序统计量</strong>将样本从小到大排列：<span class="math inline">\(x_{(1)} \leq x_{(2)} \leq \cdots \leq x_{(n)}\)</span>。<span class="math inline">\(x_{(k)}\)</span> 称为第 <span class="math inline">\(k\)</span> 个次序统计量。<span class="math inline">\(x_{(1)}\)</span> 是样本最小值（“短板”），<span class="math inline">\(x_{(n)}\)</span> 是样本最大值（“天花板”），中位数则落在中间。</p>
+<p>第 <span class="math inline">\(k\)</span> 个次序统计量的精确分布有一个优雅的概率解释：事件 <span class="math inline">\(\{x_{(k)} \leq x\}\)</span> 等价于”至少有 <span class="math inline">\(k\)</span> 个样本点落在 <span class="math inline">\((-\infty, x]\)</span> 内”。由此可以导出密度函数：</p>
+<p><span class="math display">\[p_{(k)}(x) = \frac{n!}{(k-1)!(n-k)!} [F(x)]^{k-1} [1 - F(x)]^{n-k} p(x)\]</span></p>
+<p>其中 <span class="math inline">\(p(x)\)</span> 是总体的密度函数、<span class="math inline">\(F(x)\)</span> 是分布函数。三个因子各司其职：组合数来自”<span class="math inline">\(n\)</span> 个中选 <span class="math inline">\(k-1\)</span> 个在左边、<span class="math inline">\(n-k\)</span> 个在右边”的排列方式；<span class="math inline">\(F^{k-1}\)</span> 是左边 <span class="math inline">\(k-1\)</span> 个都在 <span class="math inline">\(x\)</span> 之下的概率；<span class="math inline">\((1-F)^{n-k}\)</span> 是右边 <span class="math inline">\(n-k\)</span> 个都在 <span class="math inline">\(x\)</span> 之上的概率；<span class="math inline">\(p(x)\)</span> 是第 <span class="math inline">\(k\)</span> 个恰好落在 <span class="math inline">\(x\)</span> 处的概率密度。</p>
+<p>两端极值的情况尤为简洁：<span class="math inline">\(p_{(1)}(x) = n[1-F(x)]^{n-1} p(x)\)</span>，<span class="math inline">\(p_{(n)}(x) = n[F(x)]^{n-1} p(x)\)</span>。</p>
+<blockquote class="blockquote">
+<p><strong>极值的渐近行为</strong>与中心极限定理（研究均值）形成了互补的认知维度。CLT 告诉我们”典型观测者的平均”趋向正态分布；极值理论（Extreme Value Theory）告诉我们”最极端的观测者”趋向 Gumbel、Frechet 或 Weibull 分布——取决于原始分布的尾部厚度。均值与极值，一起构成了对总体从中心到边缘的完整视野。</p>
+</blockquote>
+<p>在次序统计量中，<strong>中位数</strong>具有特殊的稳健性地位。当数据含有离群值时，均值可能被严重扭曲，但中位数几乎不受影响——一个数据点的改变最多只能让中位数跳到相邻的次序统计量。这一稳健性使得中位数回归（分位数回归的特例）在重尾数据的场景中成为均值的有效替代。</p>
+</section>
+<section id="三大抽样分布推断工具" class="level2">
+<h2 class="anchored" data-anchor-id="三大抽样分布推断工具">三大抽样分布：推断工具</h2>
+<p>前四层完成了从”数据”到”信息”的抽象建构。现在，为了在正态总体的假设下做具体的统计推断（Ch06 的区间估计、Ch07 的假设检验），我们需要三个精确的抽样分布作为”度量衡”。</p>
+<p><span class="math inline">\(\chi^2\)</span> 分布——衡量变异。 设 <span class="math inline">\(Z_1, \ldots, Z_n \overset{\text{iid}}{\sim} N(0,1)\)</span>，定义：</p>
+<p><span class="math display">\[\chi^2 = Z_1^2 + Z_2^2 + \cdots + Z_n^2 \sim \chi^2(n)\]</span></p>
+<p>其密度函数为 <span class="math inline">\(\text{Gamma}(n/2, 1/2)\)</span>：<span class="math inline">\(f(x; n) = \frac{1}{2^{n/2}\Gamma(n/2)} x^{n/2-1} e^{-x/2},\; x &gt; 0\)</span>。<span class="math inline">\(E[\chi^2] = n\)</span>，<span class="math inline">\(\text{Var}(\chi^2) = 2n\)</span>。<span class="math inline">\(\chi^2\)</span> 分布自然地成为样本方差推断的枢纽：来自正态总体的样本，<span class="math inline">\(\frac{(n-1)s^2}{\sigma^2} \sim \chi^2(n-1)\)</span>。</p>
+<p><span class="math inline">\(t\)</span> 分布——对未知的妥协。 实际应用中，<span class="math inline">\(\sigma\)</span> 几乎总是未知的。当我们用样本标准差 <span class="math inline">\(s\)</span> 代替 <span class="math inline">\(\sigma\)</span> 来标准化样本均值时，分子是标准正态 <span class="math inline">\(Z\)</span>，分母是 <span class="math inline">\(\sqrt{\chi^2/\nu}\)</span>——这个比值不再服从正态分布，而是 <span class="math inline">\(t\)</span> 分布：</p>
+<p><span class="math display">\[t = \frac{Z}{\sqrt{\chi^2(n)/n}} \sim t(n)\]</span></p>
+<p><span class="math inline">\(t\)</span> 分布的密度比标准正态的峰更低、尾部更厚——这是用 <span class="math inline">\(s\)</span> 估计 <span class="math inline">\(\sigma\)</span> 带来的<strong>额外不确定性</strong>的数学表达。自由度 <span class="math inline">\(n\)</span> 越小（样本越少），这种不确定性越显著，尾部越厚；<span class="math inline">\(n \to \infty\)</span> 时，<span class="math inline">\(s \to \sigma\)</span>，<span class="math inline">\(t\)</span> 分布收敛于标准正态。</p>
+<blockquote class="blockquote">
+<p><span class="math inline">\(t\)</span> 分布的发现（Gosset, 1908，以”Student”为笔名）打破了正态分布一统天下的局面，开创了小样本统计推断的新纪元。它的哲学含义是坦诚的：<strong>我承认我不知道</strong> <span class="math inline">\(\sigma\)</span>，我为此付出厚尾的代价。</p>
+</blockquote>
+<p><span class="math inline">\(F\)</span> 分布——衡量变异之比。 比较两个独立正态总体的方差时，两个标准化后的样本方差之比服从 <span class="math inline">\(F\)</span> 分布：</p>
+<p><span class="math display">\[F = \frac{\chi^2(m)/m}{\chi^2(n)/n} \sim F(m, n)\]</span></p>
+<p>若两个总体的方差相等（<span class="math inline">\(\sigma_1^2 = \sigma_2^2\)</span>），则 <span class="math inline">\(F = s_x^2 / s_y^2 \sim F(m-1, n-1)\)</span>。<span class="math inline">\(F\)</span> 分布是 ANOVA（Ch11）和模型比较中 <span class="math inline">\(F\)</span> 检验的数学基础——它衡量的是”模型解释的变异”与”无法解释的随机噪音”的比值。</p>
+<p><strong>三大分布的内在统一</strong>并非各自孤立：<span class="math inline">\(t^2(n) \sim F(1, n)\)</span>——<span class="math inline">\(t\)</span> 分布是 <span class="math inline">\(F\)</span> 分布在分子自由度为 1 时的开方；<span class="math inline">\(F\)</span> 分布是两个 <span class="math inline">\(\chi^2\)</span> 分布之比；<span class="math inline">\(\chi^2\)</span> 分布是独立标准正态的平方和。三者共同构成了正态总体下所有精确推断的分布基础。</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 模拟验证三大抽样分布</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">42</span>)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="dv">10000</span>; df <span class="ot">&lt;-</span> <span class="dv">5</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>chi2_sim <span class="ot">&lt;-</span> <span class="fu">replicate</span>(n, <span class="fu">sum</span>(<span class="fu">rnorm</span>(df)<span class="sc">^</span><span class="dv">2</span>))</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>t_sim <span class="ot">&lt;-</span> <span class="fu">rt</span>(n, df)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>f_sim <span class="ot">&lt;-</span> <span class="fu">rf</span>(n, <span class="dv">3</span>, <span class="dv">20</span>)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">3</span>))</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="fu">hist</span>(chi2_sim, <span class="at">breaks =</span> <span class="dv">50</span>, <span class="at">freq =</span> <span class="cn">FALSE</span>, <span class="at">main =</span> <span class="fu">expression</span>(chi<span class="sc">^</span><span class="dv">2</span><span class="sc">*</span>(<span class="dv">5</span>)),</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>     <span class="at">xlab =</span> <span class="st">""</span>, <span class="at">col =</span> <span class="st">"lightblue"</span>, <span class="at">border =</span> <span class="st">"white"</span>)</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="fu">curve</span>(<span class="fu">dchisq</span>(x, df), <span class="at">add =</span> <span class="cn">TRUE</span>, <span class="at">col =</span> <span class="st">"steelblue"</span>, <span class="at">lwd =</span> <span class="dv">2</span>)</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="fu">hist</span>(t_sim, <span class="at">breaks =</span> <span class="dv">50</span>, <span class="at">freq =</span> <span class="cn">FALSE</span>, <span class="at">main =</span> <span class="fu">expression</span>(t<span class="sc">*</span>(<span class="dv">5</span>)),</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>     <span class="at">xlab =</span> <span class="st">""</span>, <span class="at">col =</span> <span class="st">"lightblue"</span>, <span class="at">border =</span> <span class="st">"white"</span>, <span class="at">xlim =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">5</span>, <span class="dv">5</span>))</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="fu">curve</span>(<span class="fu">dt</span>(x, df), <span class="at">add =</span> <span class="cn">TRUE</span>, <span class="at">col =</span> <span class="st">"steelblue"</span>, <span class="at">lwd =</span> <span class="dv">2</span>)</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="fu">curve</span>(<span class="fu">dnorm</span>(x), <span class="at">add =</span> <span class="cn">TRUE</span>, <span class="at">col =</span> <span class="st">"gray"</span>, <span class="at">lty =</span> <span class="dv">2</span>, <span class="at">lwd =</span> <span class="fl">1.5</span>)</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="fu">legend</span>(<span class="st">"topright"</span>, <span class="fu">c</span>(<span class="st">"t(5)"</span>, <span class="st">"N(0,1)"</span>), <span class="at">col =</span> <span class="fu">c</span>(<span class="st">"steelblue"</span>, <span class="st">"gray"</span>), <span class="at">lty =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>), <span class="at">bty =</span> <span class="st">"n"</span>)</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a><span class="fu">hist</span>(f_sim, <span class="at">breaks =</span> <span class="dv">50</span>, <span class="at">freq =</span> <span class="cn">FALSE</span>, <span class="at">main =</span> <span class="fu">expression</span>(F<span class="sc">*</span>(<span class="dv">3</span><span class="sc">*</span><span class="st">","</span><span class="sc">*</span><span class="dv">20</span>)),</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>     <span class="at">xlab =</span> <span class="st">""</span>, <span class="at">col =</span> <span class="st">"lightblue"</span>, <span class="at">border =</span> <span class="st">"white"</span>, <span class="at">xlim =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">5</span>))</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a><span class="fu">curve</span>(<span class="fu">df</span>(x, <span class="dv">3</span>, <span class="dv">20</span>), <span class="at">add =</span> <span class="cn">TRUE</span>, <span class="at">col =</span> <span class="st">"steelblue"</span>, <span class="at">lwd =</span> <span class="dv">2</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="05-统计量与抽样分布_files/figure-html/sampling-dist-sim-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">1</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+</section>
+<section id="样本统计量的基本性质" class="level2">
+<h2 class="anchored" data-anchor-id="样本统计量的基本性质">样本统计量的基本性质</h2>
+<p>有了抽样分布作为工具，现在回到最常用的两个统计量，总结它们的期望、方差以及在正态总体下的精确分布。</p>
+<p><strong>样本均值</strong> <span class="math inline">\(\bar{X} = \frac{1}{n}\sum X_i\)</span> 是对总体均值 <span class="math inline">\(\mu\)</span> 最自然的估计：</p>
+<p><span class="math display">\[E(\bar{X}) = \mu, \quad \text{Var}(\bar{X}) = \frac{\sigma^2}{n}\]</span></p>
+<p>两个性质共同构成 LLN 和 CLT（Ch03）的微观表达：期望等于真值（无偏性），方差以 <span class="math inline">\(1/n\)</span> 衰减（相合性）。若总体为 <span class="math inline">\(N(\mu, \sigma^2)\)</span>，则 <span class="math inline">\(\bar{X} \sim N(\mu, \sigma^2/n)\)</span> 精确成立；若总体非正态但 <span class="math inline">\(n\)</span> 较大，则由 CLT 保证 <span class="math inline">\(\bar{X} \overset{\text{approx}}{\sim} N(\mu, \sigma^2/n)\)</span>。</p>
+<p><strong>样本方差</strong> <span class="math inline">\(s^2 = \frac{1}{n-1}\sum (X_i - \bar{X})^2\)</span> 的分母使用 <span class="math inline">\(n-1\)</span> 而非 <span class="math inline">\(n\)</span>，这是数理统计中最经典的人为修正：</p>
+<p><span class="math display">\[E(s^2) = \sigma^2\]</span></p>
+<p>分母用 <span class="math inline">\(n\)</span> 的版本（<span class="math inline">\(s_n^2\)</span>）有偏：<span class="math inline">\(E(s_n^2) = \frac{n-1}{n}\sigma^2 &lt; \sigma^2\)</span>。偏的来源是 <span class="math inline">\(\bar{X}\)</span> 本身也消耗了一个自由度来估计 <span class="math inline">\(\mu\)</span>——<span class="math inline">\(n\)</span> 个偏差 <span class="math inline">\((X_i - \bar{X})\)</span> 之间存在一个线性约束 <span class="math inline">\(\sum (X_i - \bar{X}) = 0\)</span>，因此独立偏差只有 <span class="math inline">\(n-1\)</span> 个。除以 <span class="math inline">\(n-1\)</span> 是对”用数据估计了 <span class="math inline">\(\mu\)</span> 之后再估计 <span class="math inline">\(\sigma^2\)</span>“这一双重使用数据行为的补偿。</p>
+<p><strong>样本矩</strong>是期望和方差的自然推广。样本 <span class="math inline">\(k\)</span> 阶原点矩 <span class="math inline">\(a_k = \frac{1}{n}\sum X_i^k\)</span> 估计总体 <span class="math inline">\(E(X^k)\)</span>；样本 <span class="math inline">\(k\)</span> 阶中心矩 <span class="math inline">\(b_k = \frac{1}{n}\sum (X_i - \bar{X})^k\)</span> 估计总体 <span class="math inline">\(E[(X-\mu)^k]\)</span>。由此派生出的<strong>样本偏度</strong> <span class="math inline">\(\hat{\beta}_s = b_3 / b_2^{3/2}\)</span> 和<strong>样本峰度</strong> <span class="math inline">\(\hat{\beta}_k = b_4 / b_2^2 - 3\)</span> 分别捕捉数据的不对称性和尾部厚度——它们在 Ch07 的正态性检验和 Ch13 的数据探索中反复出现。</p>
+<blockquote class="blockquote">
+<p>从样本均值到样本方差到样本矩，统计量始终在回答同一个问题：<strong>如何从</strong> <span class="math inline">\(n\)</span> 个数字中提炼出尽可能少、但又能充分代表总体特征的摘要？ 充分统计量是这一追问的极限答案——当它存在时，你只需要一个或几个数字就能完全替代原始样本。即使充分统计量不存在，我们仍然可以通过经验分布函数（整体逼近）和次序统计量（边缘刻画）获取对总体的全面认知。这六层逻辑合在一起，构成了经典统计推断不可动摇的地基。</p>
+</blockquote>
+<hr>
+<p><strong>速查卡片</strong>：</p>
+<ul>
+<li><strong>核心问题</strong>：如何从 <span class="math inline">\(n\)</span> 个数字（样本）逆推出不可见的 <span class="math inline">\(\theta\)</span>（参数）？统计量作为信息压缩的数学机制是什么？</li>
+<li><strong>关键概念</strong>：概率论 vs 数理统计（演绎 vs 归纳） → 总体/样本 → 统计量（<span class="math inline">\(\mathbb{R}^n \to \mathbb{R}^k\)</span> 压缩） → 充分统计量与因子分解定理 → 经验分布函数与格利文科定理 → 次序统计量与极值 → 三大抽样分布（<span class="math inline">\(\chi^2\)</span> / <span class="math inline">\(t\)</span> / <span class="math inline">\(F\)</span>） → 样本均值/方差的性质</li>
+<li><strong>R 命令</strong>：<code>mean()</code>, <code>var()</code>, <code>ecdf()</code>, <code>quantile()</code>, <code>dchisq()</code> / <code>dt()</code> / <code>df()</code>, <code>qqnorm()</code> + <code>qqline()</code></li>
+<li><strong>参见</strong>：Ch01（指数族与概率基础）、Ch03（LLN 与 CLT）、Ch04（DKW 不等式）、Ch06（区间估计）、Ch07（假设检验）、Ch11（GLM 与指数族）、Ch13（非参数统计）</li>
+</ul>
+<hr>
+<p><strong>深度思考</strong>：</p>
+<ol type="1">
+<li><p>充分统计量定义为”给定 <span class="math inline">\(T\)</span> 后，样本的条件分布与 <span class="math inline">\(\theta\)</span> 无关”。这一定义的<strong>操作意义</strong>是什么？——如果你只拿到 <span class="math inline">\(T\)</span> 的取值而丢失了原始数据，你是否在数学上”损失了任何关于 <span class="math inline">\(\theta\)</span> 的东西”？因子分解定理如何将这个问题转化为纯粹的代数判定？</p></li>
+<li><p>格利文科定理说经验分布<strong>一致收敛</strong>于真实分布。相比之下，LLN 只给出<strong>逐点收敛</strong>（<span class="math inline">\(\bar{X}_n \to \mu\)</span>）。“一致收敛”比”逐点收敛”强在哪里？为什么这个强度对非参数统计方法的合法性至关重要？</p></li>
+<li><p><span class="math inline">\(t\)</span> 分布的厚尾来自”用 <span class="math inline">\(s\)</span> 估计 <span class="math inline">\(\sigma\)</span> 的额外不确定性”。为什么用 <span class="math inline">\(\sigma\)</span>（已知）时得到正态分布，用 <span class="math inline">\(s\)</span>（估计）时得到 <span class="math inline">\(t\)</span> 分布？从抽样分布的推导过程中，这一步的数学机制是什么？——提示：比较 <span class="math inline">\(Z = \frac{\bar{X} - \mu}{\sigma/\sqrt{n}}\)</span> 和 <span class="math inline">\(t = \frac{\bar{X} - \mu}{s/\sqrt{n}}\)</span> 中分母的随机性。</p></li>
+<li><p>指数族提供了充分统计量的”自动生成机制”。在什么意义上，指数族是唯一具有此性质的分布族？——提示：思考因子分解定理的结构与指数族形式的对应关系，以及 Darmois–Pitman–Koopman 定理的断言。</p></li>
+</ol>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="./04-概率不等式与收敛性.html" class="pagination-link" aria-label="概率不等式与收敛性">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-title">概率不等式与收敛性</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="./06-参数估计.html" class="pagination-link" aria-label="参数估计">
+        <span class="nav-page-text"><span class="chapter-title">参数估计</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

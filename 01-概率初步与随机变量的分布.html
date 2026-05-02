@@ -1,0 +1,1321 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.37">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>概率初步与随机变量的分布 – 乱中寻序：统计学的统一逻辑</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./02-多维随机变量及其分布.html" rel="next">
+<link href="./index.html" rel="prev">
+<script src="site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-7f8f88aac4f3542376d5c11b86a4c14d.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-b46385535caf84bc62f311a600ac5013.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body class="nav-sidebar docked quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./01-概率初步与随机变量的分布.html">Part I: 概率论基础</a></li><li class="breadcrumb-item"><a href="./01-概率初步与随机变量的分布.html"><span class="chapter-title">概率初步与随机变量的分布</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="./">乱中寻序：统计学的统一逻辑</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">乱中寻序：统计学的统一逻辑</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part I: 概率论基础</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./01-概率初步与随机变量的分布.html" class="sidebar-item-text sidebar-link active"><span class="chapter-title">概率初步与随机变量的分布</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./02-多维随机变量及其分布.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">多维随机变量及其分布</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./03-大数定律和中心极限定理.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">大数定律和中心极限定理</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./04-概率不等式与收敛性.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">概率不等式与收敛性</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false">
+ <span class="menu-text">Part II: 经典统计推断</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./05-统计量与抽样分布.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">统计量与抽样分布</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./06-参数估计.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">参数估计</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./07-假设检验与方差分析.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">假设检验与方差分析</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./08-贝叶斯统计与计算.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">贝叶斯统计与计算</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false">
+ <span class="menu-text">Part III: 现代统计方法</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./09-回归分析.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">回归分析</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./10-广义线性模型.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">广义线性回归</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./11-类别数据分析.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">类别数据分析</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./12-非参数统计.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">非参数统计</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./13-时间序列分析.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">时间序列分析</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./14-多元统计分析.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">多元统计分析</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false">
+ <span class="menu-text">Part IV: 机器学习</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./15-机器学习基础.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">机器学习基础</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./16-经典分类方法.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">经典分类方法</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./17-集成学习与模型选择.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">集成学习与模型选择</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./18-深度学习.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">深度学习</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./19-因果推断入门.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">因果推断入门</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="false">
+ <span class="menu-text">附录：统计计算工具</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./A-优化方法.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">优化方法</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./B-矩阵计算与数值方法.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">矩阵计算与数值方法</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#观测者与可能性空间" id="toc-观测者与可能性空间" class="nav-link active" data-scroll-target="#观测者与可能性空间">观测者与可能性空间</a></li>
+  <li><a href="#随机事件的运算" id="toc-随机事件的运算" class="nav-link" data-scroll-target="#随机事件的运算">随机事件的运算</a></li>
+  <li><a href="#概率是什么" id="toc-概率是什么" class="nav-link" data-scroll-target="#概率是什么">概率是什么？</a>
+  <ul class="collapse">
+  <li><a href="#阵营一概率是世界的属性客观概率" id="toc-阵营一概率是世界的属性客观概率" class="nav-link" data-scroll-target="#阵营一概率是世界的属性客观概率">阵营一：概率是世界的属性——客观概率</a></li>
+  <li><a href="#阵营二概率是认知的属性主观概率" id="toc-阵营二概率是认知的属性主观概率" class="nav-link" data-scroll-target="#阵营二概率是认知的属性主观概率">阵营二：概率是认知的属性——主观概率</a></li>
+  <li><a href="#超越争论概率的公理化定义" id="toc-超越争论概率的公理化定义" class="nav-link" data-scroll-target="#超越争论概率的公理化定义">超越争论：概率的公理化定义</a></li>
+  </ul></li>
+  <li><a href="#信息熵不确定性的数学度量" id="toc-信息熵不确定性的数学度量" class="nav-link" data-scroll-target="#信息熵不确定性的数学度量">信息熵：不确定性的数学度量</a>
+  <ul class="collapse">
+  <li><a href="#熵的取值区间" id="toc-熵的取值区间" class="nav-link" data-scroll-target="#熵的取值区间">熵的取值区间</a></li>
+  <li><a href="#熵的深层含义" id="toc-熵的深层含义" class="nav-link" data-scroll-target="#熵的深层含义">熵的深层含义</a></li>
+  </ul></li>
+  <li><a href="#条件概率新信息流入导致的可能性空间塌缩" id="toc-条件概率新信息流入导致的可能性空间塌缩" class="nav-link" data-scroll-target="#条件概率新信息流入导致的可能性空间塌缩">条件概率：新信息流入导致的可能性空间塌缩</a>
+  <ul class="collapse">
+  <li><a href="#从无条件到有条件" id="toc-从无条件到有条件" class="nav-link" data-scroll-target="#从无条件到有条件">从无条件到有条件</a></li>
+  <li><a href="#乘法公式与全概率公式" id="toc-乘法公式与全概率公式" class="nav-link" data-scroll-target="#乘法公式与全概率公式">乘法公式与全概率公式</a></li>
+  <li><a href="#贝叶斯公式从结果反推原因" id="toc-贝叶斯公式从结果反推原因" class="nav-link" data-scroll-target="#贝叶斯公式从结果反推原因">贝叶斯公式：从结果反推原因</a></li>
+  <li><a href="#独立性信息通道的断裂" id="toc-独立性信息通道的断裂" class="nav-link" data-scroll-target="#独立性信息通道的断裂">独立性：信息通道的断裂</a></li>
+  </ul></li>
+  <li><a href="#随机变量" id="toc-随机变量" class="nav-link" data-scroll-target="#随机变量">随机变量</a>
+  <ul class="collapse">
+  <li><a href="#数学期望" id="toc-数学期望" class="nav-link" data-scroll-target="#数学期望">数学期望</a></li>
+  <li><a href="#方差与切比雪夫不等式" id="toc-方差与切比雪夫不等式" class="nav-link" data-scroll-target="#方差与切比雪夫不等式">方差与切比雪夫不等式</a></li>
+  <li><a href="#其他特征数分布形态的完整素描" id="toc-其他特征数分布形态的完整素描" class="nav-link" data-scroll-target="#其他特征数分布形态的完整素描">其他特征数：分布形态的完整素描</a></li>
+  </ul></li>
+  <li><a href="#分布的演化树" id="toc-分布的演化树" class="nav-link" data-scroll-target="#分布的演化树">分布的演化树</a>
+  <ul class="collapse">
+  <li><a href="#第一棵树伯努利过程-计数与等待" id="toc-第一棵树伯努利过程-计数与等待" class="nav-link" data-scroll-target="#第一棵树伯努利过程-计数与等待">第一棵树：伯努利过程 —— 计数与等待</a></li>
+  <li><a href="#第二棵树泊松流-计数与间隔的双面" id="toc-第二棵树泊松流-计数与间隔的双面" class="nav-link" data-scroll-target="#第二棵树泊松流-计数与间隔的双面">第二棵树：泊松流 —— 计数与间隔的双面</a></li>
+  <li><a href="#第三棵树极限与共轭-正态与贝塔的独特地位" id="toc-第三棵树极限与共轭-正态与贝塔的独特地位" class="nav-link" data-scroll-target="#第三棵树极限与共轭-正态与贝塔的独特地位">第三棵树：极限与共轭 —— 正态与贝塔的独特地位</a></li>
+  <li><a href="#均匀分布与超几何分布" id="toc-均匀分布与超几何分布" class="nav-link" data-scroll-target="#均匀分布与超几何分布">均匀分布与超几何分布</a></li>
+  </ul></li>
+  <li><a href="#随机变量函数的分布" id="toc-随机变量函数的分布" class="nav-link" data-scroll-target="#随机变量函数的分布">随机变量函数的分布</a></li>
+  <li><a href="#分布之间的距离度量" id="toc-分布之间的距离度量" class="nav-link" data-scroll-target="#分布之间的距离度量">分布之间的距离度量</a>
+  <ul class="collapse">
+  <li><a href="#kl-散度信息论意义上的距离" id="toc-kl-散度信息论意义上的距离" class="nav-link" data-scroll-target="#kl-散度信息论意义上的距离">KL 散度：信息论意义上的”距离”</a></li>
+  <li><a href="#从-kl-散度到最大似然估计" id="toc-从-kl-散度到最大似然估计" class="nav-link" data-scroll-target="#从-kl-散度到最大似然估计">从 KL 散度到最大似然估计</a></li>
+  <li><a href="#交叉熵损失深度学习的默认语言" id="toc-交叉熵损失深度学习的默认语言" class="nav-link" data-scroll-target="#交叉熵损失深度学习的默认语言">交叉熵损失：深度学习的默认语言</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./01-概率初步与随机变量的分布.html">Part I: 概率论基础</a></li><li class="breadcrumb-item"><a href="./01-概率初步与随机变量的分布.html"><span class="chapter-title">概率初步与随机变量的分布</span></a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title"><span class="chapter-title">概率初步与随机变量的分布</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<blockquote class="blockquote">
+<p>你是一个观测者。你面对世界，唯一确定的事情是：你不可能提前知道一切。概率论，就是我们为“不知道”发明的语言。</p>
+</blockquote>
+<section id="观测者与可能性空间" class="level2">
+<h2 class="anchored" data-anchor-id="观测者与可能性空间">观测者与可能性空间</h2>
+<p>一个观测者站在时间之前。他不知道明天会不会下雨，不知道下一次掷硬币的结果，不知道自己还能活多少年。他唯一拥有的，是<strong>对可能性的列举</strong>——所有可能发生的结果的集合。</p>
+<p>这就是<strong>样本空间</strong> <span class="math inline">\(\Omega\)</span>：观测者能想象到的、互不重叠的全部可能结果的集合。每一个具体的结果 <span class="math inline">\(\omega\)</span> 是一个<strong>样本点</strong>。</p>
+<p>样本空间的大小，度量了观测者<strong>无知的程度</strong>。当 <span class="math inline">\(\Omega\)</span> 只有一个元素时，观测者全知——他知道必然发生什么。当 <span class="math inline">\(\Omega\)</span> 有无穷多个元素时，观测者的无知是彻底的。</p>
+<p>但无知不等于无能为力。观测者可以做两件事：</p>
+<ol type="1">
+<li><strong>划定事件</strong>：在 <span class="math inline">\(\Omega\)</span> 中圈出一个子集 <span class="math inline">\(A\)</span>，说“我关心这个子集是否出现”——这就是<strong>随机事件</strong>。</li>
+<li><strong>分配信念</strong>：对每个事件赋予一个 0 到 1 之间的数值，表达“我认为它发生的可能性”——这就是<strong>概率</strong>。</li>
+</ol>
+</section>
+<section id="随机事件的运算" class="level2">
+<h2 class="anchored" data-anchor-id="随机事件的运算">随机事件的运算</h2>
+<p>事件本质上是 <span class="math inline">\(\Omega\)</span> 的子集。因此，事件之间的运算就是集合运算——但每一个运算背后都有直观的含义。</p>
+<ul>
+<li><strong>并</strong> <span class="math inline">\(A \cup B\)</span>：<span class="math inline">\(A\)</span> 或 <span class="math inline">\(B\)</span> 至少有一个发生。这是在<strong>扩大</strong>可能性——只要落入任一区域就算。</li>
+<li><strong>交</strong> <span class="math inline">\(A \cap B\)</span>：<span class="math inline">\(A\)</span> 和 <span class="math inline">\(B\)</span> 同时发生。这是在<strong>缩小</strong>可能性——必须同时满足两个条件。</li>
+<li><strong>补</strong> <span class="math inline">\(\bar{A}\)</span>：<span class="math inline">\(A\)</span> 不发生。这是观测者视野的翻转——关注的是 <span class="math inline">\(A\)</span> 之外的一切。</li>
+<li><strong>差</strong> <span class="math inline">\(A - B\)</span>：<span class="math inline">\(A\)</span> 发生而 <span class="math inline">\(B\)</span> 不发生。这是精确排除——“我要 <span class="math inline">\(A\)</span>，但不要 <span class="math inline">\(B\)</span> 附带进来”。</li>
+</ul>
+<p>运算遵循对偶律：事件并的对立等于对立的交；事件交的对立等于对立的并。这是逻辑中德摩根律的概率表达。</p>
+<p><strong>事件域</strong> <span class="math inline">\(\mathcal{F}\)</span> 是 <span class="math inline">\(\Omega\)</span> 中那些“可以被赋予概率”的子集的全体。并非所有子集都有资格——我们只对“封闭于可列次运算”的子集类分配概率。<span class="math inline">\((\Omega, \mathcal{F})\)</span> 构成了概率空间的骨架。</p>
+</section>
+<section id="概率是什么" class="level2">
+<h2 class="anchored" data-anchor-id="概率是什么">概率是什么？</h2>
+<p>观测者已经有了 <span class="math inline">\(\Omega\)</span>——他知道可能发生什么。但他还缺一样东西:<strong>在事件之间做选择的依据</strong>。明天出门带不带伞？要不要为小概率的灾难买保险？这些问题不是在问”可能发生什么”，而是在问”发生的可能性有多大”。</p>
+<p>观测者需要一个数值，一个 0 到 1 之间的刻度，来表达他对每个事件的相信程度。这就是<strong>概率</strong>。</p>
+<p>但此刻分歧出现了:<strong>这个刻度从哪来</strong>？是世界固有的物理属性，还是观测者认知状态的数值表达？这个问题争论了三百年。四种回答，分属两个阵营，追问同一个元问题：</p>
+<blockquote class="blockquote">
+<p><strong>概率是世界的属性，还是认知的属性？</strong></p>
+</blockquote>
+<section id="阵营一概率是世界的属性客观概率" class="level3">
+<h3 class="anchored" data-anchor-id="阵营一概率是世界的属性客观概率">阵营一：概率是世界的属性——客观概率</h3>
+<p><strong>古典概率</strong>（拉普拉斯，1812）是最早的系统回答。当 <span class="math inline">\(\Omega\)</span> 中的每个样本点”理由均等”时：</p>
+<p><span class="math display">\[P(A) = \frac{A \text{ 所含样本点数}}{\Omega \text{ 中样本点总数}}\]</span></p>
+<p>拉普拉斯称之为”不充分理由原理”——如果你没有理由认为某些结果比另一些更可能，就认为它们等可能。古典概率的美，在于它将无知转化为等权。但它只适用于有限且对称的样本空间，无法处理有偏硬币，也无法回答”明天股市崩盘的概率”。</p>
+<p><strong>频率概率</strong>（冯·米塞斯，1919）继承了客观主义的路线，但换了一种操作化的进路：概率不是枚举出来的，而是在大量重复试验中，事件出现频率的<strong>稳定值</strong>。抛硬币十万次，正面频率稳定在 0.5 附近——这个稳定值就是 <span class="math inline">\(1/2\)</span>。</p>
+<p>频率方法的问题是：它假设世界可以无限重复。但很多事件不可重复——“明天股市崩盘的概率”没有频率解释。这个问题要到 Ch03 的大数定律才能给出数学担保：至少在可重复的场景中，频率收敛到概率是一个可以被证明的定理，而不只是经验观察。</p>
+<p>古典概率和频率概率共享同一个信念：<strong>概率客观存在于随机机制中，与观测者无关。</strong></p>
+</section>
+<section id="阵营二概率是认知的属性主观概率" class="level3">
+<h3 class="anchored" data-anchor-id="阵营二概率是认知的属性主观概率">阵营二：概率是认知的属性——主观概率</h3>
+<p><strong>主观概率</strong>（拉姆齐 1926，德·菲内蒂 1937）给出完全不同的回答：概率是观测者根据经验和信息对事件发生的<strong>个人信念</strong>的数值表达。你的概率和我的概率可以不同——因为我们掌握的信息不同。硬币的”公平性”不是硬币的物理属性，而是观测者没有理由偏向任何一方的认知状态。</p>
+<p>主观概率通向贝叶斯统计（Ch08）：概率是观测者认知状态的度量。新数据流入，概率更新。这个世界观下，不存在绝对的”真实概率”——只存在不断被数据修正的后验信念。</p>
+<blockquote class="blockquote">
+<p>两派的共识比你想象的更多。频率学派在大样本下大量使用贝叶斯式的思维（MLE 的渐近正态性，Ch06）；贝叶斯学派在后验收敛的意义上同样依赖大数定律（Ch03）。Ch06 末尾将通过 KL 散度展示：最大似然估计和贝叶斯后验模态，在信息论上是同一种操作的两个视角。</p>
+</blockquote>
+</section>
+<section id="超越争论概率的公理化定义" class="level3">
+<h3 class="anchored" data-anchor-id="超越争论概率的公理化定义">超越争论：概率的公理化定义</h3>
+<p>科尔莫戈罗夫做了一个所有争论方都能接受的智慧之举——<strong>绕过”概率是什么”的本体论问题，直接规定”概率应该如何运算”</strong>：</p>
+<ul>
+<li><strong>非负性</strong>：<span class="math inline">\(P(A) \geq 0\)</span>。概率不能是负的——你不能比”绝不可能”更不可能。</li>
+<li><strong>正则性</strong>：<span class="math inline">\(P(\Omega) = 1\)</span>。必然事件的概率为 1——可能性空间必须有一个度量上限。</li>
+<li><strong>可列可加性</strong>：若 <span class="math inline">\(A_1, A_2, \ldots\)</span> 互不相容，则 <span class="math inline">\(P(\cup A_i) = \sum P(A_i)\)</span>。互斥事件的概率可加——这是概率运算的核心规则。</li>
+</ul>
+<p>公理化定义把概率变成了纯粹的数学对象。无论你认为概率是客观频率还是主观信念，三条公理都成立。<strong>它提供的不是答案，而是一个中立的语法平台——在这个平台上，两派的对话可以继续。</strong></p>
+<blockquote class="blockquote">
+<p>这四种回答之间的关系贯穿全书：Ch05-07 走频率路径（抽样分布→MLE→假设检验），Ch08 走贝叶斯路径（先验→后验→共轭），Ch03-04 为两者提供共同的渐近地基。它们不是敌人，而是从不同方向攀登同一座山。</p>
+</blockquote>
+<p>从公理出发，可以推导出概率的运算性质：有限可加性、补事件概率、单调性、加法公式、连续性。这些性质构成了概率运算的语法规则。</p>
+</section>
+</section>
+<section id="信息熵不确定性的数学度量" class="level2">
+<h2 class="anchored" data-anchor-id="信息熵不确定性的数学度量">信息熵：不确定性的数学度量</h2>
+<p>前面讨论了概率的四种定义，但它们都没有回答一个更根本的问题：<strong>不确定性本身如何度量？</strong></p>
+<p>1948 年，香农（Claude Shannon）在《通信的数学理论》中给出了答案。对于一个取 <span class="math inline">\(K\)</span> 个可能值的离散随机变量 <span class="math inline">\(X\)</span>，其分布为 <span class="math inline">\(P(X = k) = p_k\)</span>，香农定义了<strong>信息熵</strong>：</p>
+<p><span class="math display">\[H(X) = -\sum_{k=1}^{K} p_k \log_2 p_k\]</span></p>
+<p>这个公式的含义出人意料地朴素：<span class="math inline">\(-\log_2 p_k\)</span> 是事件 <span class="math inline">\(\{X = k\}\)</span> 发生时所携带的<strong>信息量</strong>（单位为比特）——概率越小的事件，一旦发生，信息量越大。而熵，是信息量的<strong>期望值</strong>。换言之：</p>
+<blockquote class="blockquote">
+<p><strong>熵 = 你在观测之前，预期会接收到的”惊讶程度”的平均值。</strong></p>
+</blockquote>
+<section id="熵的取值区间" class="level3">
+<h3 class="anchored" data-anchor-id="熵的取值区间">熵的取值区间</h3>
+<p>当 <span class="math inline">\(X\)</span> 完全均匀分布（<span class="math inline">\(p_k = 1/K\)</span>）时，熵取到最大值 <span class="math inline">\(\log_2 K\)</span>。此时你对 <span class="math inline">\(X\)</span> 的取值最不确定——每一种可能性都同等合理，观测会给你最大的平均惊讶。</p>
+<p>当 <span class="math inline">\(X\)</span> 以概率 1 取某个值（退化分布）时，熵为零。你完全确定 <span class="math inline">\(X\)</span> 会取什么——观测不会带来任何惊讶。</p>
+<p><strong>一切其他分布的熵，都落在</strong> <span class="math inline">\([0, \log_2 K]\)</span> 之间。 也就是说，熵给出了一个从”完全确定”到”完全无知”的连续标尺。</p>
+</section>
+<section id="熵的深层含义" class="level3">
+<h3 class="anchored" data-anchor-id="熵的深层含义">熵的深层含义</h3>
+<p>熵不仅仅是一个数字，它蕴含了几个贯穿全书的哲学命题：</p>
+<ol type="1">
+<li><p><strong>无知的可量化性</strong>：样本空间的大小给出了”无知的绝对边界”（<span class="math inline">\(\log_2 K\)</span>），但熵告诉你在这个边界之内，你的无知处于什么水平。先验均匀分布 <span class="math inline">\(\Leftrightarrow\)</span> 最大熵 <span class="math inline">\(\Leftrightarrow\)</span> 最诚实的无知。</p></li>
+<li><p><strong>信息就是熵的减少</strong>：观测前熵为 <span class="math inline">\(H(X)\)</span>，观测到 <span class="math inline">\(Y=y\)</span> 后熵变为 <span class="math inline">\(H(X \mid Y=y)\)</span>。两者之差，就是 <span class="math inline">\(Y=y\)</span> 带来的<strong>信息增益</strong>。这正是决策树（Ch18）选择分裂变量的核心准则。</p></li>
+<li><p><strong>最大熵原理</strong>：在只知道部分约束（如均值和方差）的情况下，选择熵最大的分布是最”不武断”的选择。正态分布正是给定均值和方差下熵最大的连续分布——Ch08 的贝叶斯先验选择将回到这个原理。</p></li>
+<li><p><strong>熵与似然的等价性</strong>：最小化模型分布与经验分布之间的交叉熵，等价于最大化模型似然（Ch06）。统计学中最核心的估计方法和机器学习中最核心的损失函数，共享同一个信息论根基。</p></li>
+</ol>
+<blockquote class="blockquote">
+<p>前言中提到了”信息熵与贝叶斯更新”作为全书的底层哲学。后文讲完分布之后，我们将回到信息论——引入 KL 散度和交叉熵——届时上述第 4 点的等价性将得到完整的阐释。这条线索将贯穿全书：MLE 的信息论解释（Ch06）→ 决策树的信息增益（Ch18）→ 交叉熵损失（Ch17、Ch20）。</p>
+</blockquote>
+</section>
+</section>
+<section id="条件概率新信息流入导致的可能性空间塌缩" class="level2">
+<h2 class="anchored" data-anchor-id="条件概率新信息流入导致的可能性空间塌缩">条件概率：新信息流入导致的可能性空间塌缩</h2>
+<p>这是全书最重要的概念之一。不是因为它难，而是因为它道出了学习的本质。</p>
+<section id="从无条件到有条件" class="level3">
+<h3 class="anchored" data-anchor-id="从无条件到有条件">从无条件到有条件</h3>
+<p>你原本面对样本空间 <span class="math inline">\(\Omega\)</span>，对事件 <span class="math inline">\(A\)</span> 的概率评估是 <span class="math inline">\(P(A)\)</span>。现在你得知：事件 <span class="math inline">\(B\)</span> 已经发生了。</p>
+<p>这一刻发生了什么？你的可能性空间<strong>塌缩</strong>了——从整个 <span class="math inline">\(\Omega\)</span> 缩小到 <span class="math inline">\(B\)</span>。<span class="math inline">\(B\)</span> 之外的一切结果都变得不可能。在塌缩后的新空间里，<span class="math inline">\(A\)</span> 必须落在 <span class="math inline">\(B\)</span> 之内才会有可能发生。</p>
+<p><span class="math display">\[P(A|B) = \frac{P(A \cap B)}{P(B)}\]</span></p>
+<p>分子是 <span class="math inline">\(A\)</span> 在 <span class="math inline">\(B\)</span> 中的那部分，分母 <span class="math inline">\(P(B)\)</span> 是归一化因子——确保塌缩后的概率仍然加起来等于 1。</p>
+<p>这就是<strong>条件概率</strong>。它描述的，是观测者接收到新信息后的认知更新。</p>
+<blockquote class="blockquote">
+<p>每当你听到一个消息，你的大脑就在做条件概率计算——只是它不写公式。</p>
+</blockquote>
+</section>
+<section id="乘法公式与全概率公式" class="level3">
+<h3 class="anchored" data-anchor-id="乘法公式与全概率公式">乘法公式与全概率公式</h3>
+<p>条件概率的两个直接推论，是计算复杂事件概率的基本工具。</p>
+<p><strong>乘法公式</strong>：事件链的逐步塌缩。</p>
+<p><span class="math display">\[P(A_1 A_2 \cdots A_n) = P(A_1) P(A_2|A_1) P(A_3|A_1 A_2) \cdots P(A_n|A_1 A_2 \cdots A_{n-1})\]</span></p>
+<p><strong>全概率公式</strong>：用一组互斥的 <span class="math inline">\(B_1, \ldots, B_n\)</span> 划分 <span class="math inline">\(\Omega\)</span>，则 <span class="math inline">\(A\)</span> 的概率等于各条路径的加权和。</p>
+<p><span class="math display">\[P(A) = \sum_{i=1}^n P(B_i) P(A|B_i)\]</span></p>
+</section>
+<section id="贝叶斯公式从结果反推原因" class="level3">
+<h3 class="anchored" data-anchor-id="贝叶斯公式从结果反推原因">贝叶斯公式：从结果反推原因</h3>
+<p>全概率公式从原因推结果（<span class="math inline">\(B_i \to A\)</span>），而贝叶斯公式逆着信息流，从观测到的结果 <span class="math inline">\(A\)</span> 反推原因 <span class="math inline">\(B_i\)</span>：</p>
+<p><span class="math display">\[P(B_i|A) = \frac{P(B_i) P(A|B_i)}{\sum_{j=1}^n P(B_j) P(A|B_j)}\]</span></p>
+<p>拆解开看，这个公式有三层含义，对应三段结构：</p>
+<ul>
+<li><strong>分子第一因子</strong> <span class="math inline">\(P(B_i)\)</span>：在观测到 <span class="math inline">\(A\)</span> 之前，你对原因 <span class="math inline">\(B_i\)</span> 的信念——<strong>先验概率</strong>（Prior）。</li>
+<li><strong>分子第二因子</strong> <span class="math inline">\(P(A|B_i)\)</span>：如果 <span class="math inline">\(B_i\)</span> 真的是原因，产生结果 <span class="math inline">\(A\)</span> 的可能性——<strong>似然</strong>（Likelihood）。这是数据”说话”的通道。</li>
+<li><strong>分母</strong> <span class="math inline">\(\sum_j P(B_j) P(A|B_j) = P(A)\)</span>：在所有可能的原因下，<span class="math inline">\(A\)</span> 出现的总概率——<strong>归一化常数</strong>。保证后验概率加起来等于 1。</li>
+</ul>
+<p>因此，贝叶斯公式可以写成全书最常见的形式：</p>
+<p><span class="math display">\[\text{后验} \propto \text{似然} \times \text{先验}, \quad P(B_i|A) \propto P(A|B_i) \cdot P(B_i)\]</span></p>
+<p>这个简洁的比例关系揭示了统计学习的本质：<strong>今天的后验，就是明天的先验</strong>。每看到一条新数据，你的认知就按”似然 × 先验 → 后验”这个循环更新一次。昨天的后验成为今天的先验，等待下一条数据来修正它。数据流不断冲刷，认知不断逼近真实。人类学习的理想化模型，不过如此。</p>
+<blockquote class="blockquote">
+<p>这是全书的认知更新引擎。Ch08 将其升华为完整的贝叶斯推断体系（先验→后验→共轭），Ch09 处理当分母不可解析计算时的数值实现（MCMC、变分推断）。</p>
+</blockquote>
+<blockquote class="blockquote">
+<p>贝叶斯公式同时也是信息流动的逆运算。前向流动是世界 → 数据（似然），反向流动是数据 → 世界（后验）。这一双向性也是 Ch06 末尾 KL 散度等价性的哲学基础——MLE 走前向（从参数生成数据的似然），贝叶斯走后向（从数据更新参数的信念）。</p>
+</blockquote>
+</section>
+<section id="独立性信息通道的断裂" class="level3">
+<h3 class="anchored" data-anchor-id="独立性信息通道的断裂">独立性：信息通道的断裂</h3>
+<p><span class="math display">\[P(AB) = P(A)P(B) \quad \Leftrightarrow \quad P(A|B) = P(A)\]</span></p>
+<p>如果知道 <span class="math inline">\(B\)</span> 是否发生不改变 <span class="math inline">\(A\)</span> 的概率评估，则 <span class="math inline">\(A\)</span> 与 <span class="math inline">\(B\)</span> 独立。<strong>独立的本质是两条信息通道的隔绝</strong>——观测到一个，不会带来另一个的任何信息。</p>
+<blockquote class="blockquote">
+<p>独立性是现代统计使用最频繁、也最容易滥用的假设。Ch02 将深化多维独立性（含条件独立），Ch13 提供不依赖独立假设的推断方法。</p>
+</blockquote>
+</section>
+</section>
+<section id="随机变量" class="level2">
+<h2 class="anchored" data-anchor-id="随机变量">随机变量</h2>
+<p>样本点 <span class="math inline">\(\omega\)</span> 可能是”正面”或”反面”，可能是”晴天””阴天””雨天”——这些不是数字，不便运算。<strong>随机变量</strong> <span class="math inline">\(X\)</span> 做的事，就是给每个样本点赋予一个实数：</p>
+<p><span class="math display">\[X: \Omega \to \mathbb{R}\]</span></p>
+<p>但不是随便一个映射都叫随机变量。它必须满足一个<strong>可测性条件</strong>：对任意实数 <span class="math inline">\(a\)</span>，</p>
+<p><span class="math display">\[\{\omega \in \Omega : X(\omega) \leq a\} \in \mathcal{F}\]</span></p>
+<p>即 <span class="math inline">\(X\)</span> 在 <span class="math inline">\((-\infty, a]\)</span> 上的原像必须落在事件域 <span class="math inline">\(\mathcal{F}\)</span> 中——它必须是一个可以被赋予概率的集合。正是这个条件，保证了 <span class="math inline">\(P(X \leq a)\)</span> 有定义。</p>
+<p>有了这个保证，就可以定义<strong>分布函数</strong>：</p>
+<p><span class="math display">\[F(x) = P(X \leq x)\]</span></p>
+<p>分布函数有三条基本性质：单调不减（值越大，累积概率越大）、右连续、在 <span class="math inline">\(-\infty\)</span> 处为 0、在 <span class="math inline">\(+\infty\)</span> 处为 1。</p>
+<p>分布函数<strong>完全</strong>刻画了随机变量的统计规律。知道分布函数，就知道 <span class="math inline">\(X\)</span> 落在任何区间的概率。反过来，两个随机变量同分布，当且仅当它们的分布函数处处相等。</p>
+<p>随机变量分为两大类：</p>
+<ul>
+<li><strong>离散型</strong>：<span class="math inline">\(X\)</span> 只能取有限个或可列个值。用<strong>分布列</strong> <span class="math inline">\(p(x_i) = P(X = x_i)\)</span> 描述。</li>
+<li><strong>连续型</strong>：<span class="math inline">\(X\)</span> 可以取某个区间内的任意值。用<strong>概率密度函数</strong> <span class="math inline">\(p(x)\)</span> 描述，满足 <span class="math inline">\(F(x) = \int_{-\infty}^x p(t)dt\)</span>。</li>
+</ul>
+<p>密度函数 <span class="math inline">\(p(x)\)</span> 在单点 <span class="math inline">\(x\)</span> 处的值<strong>不是</strong>概率（单点的概率为 0），而是概率的”瞬时密度”——<span class="math inline">\(p(x)dx\)</span> 才是 <span class="math inline">\(X\)</span> 落在 <span class="math inline">\([x, x+dx]\)</span> 内的近似概率。</p>
+<p>如果分布函数是随机变量的完整肖像，那么期望和方差就是这张肖像上最重要的两个特征。</p>
+<section id="数学期望" class="level3">
+<h3 class="anchored" data-anchor-id="数学期望">数学期望</h3>
+<p><span class="math display">\[E(X) = \begin{cases} \sum_i x_i p(x_i) &amp; \text{离散} \\ \int_{-\infty}^{\infty} x p(x) dx &amp; \text{连续} \end{cases}\]</span></p>
+<p><strong>期望不是”最可能的值”，而是”长期平均”</strong>。如果你能无限次重复随机试验，所有观测值的平均会收敛到期望——这是大数定律（Ch03）的承诺。</p>
+<blockquote class="blockquote">
+<p>期望是概率分布的<strong>重心</strong>。如果把概率质量 <span class="math inline">\(p(x)\)</span> 看作物理质量沿实数轴的分布，那么 <span class="math inline">\(E(X)\)</span> 就是质心。</p>
+</blockquote>
+</section>
+<section id="方差与切比雪夫不等式" class="level3">
+<h3 class="anchored" data-anchor-id="方差与切比雪夫不等式">方差与切比雪夫不等式</h3>
+<p><span class="math display">\[Var(X) = E[(X - E(X))^2] = E(X^2) - [E(X)]^2\]</span></p>
+<p>期望告诉你“中心在哪”，方差告诉你“离中心有多远”。</p>
+<blockquote class="blockquote">
+<p>方差是概率分布的<strong>转动惯量</strong>。如果 <span class="math inline">\(E(X)\)</span> 是质心，那么 <span class="math inline">\(Var(X)\)</span> 就是概率质量绕质心的转动惯量。方差越大，分布越“散”。</p>
+</blockquote>
+<p>标准差 <span class="math inline">\(\sigma(X) = \sqrt{Var(X)}\)</span> 与 <span class="math inline">\(X\)</span> 有相同的量纲，更适合直观理解。”3σ 原则”（正态分布下，约 99.7% 的概率落在 <span class="math inline">\(\mu \pm 3\sigma\)</span> 内）是对方差最常用的直观解释。</p>
+<p>方差之所以被定义为二阶中心矩，有一个直接的理由——它能给出偏离期望的概率上界。这就是<strong>切比雪夫不等式</strong>：</p>
+<p><span class="math display">\[P(|X - E(X)| \geq \epsilon) \leq \frac{Var(X)}{\epsilon^2}\]</span></p>
+<p>方差越大，这个上界越宽松——你对自己”离中心有多远”的掌控越弱。这个不等式是最基础的概率集中不等式：它只需要方差存在，不需要知道分布的具体形状。Ch04 将展示用更强的假设换取更紧的界（Hoeffding、Bernstein）。</p>
+</section>
+<section id="其他特征数分布形态的完整素描" class="level3">
+<h3 class="anchored" data-anchor-id="其他特征数分布形态的完整素描">其他特征数：分布形态的完整素描</h3>
+<ul>
+<li><strong>k 阶原点矩</strong> <span class="math inline">\(\mu_k = E(X^k)\)</span>：一阶原点矩是期望。</li>
+<li><strong>k 阶中心矩</strong> <span class="math inline">\(\nu_k = E[(X - E(X))^k]\)</span>：二阶中心矩是方差。</li>
+<li><strong>偏度系数</strong> <span class="math inline">\(\beta_s = \nu_3 / \nu_2^{3/2}\)</span>：度量分布的左右不对称性。<span class="math inline">\(\beta_s &lt; 0\)</span> 表示左偏（左尾更长），<span class="math inline">\(\beta_s &gt; 0\)</span> 表示右偏。</li>
+<li><strong>峰度系数</strong> <span class="math inline">\(\beta_k = \nu_4 / \nu_2^2 - 3\)</span>：度量分布的尖峭程度（相对于正态分布）。<span class="math inline">\(\beta_k &gt; 0\)</span> 表示比正态分布更尖、尾部更厚。</li>
+<li><strong>分位数</strong> <span class="math inline">\(x_p\)</span>：满足 <span class="math inline">\(F(x_p) = p\)</span>。中位数是 0.5 分位数——它将分布的概率质量一分为二。</li>
+<li><strong>变异系数</strong> <span class="math inline">\(CV = \sigma / \mu\)</span>：消除量纲后的离散度，用于比较不同尺度的变量的波动性。</li>
+</ul>
+</section>
+</section>
+<section id="分布的演化树" class="level2">
+<h2 class="anchored" data-anchor-id="分布的演化树">分布的演化树</h2>
+<p>分布不是各自孤立的孤岛，而是一个彼此关联的<strong>演化网络</strong>。理解了这个网络，就理解了一个随机过程如何衍生出不同的观测维度。</p>
+<section id="第一棵树伯努利过程-计数与等待" class="level3">
+<h3 class="anchored" data-anchor-id="第一棵树伯努利过程-计数与等待">第一棵树：伯努利过程 —— 计数与等待</h3>
+<p>源头是一枚硬币，正面概率为 <span class="math inline">\(p\)</span>。重复抛掷，每次独立——这就是<strong>伯努利过程</strong>，所有离散分布之母。</p>
+<pre><code>                  伯努利试验 Be(p)
+                       │
+          ┌────────────┼────────────┐
+          │            │            │
+    单次观测：      n次独立和：   等待第r次成功：
+    两点分布      二项分布       负二项分布
+    X~0-1        X~b(n,p)       X~Nb(r,p)
+                    │               │
+               n大p小 →          r=1 →
+              泊松分布           几何分布
+              X~P(λ)            X~Ge(p)</code></pre>
+<p><strong>两点分布</strong>（0-1 分布）<span class="math inline">\(P(X=x) = p^x(1-p)^{1-x}, x \in \{0,1\}\)</span> 是最简单的随机变量——一次试验，成功或失败。</p>
+<p><strong>二项分布</strong> <span class="math inline">\(P(X=k) = C_n^k p^k (1-p)^{n-k}\)</span>：<span class="math inline">\(n\)</span> 次独立伯努利试验中成功次数的分布。它的随机变量可以分解为 <span class="math inline">\(n\)</span> 个独立同分布的两点分布之和。</p>
+<p><span class="math display">\[
+E(X) = np, \quad Var(X) = np(1-p)
+\]</span></p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">3</span>), <span class="at">mar =</span> <span class="fu">c</span>(<span class="dv">4</span>, <span class="dv">4</span>, <span class="dv">3</span>, <span class="dv">1</span>))</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>k <span class="ot">&lt;-</span> <span class="dv">0</span><span class="sc">:</span><span class="dv">20</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(k, <span class="fu">dbinom</span>(k, <span class="dv">20</span>, <span class="fl">0.1</span>), <span class="at">type =</span> <span class="st">"h"</span>, <span class="at">lwd =</span> <span class="dv">3</span>, <span class="at">col =</span> <span class="st">"steelblue"</span>,</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>     <span class="at">xlab =</span> <span class="st">"k"</span>, <span class="at">ylab =</span> <span class="st">"P(X=k)"</span>, <span class="at">main =</span> <span class="fu">expression</span>(<span class="fu">Bin</span>(<span class="dv">20</span>, <span class="fl">0.1</span>)))</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(k, <span class="fu">dbinom</span>(k, <span class="dv">20</span>, <span class="fl">0.5</span>), <span class="at">type =</span> <span class="st">"h"</span>, <span class="at">lwd =</span> <span class="dv">3</span>, <span class="at">col =</span> <span class="st">"steelblue"</span>,</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>     <span class="at">xlab =</span> <span class="st">"k"</span>, <span class="at">ylab =</span> <span class="st">"P(X=k)"</span>, <span class="at">main =</span> <span class="fu">expression</span>(<span class="fu">Bin</span>(<span class="dv">20</span>, <span class="fl">0.5</span>)))</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(k, <span class="fu">dbinom</span>(k, <span class="dv">20</span>, <span class="fl">0.9</span>), <span class="at">type =</span> <span class="st">"h"</span>, <span class="at">lwd =</span> <span class="dv">3</span>, <span class="at">col =</span> <span class="st">"steelblue"</span>,</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>     <span class="at">xlab =</span> <span class="st">"k"</span>, <span class="at">ylab =</span> <span class="st">"P(X=k)"</span>, <span class="at">main =</span> <span class="fu">expression</span>(<span class="fu">Bin</span>(<span class="dv">20</span>, <span class="fl">0.9</span>)))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="01-概率初步与随机变量的分布_files/figure-html/binom-plot-1.png" class="img-fluid figure-img" width="672"></p>
+<figcaption>二项分布 Bin(20, p) 的概率质量函数。p = 0.1 时分布集中在左侧，p = 0.5 时对称，p = 0.9 时集中在右侧。</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>当 <span class="math inline">\(n\)</span> 很大而 <span class="math inline">\(p\)</span> 很小时，二项分布的计算量巨大。<strong>泊松分布</strong>提供了优雅的近似——令 <span class="math inline">\(\lambda = np\)</span>：</p>
+<p><span class="math display">\[\lim_{n \to \infty} C_n^k p_n^k (1-p_n)^{n-k} = \frac{\lambda^k}{k!} e^{-\lambda}\]</span></p>
+<p>泊松分布只有一个参数 <span class="math inline">\(\lambda\)</span>，且 <span class="math inline">\(E(X) = Var(X) = \lambda\)</span>——均值和方差相等，这是它的签名。</p>
+<blockquote class="blockquote">
+<p>泊松分布刻画的是”稀有事件在固定时间窗口内的发生次数”——如果你在等一个罕见事件，它就是你的分布。</p>
+</blockquote>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">3</span>), <span class="at">mar =</span> <span class="fu">c</span>(<span class="dv">4</span>, <span class="dv">4</span>, <span class="dv">3</span>, <span class="dv">1</span>))</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>k <span class="ot">&lt;-</span> <span class="dv">0</span><span class="sc">:</span><span class="dv">25</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(k, <span class="fu">dpois</span>(k, <span class="dv">1</span>), <span class="at">type =</span> <span class="st">"h"</span>, <span class="at">lwd =</span> <span class="dv">3</span>, <span class="at">col =</span> <span class="st">"darkgreen"</span>,</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>     <span class="at">xlab =</span> <span class="st">"k"</span>, <span class="at">ylab =</span> <span class="st">"P(X=k)"</span>, <span class="at">main =</span> <span class="fu">expression</span>(<span class="fu">Pois</span>(<span class="dv">1</span>)))</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(k, <span class="fu">dpois</span>(k, <span class="dv">4</span>), <span class="at">type =</span> <span class="st">"h"</span>, <span class="at">lwd =</span> <span class="dv">3</span>, <span class="at">col =</span> <span class="st">"darkgreen"</span>,</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>     <span class="at">xlab =</span> <span class="st">"k"</span>, <span class="at">ylab =</span> <span class="st">"P(X=k)"</span>, <span class="at">main =</span> <span class="fu">expression</span>(<span class="fu">Pois</span>(<span class="dv">4</span>)))</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(k, <span class="fu">dpois</span>(k, <span class="dv">10</span>), <span class="at">type =</span> <span class="st">"h"</span>, <span class="at">lwd =</span> <span class="dv">3</span>, <span class="at">col =</span> <span class="st">"darkgreen"</span>,</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>     <span class="at">xlab =</span> <span class="st">"k"</span>, <span class="at">ylab =</span> <span class="st">"P(X=k)"</span>, <span class="at">main =</span> <span class="fu">expression</span>(<span class="fu">Pois</span>(<span class="dv">10</span>)))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="01-概率初步与随机变量的分布_files/figure-html/pois-plot-1.png" class="img-fluid figure-img" width="672"></p>
+<figcaption>泊松分布 P(λ) 的概率质量函数。λ 增大时分布趋向对称，峰值右移。</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p><strong>几何分布</strong> <span class="math inline">\(P(X=k) = (1-p)^{k-1} p\)</span>：在伯努利过程中，<strong>首次成功所需的试验次数</strong>。</p>
+<p><span class="math display">\[E(X) = \frac{1}{p}, \quad Var(X) = \frac{1-p}{p^2}\]</span></p>
+<p>几何分布拥有<strong>无记忆性</strong>：<span class="math inline">\(P(X &gt; m+n \mid X &gt; m) = P(X &gt; n)\)</span>。前面 <span class="math inline">\(m\)</span> 次已经失败了，后面 <span class="math inline">\(n\)</span> 次仍然失败的概率，与“从一开始就连续失败 <span class="math inline">\(n\)</span> 次”完全一样。伯努利过程不记得过去——这是独立性最戏剧性的后果。</p>
+<p><strong>负二项分布</strong>：等待第 <span class="math inline">\(r\)</span> 次成功所需的试验次数。它可以分解为 <span class="math inline">\(r\)</span> 个独立几何分布之和。</p>
+</section>
+<section id="第二棵树泊松流-计数与间隔的双面" class="level3">
+<h3 class="anchored" data-anchor-id="第二棵树泊松流-计数与间隔的双面">第二棵树：泊松流 —— 计数与间隔的双面</h3>
+<p>泊松过程描述的是事件随时间随机发生的模型：事件以恒定速率 <span class="math inline">\(\lambda\)</span> 独立地发生。</p>
+<pre><code>                    泊松过程 (速率λ)
+                         │
+            ┌────────────┴────────────┐
+            │                         │
+        [0,t]内的事件次数         第k-1次到第k次
+        N(t) ~ P(λt)              事件的时间间隔
+        (计数维度)                T_k ~ Exp(λ)
+                                      │
+                                 r个间隔之和：
+                                Tr ~ Ga(r, λ)
+                                (等待时间维度)</code></pre>
+<p><strong>泊松分布</strong> <span class="math inline">\(P(N(t) = k) = \frac{(\lambda t)^k}{k!} e^{-\lambda t}\)</span>：在长为 <span class="math inline">\(t\)</span> 的时间区间内，事件发生 <span class="math inline">\(k\)</span> 次的概率。</p>
+<p><strong>指数分布</strong> <span class="math inline">\(p(t) = \lambda e^{-\lambda t}, t &gt; 0\)</span>：<strong>相邻两次事件之间的等待时间</strong>。</p>
+<p><span class="math display">\[E(T) = \frac{1}{\lambda}, \quad Var(T) = \frac{1}{\lambda^2}\]</span></p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">curve</span>(<span class="fu">dexp</span>(x, <span class="fl">0.5</span>), <span class="at">from =</span> <span class="dv">0</span>, <span class="at">to =</span> <span class="dv">10</span>, <span class="at">col =</span> <span class="st">"darkgreen"</span>, <span class="at">lwd =</span> <span class="dv">2</span>,</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>      <span class="at">xlab =</span> <span class="st">"t"</span>, <span class="at">ylab =</span> <span class="st">"p(t)"</span>, <span class="at">main =</span> <span class="st">"指数分布"</span>)</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="fu">curve</span>(<span class="fu">dexp</span>(x, <span class="dv">1</span>), <span class="at">from =</span> <span class="dv">0</span>, <span class="at">to =</span> <span class="dv">10</span>, <span class="at">col =</span> <span class="st">"steelblue"</span>, <span class="at">lwd =</span> <span class="dv">2</span>, <span class="at">add =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="fu">curve</span>(<span class="fu">dexp</span>(x, <span class="dv">2</span>), <span class="at">from =</span> <span class="dv">0</span>, <span class="at">to =</span> <span class="dv">10</span>, <span class="at">col =</span> <span class="st">"darkred"</span>, <span class="at">lwd =</span> <span class="dv">2</span>, <span class="at">add =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="fu">legend</span>(<span class="st">"topright"</span>, <span class="at">legend =</span> <span class="fu">c</span>(<span class="fu">expression</span>(lambda<span class="sc">==</span><span class="fl">0.5</span>), <span class="fu">expression</span>(lambda<span class="sc">==</span><span class="dv">1</span>), <span class="fu">expression</span>(lambda<span class="sc">==</span><span class="dv">2</span>)),</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>       <span class="at">col =</span> <span class="fu">c</span>(<span class="st">"darkgreen"</span>, <span class="st">"steelblue"</span>, <span class="st">"darkred"</span>), <span class="at">lwd =</span> <span class="dv">2</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="01-概率初步与随机变量的分布_files/figure-html/exp-plot-1.png" class="img-fluid figure-img" width="672"></p>
+<figcaption>指数分布 Exp(λ) 的概率密度函数。λ 越大，概率质量越集中在 0 附近（等待时间越短）。</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>指数分布同样拥有无记忆性：<span class="math inline">\(P(T &gt; s+t \mid T &gt; s) = P(T &gt; t)\)</span>。一个已经使用了 <span class="math inline">\(s\)</span> 小时没有故障的设备，其剩余寿命的分布和全新设备一样——这是泊松过程的另一个面孔。</p>
+<blockquote class="blockquote">
+<p>泊松分布和指数分布从两个角度描述同一个泊松过程。计数维度（离散）与间隔维度（连续）之间的对偶，是随机过程理论中最优美的结构之一。指数分布是无记忆性的唯一连续分布：<strong>已经等了多久，不影响还要等多久。它是”永恒的现在”。</strong></p>
+</blockquote>
+<p><strong>伽马分布</strong> <span class="math inline">\(X \sim Ga(\alpha, \lambda)\)</span>：<span class="math inline">\(\alpha\)</span> 个独立的指数分布之和。</p>
+<p><span class="math display">\[p(x) = \frac{\lambda^\alpha}{\Gamma(\alpha)} x^{\alpha-1} e^{-\lambda x}, \quad x \geq 0\]</span></p>
+<p><span class="math display">\[E(X) = \frac{\alpha}{\lambda}, \quad Var(X) = \frac{\alpha}{\lambda^2}\]</span></p>
+<p>当 <span class="math inline">\(\alpha = 1\)</span> 时，伽马分布退化为指数分布。当 <span class="math inline">\(\alpha = n/2\)</span>、<span class="math inline">\(\lambda = 1/2\)</span> 时，伽马分布即为卡方分布 <span class="math inline">\(\chi^2(n)\)</span>——这是 Ch05 抽样分布的核心角色。</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">curve</span>(<span class="fu">dgamma</span>(x, <span class="dv">1</span>, <span class="dv">1</span>), <span class="at">from =</span> <span class="dv">0</span>, <span class="at">to =</span> <span class="dv">15</span>, <span class="at">col =</span> <span class="st">"darkgreen"</span>, <span class="at">lwd =</span> <span class="dv">2</span>,</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>      <span class="at">xlab =</span> <span class="st">"x"</span>, <span class="at">ylab =</span> <span class="st">"p(x)"</span>, <span class="at">main =</span> <span class="fu">expression</span>(<span class="fu">Ga</span>(alpha, <span class="dv">1</span>)))</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="fu">curve</span>(<span class="fu">dgamma</span>(x, <span class="dv">2</span>, <span class="dv">1</span>), <span class="at">from =</span> <span class="dv">0</span>, <span class="at">to =</span> <span class="dv">15</span>, <span class="at">col =</span> <span class="st">"steelblue"</span>, <span class="at">lwd =</span> <span class="dv">2</span>, <span class="at">add =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="fu">curve</span>(<span class="fu">dgamma</span>(x, <span class="dv">5</span>, <span class="dv">1</span>), <span class="at">from =</span> <span class="dv">0</span>, <span class="at">to =</span> <span class="dv">15</span>, <span class="at">col =</span> <span class="st">"darkred"</span>, <span class="at">lwd =</span> <span class="dv">2</span>, <span class="at">add =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="fu">legend</span>(<span class="st">"topright"</span>, <span class="at">legend =</span> <span class="fu">c</span>(<span class="fu">expression</span>(alpha<span class="sc">==</span><span class="dv">1</span>), <span class="fu">expression</span>(alpha<span class="sc">==</span><span class="dv">2</span>), <span class="fu">expression</span>(alpha<span class="sc">==</span><span class="dv">5</span>)),</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>       <span class="at">col =</span> <span class="fu">c</span>(<span class="st">"darkgreen"</span>, <span class="st">"steelblue"</span>, <span class="st">"darkred"</span>), <span class="at">lwd =</span> <span class="dv">2</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="01-概率初步与随机变量的分布_files/figure-html/gamma-plot-1.png" class="img-fluid figure-img" width="672"></p>
+<figcaption>伽马分布 Ga(α, λ=1) 的概率密度函数。α 控制形状：α=1 即指数分布，α 增大时分布趋向对称、峰值右移。</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="第三棵树极限与共轭-正态与贝塔的独特地位" class="level3">
+<h3 class="anchored" data-anchor-id="第三棵树极限与共轭-正态与贝塔的独特地位">第三棵树：极限与共轭 —— 正态与贝塔的独特地位</h3>
+<p><strong>正态分布</strong>是一条特殊的河流——几乎所有其他分布，在“大量独立叠加”的极限下，都汇入正态之海。这就是中心极限定理（Ch03）的断言。</p>
+<p><span class="math display">\[p(x) = \frac{1}{\sqrt{2\pi}\sigma} e^{-\frac{(x-\mu)^2}{2\sigma^2}}, \quad X \sim N(\mu, \sigma^2)\]</span></p>
+<p><span class="math display">\[E(X) = \mu, \quad Var(X) = \sigma^2\]</span></p>
+<p>正态分布有两个参数：<span class="math inline">\(\mu\)</span> 控制中心位置，<span class="math inline">\(\sigma\)</span> 控制离散程度。通过标准化变换 <span class="math inline">\(U = (X - \mu)/\sigma \sim N(0,1)\)</span>，任何正态变量都可以转化为标准正态。</p>
+<blockquote class="blockquote">
+<p>高斯在研究天文观测误差时首次使用正态分布刻画误差。他证明了：在“误差的期望为零且独立同分布”的假设下，<strong>最小二乘法等价于正态误差模型下的最大似然估计</strong>。这个优雅的等价性是回归分析（Ch10）的逻辑起点。</p>
+</blockquote>
+<p>正态分布还是给定均值和方差下<strong>熵最大</strong>的分布——在只知道这两个约束时，正态分布是”最不武断”的选择。这个最大熵性质在 Ch08 的贝叶斯先验选择和 Ch20 的变分自编码器中都会再次出现。</p>
+<blockquote class="blockquote">
+<p>正态分布是中心极限定理的终点——无论你从什么分布出发，累加足够多之后，你总会到达正态。它是<strong>”宇宙的平均脸”</strong>。</p>
+</blockquote>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">curve</span>(<span class="fu">dnorm</span>(x, <span class="dv">0</span>, <span class="dv">1</span>), <span class="at">from =</span> <span class="sc">-</span><span class="dv">4</span>, <span class="at">to =</span> <span class="dv">8</span>, <span class="at">col =</span> <span class="st">"steelblue"</span>, <span class="at">lwd =</span> <span class="dv">2</span>,</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>      <span class="at">xlab =</span> <span class="st">"x"</span>, <span class="at">ylab =</span> <span class="st">"p(x)"</span>, <span class="at">main =</span> <span class="st">"正态分布"</span>)</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="fu">curve</span>(<span class="fu">dnorm</span>(x, <span class="dv">0</span>, <span class="dv">2</span>), <span class="at">from =</span> <span class="sc">-</span><span class="dv">4</span>, <span class="at">to =</span> <span class="dv">8</span>, <span class="at">col =</span> <span class="st">"darkgreen"</span>, <span class="at">lwd =</span> <span class="dv">2</span>, <span class="at">add =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="fu">curve</span>(<span class="fu">dnorm</span>(x, <span class="dv">3</span>, <span class="dv">1</span>), <span class="at">from =</span> <span class="sc">-</span><span class="dv">4</span>, <span class="at">to =</span> <span class="dv">8</span>, <span class="at">col =</span> <span class="st">"darkred"</span>, <span class="at">lwd =</span> <span class="dv">2</span>, <span class="at">add =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="fu">legend</span>(<span class="st">"topright"</span>, <span class="at">legend =</span> <span class="fu">c</span>(<span class="fu">expression</span>(<span class="fu">N</span>(<span class="dv">0</span>,<span class="dv">1</span>)), <span class="fu">expression</span>(<span class="fu">N</span>(<span class="dv">0</span>,<span class="dv">4</span>)), <span class="fu">expression</span>(<span class="fu">N</span>(<span class="dv">3</span>,<span class="dv">1</span>))),</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>       <span class="at">col =</span> <span class="fu">c</span>(<span class="st">"steelblue"</span>, <span class="st">"darkgreen"</span>, <span class="st">"darkred"</span>), <span class="at">lwd =</span> <span class="dv">2</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="01-概率初步与随机变量的分布_files/figure-html/norm-plot-1.png" class="img-fluid figure-img" width="672"></p>
+<figcaption>正态分布 N(μ, σ²) 的概率密度函数。μ 控制中心位置，σ 控制离散程度。</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p><strong>贝塔分布</strong> <span class="math inline">\(X \sim Be(a, b)\)</span>，取值在 <span class="math inline">\((0, 1)\)</span>：</p>
+<p><span class="math display">\[p(x) = \frac{\Gamma(a+b)}{\Gamma(a)\Gamma(b)} x^{a-1} (1-x)^{b-1}, \quad x \in (0,1)\]</span></p>
+<p>它的取值天然是<strong>概率</strong>——贝塔分布在贝叶斯统计中作为二项分布的<strong>共轭先验</strong>出现：先验是 Be(a,b)，观测到 <span class="math inline">\(k\)</span> 次成功和 <span class="math inline">\(n-k\)</span> 次失败后，后验是 Be(a+k, b+n-k)。这是一个干净的贝叶斯更新（Ch08）。</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">curve</span>(<span class="fu">dbeta</span>(x, <span class="fl">0.5</span>, <span class="fl">0.5</span>), <span class="at">from =</span> <span class="dv">0</span>, <span class="at">to =</span> <span class="dv">1</span>, <span class="at">col =</span> <span class="st">"darkgreen"</span>, <span class="at">lwd =</span> <span class="dv">2</span>,</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>      <span class="at">xlab =</span> <span class="st">"x"</span>, <span class="at">ylab =</span> <span class="st">"p(x)"</span>, <span class="at">main =</span> <span class="st">"贝塔分布"</span>, <span class="at">ylim =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">3</span>))</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="fu">curve</span>(<span class="fu">dbeta</span>(x, <span class="dv">2</span>, <span class="dv">5</span>), <span class="at">from =</span> <span class="dv">0</span>, <span class="at">to =</span> <span class="dv">1</span>, <span class="at">col =</span> <span class="st">"steelblue"</span>, <span class="at">lwd =</span> <span class="dv">2</span>, <span class="at">add =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="fu">curve</span>(<span class="fu">dbeta</span>(x, <span class="dv">5</span>, <span class="dv">2</span>), <span class="at">from =</span> <span class="dv">0</span>, <span class="at">to =</span> <span class="dv">1</span>, <span class="at">col =</span> <span class="st">"darkred"</span>, <span class="at">lwd =</span> <span class="dv">2</span>, <span class="at">add =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="fu">curve</span>(<span class="fu">dbeta</span>(x, <span class="dv">1</span>, <span class="dv">1</span>), <span class="at">from =</span> <span class="dv">0</span>, <span class="at">to =</span> <span class="dv">1</span>, <span class="at">col =</span> <span class="st">"darkgray"</span>, <span class="at">lwd =</span> <span class="fl">1.5</span>, <span class="at">lty =</span> <span class="dv">2</span>, <span class="at">add =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="fu">legend</span>(<span class="st">"top"</span>, <span class="at">legend =</span> <span class="fu">c</span>(<span class="st">"Be(0.5,0.5) U形"</span>, <span class="st">"Be(2,5) 左偏"</span>, <span class="st">"Be(5,2) 右偏"</span>, <span class="st">"Be(1,1) = U(0,1)"</span>),</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>       <span class="at">col =</span> <span class="fu">c</span>(<span class="st">"darkgreen"</span>, <span class="st">"steelblue"</span>, <span class="st">"darkred"</span>, <span class="st">"darkgray"</span>), <span class="at">lwd =</span> <span class="fu">c</span>(<span class="dv">2</span>,<span class="dv">2</span>,<span class="dv">2</span>,<span class="fl">1.5</span>), <span class="at">lty =</span> <span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">2</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="01-概率初步与随机变量的分布_files/figure-html/beta-plot-1.png" class="img-fluid figure-img" width="672"></p>
+<figcaption>贝塔分布 Be(a, b) 的概率密度函数。a 和 b 的相对大小控制分布的倾斜方向与形态（U 形、钟形、均匀）。</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>并非所有分布都生长在前面的演化树上。有些分布不依附于特定的随机过程，但因其基础性而在整个概率体系中扮演枢纽角色。</p>
+</section>
+<section id="均匀分布与超几何分布" class="level3">
+<h3 class="anchored" data-anchor-id="均匀分布与超几何分布">均匀分布与超几何分布</h3>
+<p><strong>均匀分布</strong> <span class="math inline">\(U(a,b)\)</span>：区间内每一点的可能性均等——这是连续版本的“不充分理由原理”。均匀分布还有一个关键地位：若 <span class="math inline">\(F_X\)</span> 是严格单调的连续分布函数，则 <span class="math inline">\(Y = F_X(X) \sim U(0,1)\)</span>。这表明<strong>任何连续分布都可以通过均匀分布生成</strong>——这是所有随机数生成算法的理论基础。</p>
+<p><strong>超几何分布</strong>：有限总体中的不放回抽样。当样本量 <span class="math inline">\(n\)</span> 远小于总体量 <span class="math inline">\(N\)</span> 时，超几何分布可近似为二项分布——不放回近似为放回，这是统计实践中常用的简化。</p>
+</section>
+</section>
+<section id="随机变量函数的分布" class="level2">
+<h2 class="anchored" data-anchor-id="随机变量函数的分布">随机变量函数的分布</h2>
+<p>已知 <span class="math inline">\(X\)</span> 的分布，<span class="math inline">\(Y = g(X)\)</span> 的分布是什么？</p>
+<p><strong>离散情况</strong>：<span class="math inline">\(Y\)</span> 仍是离散的，枚举 <span class="math inline">\(X\)</span> 的取值、计算对应的 <span class="math inline">\(Y\)</span> 值、合并相同 <span class="math inline">\(Y\)</span> 的概率。</p>
+<p><strong>连续情况</strong>：若 <span class="math inline">\(g\)</span> 严格单调，其反函数为 <span class="math inline">\(h\)</span>，则</p>
+<p><span class="math display">\[p_Y(y) = p_X(h(y)) \cdot |h'(y)|\]</span></p>
+<p>直观理解：<span class="math inline">\(X\)</span> 落在 <span class="math inline">\([x, x+dx]\)</span> 内的概率质量，被映射到 <span class="math inline">\(Y\)</span> 的 <span class="math inline">\([g(x), g(x+dx)]\)</span> 区间。<span class="math inline">\(|h'(y)|\)</span> 是 <span class="math inline">\(dx/dy\)</span>——拉伸因子，补偿 <span class="math inline">\(g\)</span> 对概率质量的压缩或膨胀。</p>
+<p>几个重要的特例：</p>
+<ul>
+<li>正态变量的线性变换仍是正态：<span class="math inline">\(X \sim N(\mu,\sigma^2) \Rightarrow aX+b \sim N(a\mu+b, a^2\sigma^2)\)</span></li>
+<li>正态变量的指数是对数正态：<span class="math inline">\(X \sim N(\mu,\sigma^2) \Rightarrow e^X \sim LN(\mu,\sigma^2)\)</span></li>
+<li>伽马变量的尺度变换：<span class="math inline">\(X \sim Ga(\alpha,\lambda) \Rightarrow kX \sim Ga(\alpha, \lambda/k)\)</span></li>
+<li>任意分布的 CDF 变换：<span class="math inline">\(F_X(X) \sim U(0,1)\)</span></li>
+</ul>
+<blockquote class="blockquote">
+<p><strong>补充：无意识统计学家的法则。</strong> 注意，计算 <span class="math inline">\(E[g(X)]\)</span> 不一定需要先求出 <span class="math inline">\(Y = g(X)\)</span> 的分布——可以直接对 <span class="math inline">\(X\)</span> 的分布积分：<span class="math inline">\(E[g(X)] = \int g(x) p_X(x) dx\)</span>。这个”绕过分布求期望”的捷径在计算上极其便利，但逻辑上它依赖于上述”已知 <span class="math inline">\(X\)</span> 的分布求 <span class="math inline">\(Y\)</span> 分布”的反向路径。两者合在一起，才构成完整的随机变量函数理论。</p>
+</blockquote>
+</section>
+<section id="分布之间的距离度量" class="level2">
+<h2 class="anchored" data-anchor-id="分布之间的距离度量">分布之间的距离度量</h2>
+<p>前面的熵度量了<strong>单个分布</strong>的不确定性。接下来一个自然的问题是：<strong>两个分布之间有多”远”？</strong></p>
+<p>这个问题的答案，跨越了从参数估计到深度学习的所有统计方法。</p>
+<section id="kl-散度信息论意义上的距离" class="level3">
+<h3 class="anchored" data-anchor-id="kl-散度信息论意义上的距离">KL 散度：信息论意义上的”距离”</h3>
+<p>对于离散分布 <span class="math inline">\(P\)</span> 和 <span class="math inline">\(Q\)</span>（定义在同一个样本空间上），<strong>KL 散度</strong>（Kullback–Leibler Divergence）定义为：</p>
+<p><span class="math display">\[D_{KL}(P \parallel Q) = \sum_{k} p_k \log \frac{p_k}{q_k} = \sum_k p_k \log p_k - \sum_k p_k \log q_k\]</span></p>
+<p>连续版本只需将求和换为积分。</p>
+<p>拆解开来看：</p>
+<ul>
+<li>第一项 <span class="math inline">\(\sum p_k \log p_k = -H(P)\)</span>，是 <span class="math inline">\(P\)</span> 的负熵。</li>
+<li>第二项 <span class="math inline">\(-\sum p_k \log q_k\)</span>，是<strong>交叉熵</strong> <span class="math inline">\(H(P, Q)\)</span>——用 <span class="math inline">\(Q\)</span> 的编码方案去描述 <span class="math inline">\(P\)</span> 时，所需的平均比特数。</li>
+</ul>
+<p>因此：</p>
+<p><span class="math display">\[D_{KL}(P \parallel Q) = H(P, Q) - H(P)\]</span></p>
+<blockquote class="blockquote">
+<p>KL 散度 = 交叉熵 − 熵。它的物理含义是：<strong>用</strong> <span class="math inline">\(Q\)</span> 近似 <span class="math inline">\(P\)</span> 时，额外浪费的信息量。</p>
+</blockquote>
+<p>KL 散度的两个关键性质：</p>
+<ol type="1">
+<li><p><strong>非负性</strong>：<span class="math inline">\(D_{KL}(P \parallel Q) \geq 0\)</span>，等号成立当且仅当 <span class="math inline">\(P = Q\)</span>（几乎处处）。这是吉布斯不等式（Gibbs’ inequality）的结论。无论你怎么选 <span class="math inline">\(Q\)</span>，用 <span class="math inline">\(Q\)</span> 去编码 <span class="math inline">\(P\)</span> 永远需要至少 <span class="math inline">\(H(P)\)</span> 个比特——不可能比用 <span class="math inline">\(P\)</span> 自己的最优编码更省。</p></li>
+<li><p><strong>不对称性</strong>：<span class="math inline">\(D_{KL}(P \parallel Q) \neq D_{KL}(Q \parallel P)\)</span>（一般情况下）。因此 KL 散度不是真正的距离度量，而是<strong>方向性的信息损失</strong>。<span class="math inline">\(D_{KL}(P \parallel Q)\)</span> 和 <span class="math inline">\(D_{KL}(Q \parallel P)\)</span> 回答的是不同的问题：</p>
+<ul>
+<li><span class="math inline">\(D_{KL}(P \parallel Q)\)</span>：用 <span class="math inline">\(Q\)</span> 近似真实分布 <span class="math inline">\(P\)</span>，损失多少信息？（<strong>正向 KL</strong>，MLE 的方向）</li>
+<li><span class="math inline">\(D_{KL}(Q \parallel P)\)</span>：用 <span class="math inline">\(P\)</span> 近似 <span class="math inline">\(Q\)</span>，损失多少信息？（<strong>反向 KL</strong>，变分推断的方向，Ch09）</li>
+</ul></li>
+</ol>
+</section>
+<section id="从-kl-散度到最大似然估计" class="level3">
+<h3 class="anchored" data-anchor-id="从-kl-散度到最大似然估计">从 KL 散度到最大似然估计</h3>
+<p>这是全书最重要的等价关系之一。设有真实数据分布 <span class="math inline">\(P_{\text{data}}\)</span>（由经验分布 <span class="math inline">\(\hat{P}_n\)</span> 逼近）和参数模型 <span class="math inline">\(Q_\theta\)</span>：</p>
+<p><span class="math display">\[\hat{\theta}_{\text{MLE}} = \arg\max_\theta \sum_{i=1}^n \log q_\theta(x_i)\]</span></p>
+<p>而最小化 <span class="math inline">\(D_{KL}(\hat{P}_n \parallel Q_\theta)\)</span>：</p>
+<p><span class="math display">\[\arg\min_\theta D_{KL}(\hat{P}_n \parallel Q_\theta) = \arg\min_\theta \left[-\sum_i \frac{1}{n} \log q_\theta(x_i) - H(\hat{P}_n)\right] = \arg\max_\theta \sum_i \log q_\theta(x_i)\]</span></p>
+<p><span class="math inline">\(H(\hat{P}_n)\)</span> 与 <span class="math inline">\(\theta\)</span> 无关，消去。剩下的是对数似然。</p>
+<blockquote class="blockquote">
+<p><strong>最大似然估计 = 最小化经验分布与模型分布之间的 KL 散度。</strong> 换言之，MLE 在寻找那个与数据分布”信息损失最小”的参数。这是频率学派和贝叶斯学派共享的逻辑内核，也是 Ch06 与 Ch08 对话的数学基础。</p>
+<p><strong>这句话是全书最重要的等式之一。</strong> 它意味着：Ch06 的 MLE、Ch18 的决策树分裂、Ch20 的交叉熵损失——三者共享同一个信息论逻辑。最小化 KL 散度，是统计推断和机器学习共同的”引力场”。</p>
+</blockquote>
+</section>
+<section id="交叉熵损失深度学习的默认语言" class="level3">
+<h3 class="anchored" data-anchor-id="交叉熵损失深度学习的默认语言">交叉熵损失：深度学习的默认语言</h3>
+<p>在分类问题（Ch18、Ch20）中，设真实标签为 one-hot 向量 <span class="math inline">\(\mathbf{y}\)</span>，模型预测概率为 <span class="math inline">\(\hat{\mathbf{y}}\)</span>。交叉熵损失为：</p>
+<p><span class="math display">\[\mathcal{L}_{\text{CE}} = -\sum_{c=1}^C y_c \log \hat{y}_c\]</span></p>
+<p>这正是 <span class="math inline">\(H(\mathbf{y}, \hat{\mathbf{y}})\)</span>——真实分布与预测分布之间的交叉熵。因为 <span class="math inline">\(\mathbf{y}\)</span> 的熵为零（完全确定），所以 <span class="math inline">\(D_{KL}(\mathbf{y} \parallel \hat{\mathbf{y}}) = H(\mathbf{y}, \hat{\mathbf{y}})\)</span>。交叉熵损失<strong>就是 KL 散度在分类问题中的特例</strong>。</p>
+<blockquote class="blockquote">
+<p>从伯努利（1713）到香农（1948）到 Kullback–Leibler（1951）到现代深度学习的交叉熵损失——这条 300 年的思想演化线，始于概率，终于信息，贯穿全书。</p>
+</blockquote>
+<p><strong>速查卡片</strong>：</p>
+<ul>
+<li><strong>核心问题</strong>：如何用数学语言描述”不知道”？用样本空间枚举可能性，用概率分配信念，用信息熵度量不确定性的程度，用分布函数完整刻画统计规律，用 KL 散度衡量分布之间的差异。</li>
+<li><strong>关键概念</strong>：概率公理 → 信息熵 → 条件概率与贝叶斯公式 → 随机变量与分布函数 → 期望与方差 → 分布演化树（伯努利树/泊松流树/正态树）→ KL 散度与交叉熵 → 随机变量函数的分布</li>
+<li><strong>R 命令</strong>：<code>dbinom()</code>, <code>pnorm()</code>, <code>qexp()</code>, <code>rpois()</code> 四类函数（<code>d</code>-密度, <code>p</code>-分布, <code>q</code>-分位, <code>r</code>-随机数）；<code>entropy::entropy()</code> 计算经验熵</li>
+<li><strong>参见</strong>：Ch02（多维扩展）, Ch03（极限定理）, Ch04（概率不等式）, Ch06（MLE = 最小化 KL 散度）, Ch08（贝叶斯统计）, Ch09（变分推断与反向 KL）, Ch18/Ch20（交叉熵损失）</li>
+</ul>
+<hr>
+<p><strong>深度思考</strong>：</p>
+<ol type="1">
+<li><p>如果概率是观测者主观信念的度量，那么“客观概率”这个说法还有意义吗？频率方法给出的概率值，是客观的，还是“一群观测者共享了相同的先验经验”？</p></li>
+<li><p>独立性假设在统计建模中无处不在——朴素贝叶斯分类器（Ch18）甚至假设所有特征在给定类别下条件独立。为什么一个明显错误的假设，在实践中却常常有效？</p></li>
+<li><p>贝叶斯公式将学习描述为 <span class="math inline">\(P(\theta|\text{data}) \propto P(\text{data}|\theta) \cdot P(\theta)\)</span>。如果先验 <span class="math inline">\(P(\theta)\)</span> 是主观的，那么科学知识的客观性从何而来？——随着数据量的增加，后验是否会压倒先验？Ch03 和 Ch04 将提供数学层面的答案。</p></li>
+<li><p><span class="math inline">\(D_{KL}(P \parallel Q) \neq D_{KL}(Q \parallel P)\)</span>：用真实分布近似模型，和用模型近似真实分布，信息损失不一样。在什么场景下你会优先选择正向 KL（MLE 的方向），什么场景下优先选择反向 KL（变分推断的方向）？提示：正向 KL 是”均值追踪”（覆盖所有模式），反向 KL 是”模式追踪”（锁定最可能的模式）。这个差异在 Ch09 的变分推断和 Ch20 的生成模型中会有具体的表现。</p></li>
+</ol>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="./index.html" class="pagination-link" aria-label="乱中寻序：统计学的统一逻辑">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-title">乱中寻序：统计学的统一逻辑</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="./02-多维随机变量及其分布.html" class="pagination-link" aria-label="多维随机变量及其分布">
+        <span class="nav-page-text"><span class="chapter-title">多维随机变量及其分布</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

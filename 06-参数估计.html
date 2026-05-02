@@ -1,0 +1,960 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.37">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>参数估计 – 乱中寻序：统计学的统一逻辑</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./07-假设检验与方差分析.html" rel="next">
+<link href="./05-统计量与抽样分布.html" rel="prev">
+<script src="site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-7f8f88aac4f3542376d5c11b86a4c14d.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-b46385535caf84bc62f311a600ac5013.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body class="nav-sidebar docked quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./05-统计量与抽样分布.html">Part II: 经典统计推断</a></li><li class="breadcrumb-item"><a href="./06-参数估计.html"><span class="chapter-title">参数估计</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="./">乱中寻序：统计学的统一逻辑</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">乱中寻序：统计学的统一逻辑</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false">
+ <span class="menu-text">Part I: 概率论基础</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./01-概率初步与随机变量的分布.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">概率初步与随机变量的分布</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./02-多维随机变量及其分布.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">多维随机变量及其分布</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./03-大数定律和中心极限定理.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">大数定律和中心极限定理</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./04-概率不等式与收敛性.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">概率不等式与收敛性</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part II: 经典统计推断</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./05-统计量与抽样分布.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">统计量与抽样分布</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./06-参数估计.html" class="sidebar-item-text sidebar-link active"><span class="chapter-title">参数估计</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./07-假设检验与方差分析.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">假设检验与方差分析</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./08-贝叶斯统计与计算.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">贝叶斯统计与计算</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false">
+ <span class="menu-text">Part III: 现代统计方法</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./09-回归分析.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">回归分析</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./10-广义线性模型.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">广义线性回归</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./11-类别数据分析.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">类别数据分析</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./12-非参数统计.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">非参数统计</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./13-时间序列分析.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">时间序列分析</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./14-多元统计分析.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">多元统计分析</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false">
+ <span class="menu-text">Part IV: 机器学习</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./15-机器学习基础.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">机器学习基础</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./16-经典分类方法.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">经典分类方法</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./17-集成学习与模型选择.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">集成学习与模型选择</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./18-深度学习.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">深度学习</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./19-因果推断入门.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">因果推断入门</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="false">
+ <span class="menu-text">附录：统计计算工具</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./A-优化方法.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">优化方法</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./B-矩阵计算与数值方法.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">矩阵计算与数值方法</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#统计推断本质是逆向工程" id="toc-统计推断本质是逆向工程" class="nav-link active" data-scroll-target="#统计推断本质是逆向工程">统计推断本质是逆向工程</a></li>
+  <li><a href="#估计的优良性" id="toc-估计的优良性" class="nav-link" data-scroll-target="#估计的优良性">估计的优良性</a>
+  <ul class="collapse">
+  <li><a href="#无偏性" id="toc-无偏性" class="nav-link" data-scroll-target="#无偏性">无偏性</a></li>
+  <li><a href="#均方误差偏差-方差分解" id="toc-均方误差偏差-方差分解" class="nav-link" data-scroll-target="#均方误差偏差-方差分解">均方误差：偏差-方差分解</a></li>
+  </ul></li>
+  <li><a href="#充分性原则" id="toc-充分性原则" class="nav-link" data-scroll-target="#充分性原则">充分性原则</a></li>
+  <li><a href="#fisher-信息量与-c-r-下界" id="toc-fisher-信息量与-c-r-下界" class="nav-link" data-scroll-target="#fisher-信息量与-c-r-下界">Fisher 信息量与 C-R 下界</a>
+  <ul class="collapse">
+  <li><a href="#fisher-信息量似然函数的曲率" id="toc-fisher-信息量似然函数的曲率" class="nav-link" data-scroll-target="#fisher-信息量似然函数的曲率">Fisher 信息量：似然函数的曲率</a></li>
+  <li><a href="#c-r-不等式精度的物理下界" id="toc-c-r-不等式精度的物理下界" class="nav-link" data-scroll-target="#c-r-不等式精度的物理下界">C-R 不等式：精度的物理下界</a></li>
+  </ul></li>
+  <li><a href="#最大似然估计" id="toc-最大似然估计" class="nav-link" data-scroll-target="#最大似然估计">最大似然估计</a>
+  <ul class="collapse">
+  <li><a href="#为什么是对数" id="toc-为什么是对数" class="nav-link" data-scroll-target="#为什么是对数">为什么是对数？</a></li>
+  <li><a href="#mle-最小化-kl-散度" id="toc-mle-最小化-kl-散度" class="nav-link" data-scroll-target="#mle-最小化-kl-散度">MLE = 最小化 KL 散度</a></li>
+  <li><a href="#大样本下的完美表现" id="toc-大样本下的完美表现" class="nav-link" data-scroll-target="#大样本下的完美表现">大样本下的完美表现</a></li>
+  </ul></li>
+  <li><a href="#矩估计的补充" id="toc-矩估计的补充" class="nav-link" data-scroll-target="#矩估计的补充">矩估计的补充</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./05-统计量与抽样分布.html">Part II: 经典统计推断</a></li><li class="breadcrumb-item"><a href="./06-参数估计.html"><span class="chapter-title">参数估计</span></a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title"><span class="chapter-title">参数估计</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<blockquote class="blockquote">
+<p>概率论从参数走向数据（演绎）。统计推断从数据走回参数（归纳）。本章回答：这条回头路，怎么走才最少损失信息？又能走到多准？</p>
+</blockquote>
+<section id="统计推断本质是逆向工程" class="level2">
+<h2 class="anchored" data-anchor-id="统计推断本质是逆向工程">统计推断本质是逆向工程</h2>
+<p>回忆 Ch05 的开篇：</p>
+<p><span class="math display">\[\text{概率论（演绎）}: \theta \longrightarrow X \qquad \text{数理统计（归纳）}: X \longrightarrow \theta\]</span></p>
+<p>现在把这两行放在同一个数学对象——<strong>似然函数</strong>——下观察。当 <span class="math inline">\(\theta\)</span> 已知时，<span class="math inline">\(p(x;\theta)\)</span> 描述数据 <span class="math inline">\(x\)</span> 如何从参数 <span class="math inline">\(\theta\)</span> “演化”出来。这个演化过程是概率论的正向计算。而统计推断的任务是逆转这个箭头：观测到了 <span class="math inline">\(x\)</span>，固定 <span class="math inline">\(x\)</span>，把 <span class="math inline">\(\theta\)</span> 当作变量——让密度函数 <span class="math inline">\(p(x;\theta)\)</span> 反过来”审问”每一个可能的 <span class="math inline">\(\theta\)</span>：<strong>在这个</strong> <span class="math inline">\(\theta\)</span> 下，出现我手中这批数据的概率有多大？</p>
+<p>这就是<strong>似然</strong>（Likelihood）的逻辑。它与概率共享同一个函数形式 <span class="math inline">\(p(x;\theta)\)</span>，但箭头方向完全相反。样本是 <span class="math inline">\(n\)</span> 维空间中的一个点——一个高度冗余的高维信号。参数 <span class="math inline">\(\theta\)</span> 只有区区 <span class="math inline">\(k\)</span> 维（<span class="math inline">\(k \ll n\)</span>）。参数估计的任务，本质上是<strong>从</strong> <span class="math inline">\(n\)</span> 维投影逆向还原 <span class="math inline">\(k\)</span> 维投影源——一个典型的逆问题（Inverse Problem）。</p>
+<blockquote class="blockquote">
+<p>本章用五步走完这条回头路。第一步：用什么标准评判估计的好坏？第二步：如何对估计做”无损提纯”？第三步：估计精度的物理极限在哪里？第四步：谁最接近这个极限？第五步：如果放弃模型假设，还有什么备选方案？</p>
+</blockquote>
+</section>
+<section id="估计的优良性" class="level2">
+<h2 class="anchored" data-anchor-id="估计的优良性">估计的优良性</h2>
+<p>给定样本 <span class="math inline">\(X_1, \ldots, X_n\)</span>，一个估计量 <span class="math inline">\(\hat{\theta} = \hat{\theta}(X_1, \ldots, X_n)\)</span> 是对未知参数 <span class="math inline">\(\theta\)</span> 的”猜测”。但猜测有好有坏——需要一个评判尺度。</p>
+<section id="无偏性" class="level3">
+<h3 class="anchored" data-anchor-id="无偏性">无偏性</h3>
+<p><strong>无偏性</strong>（Unbiasedness）是最朴素的要求：在重复抽样的意义上，估计量不应该系统性地偏向任何一方。</p>
+<p><span class="math display">\[E_\theta(\hat{\theta}) = \theta, \quad \forall \theta \in \Theta\]</span></p>
+<p>样本均值 <span class="math inline">\(\bar{X}\)</span> 是 <span class="math inline">\(\mu\)</span> 的无偏估计——无论抽样多少次，<span class="math inline">\(\bar{X}\)</span> 的平均命中靶心。但样本方差 <span class="math inline">\(s_n^2 = \frac{1}{n}\sum (X_i - \bar{X})^2\)</span> 不是 <span class="math inline">\(\sigma^2\)</span> 的无偏估计：<span class="math inline">\(E(s_n^2) = \frac{n-1}{n}\sigma^2\)</span>。偏差来源于 <span class="math inline">\(\bar{X}\)</span> 消耗了一个自由度去估计 <span class="math inline">\(\mu\)</span>——<span class="math inline">\(n\)</span> 个偏差 <span class="math inline">\((X_i - \bar{X})\)</span> 被一个线性约束 <span class="math inline">\(\sum (X_i - \bar{X}) = 0\)</span> 捆绑，真正独立的只有 <span class="math inline">\(n-1\)</span> 个。除以 <span class="math inline">\(n-1\)</span> 的无偏版本 <span class="math inline">\(s^2\)</span> 是对”用同一批数据先估 <span class="math inline">\(\mu\)</span> 再估 <span class="math inline">\(\sigma^2\)</span>“这一双重使用的诚实补偿。</p>
+<blockquote class="blockquote">
+<p>无偏性保障了”群体公平”——如果你把全世界的统计学家各自独立做的估计收集起来，它们的平均是正确的。但它不回答：<strong>你手里的这一次估计，离真相有多远？</strong></p>
+</blockquote>
+</section>
+<section id="均方误差偏差-方差分解" class="level3">
+<h3 class="anchored" data-anchor-id="均方误差偏差-方差分解">均方误差：偏差-方差分解</h3>
+<p>一个估计量即使无偏，波动可能极大——每次都”平均正确”，但单次可以偏得离谱。<strong>均方误差</strong>（Mean Squared Error, MSE）同时惩罚偏差和波动：</p>
+<p><span class="math display">\[\text{MSE}(\hat{\theta}) = E[(\hat{\theta} - \theta)^2] = \text{Var}(\hat{\theta}) + \underbrace{(E[\hat{\theta}] - \theta)^2}_{\text{Bias}^2}\]</span></p>
+<p>这是一个会计恒等式——总误差 = 方差 + 偏差²。两个分量之间存在<strong>此消彼长的权衡</strong>（Bias-Variance Trade-off）：</p>
+<ul>
+<li><strong>无偏估计</strong>：偏差为零，但方差可能很大。模型对数据的每一次随机波动都忠实响应——包括那些纯噪声的波动。</li>
+<li><strong>有偏估计</strong>：主动引入一点系统性偏差，换取方差的大幅降低。你不再对数据的每一次微小变化一惊一乍——估计变得”稳重”了，尽管它不再保证平均正确。</li>
+</ul>
+<blockquote class="blockquote">
+<p><strong>为什么有时愿意忍受偏差？</strong> 因为 MSE 是平方损失——方差直接进入总误差，而偏差以平方进入。如果你可以牺牲 <span class="math inline">\(0.1\)</span> 的偏差来换取方差从 <span class="math inline">\(1.0\)</span> 降到 <span class="math inline">\(0.01\)</span>，MSE 从 <span class="math inline">\(1.0\)</span> 跌至 <span class="math inline">\(0.02\)</span>。这是 Ch10（岭回归、Lasso）中正则化技术的全部逻辑地基：<strong>用一点点偏差购买大量的稳定性。</strong></p>
+</blockquote>
+</section>
+</section>
+<section id="充分性原则" class="level2">
+<h2 class="anchored" data-anchor-id="充分性原则">充分性原则</h2>
+<p>Ch05 建立了充分统计量的概念——<span class="math inline">\(T(X)\)</span> 包含了样本中关于 <span class="math inline">\(\theta\)</span> 的全部信息。现在这个概念的统计推断含义浮现出来。</p>
+<p><strong>充分性原则</strong>：如果 <span class="math inline">\(T\)</span> 是 <span class="math inline">\(\theta\)</span> 的充分统计量，那么任何统计推断都可以——而且应该——只基于 <span class="math inline">\(T\)</span> 进行。在参数估计的语境下，这一原则催生了 Rao-Blackwell 定理：</p>
+<blockquote class="blockquote">
+<p>设 <span class="math inline">\(\hat{\theta}\)</span> 是 <span class="math inline">\(\theta\)</span> 的任一无偏估计，<span class="math inline">\(T\)</span> 是充分统计量。定义 <span class="math inline">\(\tilde{\theta} = E[\hat{\theta} \mid T]\)</span>。则 <span class="math inline">\(\tilde{\theta}\)</span> 也是无偏估计，且 <span class="math inline">\(\text{Var}(\tilde{\theta}) \leq \text{Var}(\hat{\theta})\)</span>。</p>
+</blockquote>
+<p>这个定理的操作含义可以用一句话概括：<strong>如果你的估计量不是充分统计量的函数，你对充分统计量求一次条件期望，就能得到一个方差更小的估计——且不引入任何偏差。</strong></p>
+<p>为什么这一定理成立？直觉如下。<span class="math inline">\(\hat{\theta}\)</span> 可以分解为两部分：</p>
+<p><span class="math display">\[\hat{\theta} = E[\hat{\theta} \mid T] + (\hat{\theta} - E[\hat{\theta} \mid T])\]</span></p>
+<p>第一项是 <span class="math inline">\(T\)</span> 的函数——它只包含样本中与 <span class="math inline">\(\theta\)</span> 相关的”信号”。第二项是残差——它的条件期望为 0，且与第一项不相关。这个残差就是 <span class="math inline">\(\hat{\theta}\)</span> 中混入的纯噪声——它的存在只增加方差，不贡献任何关于 <span class="math inline">\(\theta\)</span> 的信息。求条件期望 <span class="math inline">\(E[\cdot \mid T]\)</span> 的操作，本质上是一次<strong>信号提纯</strong>：它将 <span class="math inline">\(\hat{\theta}\)</span> 投影到充分统计量 <span class="math inline">\(T\)</span> 生成的 <span class="math inline">\(\sigma\)</span>-代数上，滤掉了所有与 <span class="math inline">\(\theta\)</span> 正交的噪声成分。</p>
+<blockquote class="blockquote">
+<p>充分性 + Rao-Blackwell = 统计学中的”炼金术”：不需要额外的数据，不需要更强的假设——仅通过对充分统计量做一次条件期望，就能从含杂质的原始估计中提纯出方差更小的版本。这也是为什么<strong>一致最小方差无偏估计</strong>（UMVUE）——当它存在时——必然可以表示为充分统计量的函数。</p>
+</blockquote>
+</section>
+<section id="fisher-信息量与-c-r-下界" class="level2">
+<h2 class="anchored" data-anchor-id="fisher-信息量与-c-r-下界">Fisher 信息量与 C-R 下界</h2>
+<p>Rao-Blackwell 告诉你可以不断降低方差。但方差能降到多低？是否存在一个任何无偏估计都无法突破的<strong>物理极限</strong>？</p>
+<section id="fisher-信息量似然函数的曲率" class="level3">
+<h3 class="anchored" data-anchor-id="fisher-信息量似然函数的曲率">Fisher 信息量：似然函数的曲率</h3>
+<p>设对数似然函数为 <span class="math inline">\(\ell(\theta) = \log p(x;\theta)\)</span>。它的<strong>一阶导数</strong> <span class="math inline">\(\ell'(\theta)\)</span> 称为<strong>得分函数</strong>（Score Function）——衡量对数似然在 <span class="math inline">\(\theta\)</span> 处的瞬时变化率。Fisher 信息量定义为得分函数的方差：</p>
+<p><span class="math display">\[I(\theta) = \text{Var}_\theta\left(\frac{\partial}{\partial\theta} \log p(X;\theta)\right) = -E_\theta\left[\frac{\partial^2}{\partial\theta^2} \log p(X;\theta)\right]\]</span></p>
+<p>第二个等号（期望的二阶导的负数）赋予了 Fisher 信息一个关键的几何直觉。<span class="math inline">\(\ell(\theta)\)</span> 在最大值处是上凸的——二阶导为负。<strong>Fisher 信息量就是对数似然函数在其峰值附近的平均曲率</strong>。曲率越大，似然峰越尖锐，“最可能的 <span class="math inline">\(\theta\)</span>”和”次可能的 <span class="math inline">\(\theta\)</span>“的区分越清晰——数据中关于 <span class="math inline">\(\theta\)</span> 的信息越集中。</p>
+<blockquote class="blockquote">
+<p>Fisher 信息不是”数据包含多少信息”，而是”数据中关于 <span class="math inline">\(\theta\)</span> 的信息有多尖锐地集中在一个峰周围”。一个扁平的似然函数意味着多种 <span class="math inline">\(\theta\)</span> 值对数据的解释能力几乎相同——你对 <span class="math inline">\(\theta\)</span> 的认知是模糊的。</p>
+</blockquote>
+</section>
+<section id="c-r-不等式精度的物理下界" class="level3">
+<h3 class="anchored" data-anchor-id="c-r-不等式精度的物理下界">C-R 不等式：精度的物理下界</h3>
+<p>设 <span class="math inline">\(T\)</span> 是 <span class="math inline">\(g(\theta)\)</span> 的任一无偏估计。在正则条件下：</p>
+<p><span class="math display">\[\text{Var}(T) \geq \frac{[g'(\theta)]^2}{n I(\theta)}\]</span></p>
+<p>特别地，对 <span class="math inline">\(\theta\)</span> 本身的无偏估计（<span class="math inline">\(g(\theta) = \theta\)</span>，<span class="math inline">\(g'(\theta) = 1\)</span>）：</p>
+<p><span class="math display">\[\text{Var}(\hat{\theta}) \geq \frac{1}{n I(\theta)}\]</span></p>
+<p>这就是 <strong>Cramér-Rao 下界</strong>——统计学中的”测不准原理”。它声明：<strong>无论你多么聪明地构造估计量，其方差不可能低于</strong> <span class="math inline">\(1/(nI(\theta))\)</span>。 信息是有限的，精度是有天花板的。</p>
+<p>达到 C-R 下界的估计称为<strong>有效估计</strong>（Efficient Estimator）。它不多见——只在指数型分布族中才可能存在。但 C-R 下界的价值不在于”能否达到”，而在于它为所有估计量提供了一个绝对的比较基准：你的估计量的方差离下界还有多远？——这个比值（效率，Efficiency）定义了你的估计方法还有多少改进空间。</p>
+</section>
+</section>
+<section id="最大似然估计" class="level2">
+<h2 class="anchored" data-anchor-id="最大似然估计">最大似然估计</h2>
+<p>现在来到参数估计的最高点。给定数据，哪个 <span class="math inline">\(\theta\)</span> 是”最好的”？最大似然估计（MLE）给出的答案极其朴素：<strong>选那个最可能产生这批数据的参数。</strong></p>
+<p><span class="math display">\[\hat{\theta}_{\text{MLE}} = \arg\max_\theta \prod_{i=1}^n p(x_i; \theta) = \arg\max_\theta \sum_{i=1}^n \log p(x_i; \theta)\]</span></p>
+<section id="为什么是对数" class="level3">
+<h3 class="anchored" data-anchor-id="为什么是对数">为什么是对数？</h3>
+<p>乘积换成求和不仅是计算便利。<span class="math inline">\(\log p(x_i; \theta)\)</span> 是单个观测 <span class="math inline">\(x_i\)</span> 在参数 <span class="math inline">\(\theta\)</span> 下的对数似然——它可以被理解为”<span class="math inline">\(\theta\)</span> 对 <span class="math inline">\(x_i\)</span> 的解释质量”。求和意味着：MLE 在选择那个对<strong>全体</strong>数据解释质量之和最高的参数。这是民主的——每个数据点有一票。</p>
+</section>
+<section id="mle-最小化-kl-散度" class="level3">
+<h3 class="anchored" data-anchor-id="mle-最小化-kl-散度">MLE = 最小化 KL 散度</h3>
+<p>Ch01 定义了 KL 散度 <span class="math inline">\(D_{KL}(P \parallel Q)\)</span>：用分布 <span class="math inline">\(Q\)</span> 近似真实分布 <span class="math inline">\(P\)</span> 时，额外浪费的信息量。现在把这个视角套到估计问题上。设 <span class="math inline">\(\hat{P}_n\)</span> 为经验分布——在每个观测值 <span class="math inline">\(x_i\)</span> 处放置 <span class="math inline">\(1/n\)</span> 的概率质量。<span class="math inline">\(P_\theta\)</span> 为参数模型。则：</p>
+<p><span class="math display">\[
+\arg\min_\theta D_{KL}(\hat{P}_n \parallel P_\theta) = \arg\min_\theta \left[-\frac{1}{n}\sum_i \log p_\theta(x_i) - H(\hat{P}_n)\right] = \arg\max_\theta \sum_i \log p_\theta(x_i) = \hat{\theta}_{\text{MLE}}
+\]</span></p>
+<p>经验分布的熵 <span class="math inline">\(H(\hat{P}_n)\)</span> 与 <span class="math inline">\(\theta\)</span> 无关——它消掉了。剩下的恰好是对数似然。</p>
+<blockquote class="blockquote">
+<p><strong>MLE 不是在”猜”参数。它是在对经验分布做有损压缩——用光滑的参数模型</strong> <span class="math inline">\(P_\theta\)</span> 替代原始的频率阶梯 <span class="math inline">\(\hat{P}_n\)</span>，并最小化压缩过程中的信息损失。</p>
+</blockquote>
+<p>这个等价性是全书最重要的数学事实之一：<strong>MLE = 最小化 KL 散度</strong>。它的哲学回响是深远的：</p>
+<ul>
+<li>Ch08 的贝叶斯 MAP 估计 = MLE + 先验惩罚项——同样是信息损失最小化，只是多了一个”初始信念”的正则化约束。</li>
+<li>Ch18 决策树在每一步用<strong>信息增益</strong>选择分裂变量——信息增益就是 KL 散度在分类问题中的化身。</li>
+<li>Ch20 的交叉熵损失函数 = 经验分布与模型分布之间的交叉熵——它和 KL 散度只差一个常数 <span class="math inline">\(H(\hat{P}_n)\)</span>。</li>
+</ul>
+<p>MLE、决策树、深度学习——三层不同的方法论，共享同一套信息论逻辑。300 年的统计学发展，汇入一条河。</p>
+</section>
+<section id="大样本下的完美表现" class="level3">
+<h3 class="anchored" data-anchor-id="大样本下的完美表现">大样本下的完美表现</h3>
+<p>MLE 不仅是”信息损失最小”的哲学最优解，它在大样本下逼近工程最优：</p>
+<ol type="1">
+<li><strong>相合性</strong>：<span class="math inline">\(\hat{\theta}_n \xrightarrow{P} \theta_0\)</span>（当 <span class="math inline">\(n \to \infty\)</span>）。数据足够多时，MLE 会无限接近真相——这是 LLN（Ch03）的直接推论。</li>
+<li><strong>渐近正态性</strong>：<span class="math inline">\(\sqrt{n}(\hat{\theta}_n - \theta_0) \xrightarrow{d} N(0, I^{-1}(\theta_0))\)</span>。MLE 的渐近分布是正态——CLT（Ch03）的又一个胜利——且其渐近方差<strong>恰好等于 C-R 下界的倒数</strong>。在大样本下，MLE 渐近地达到了估计精度的物理极限。</li>
+<li><strong>充分性兼容</strong>：MLE 总是充分统计量的函数——它自动继承了充分统计量的全部信息保持特性。</li>
+</ol>
+<blockquote class="blockquote">
+<p>矩估计（下一节）是经验的——不假设分布形式，用样本矩匹配总体矩，简单直接。MLE 是优美的——完全依赖模型假设，在假设成立时达到最优。两者的差异，是”稳健的工程直觉”与”精确的信息论最优”之间的永恒张力。</p>
+</blockquote>
+</section>
+</section>
+<section id="矩估计的补充" class="level2">
+<h2 class="anchored" data-anchor-id="矩估计的补充">矩估计的补充</h2>
+<p>如果观测者不愿意——或没有足够的理由——假设数据来自某个特定的参数族，他还能估计参数吗？</p>
+<p><strong>矩估计</strong>（Method of Moments）给出了一个不依赖分布假设的备选方案。它的逻辑直截了当：</p>
+<ol type="1">
+<li>总体 <span class="math inline">\(k\)</span> 阶矩 <span class="math inline">\(\mu_k = E(X^k)\)</span> 是参数 <span class="math inline">\(\theta\)</span> 的函数：<span class="math inline">\(\mu_k = g_k(\theta)\)</span>。</li>
+<li>样本 <span class="math inline">\(k\)</span> 阶矩 <span class="math inline">\(m_k = \frac{1}{n}\sum X_i^k\)</span> 是 <span class="math inline">\(\mu_k\)</span> 的相合估计（由 LLN 保证）。</li>
+<li>因此，用样本矩替换总体矩，反解出 <span class="math inline">\(\theta\)</span>：<span class="math inline">\(\hat{\theta} = g^{-1}(m_1, \ldots, m_k)\)</span>。</li>
+</ol>
+<p>矩估计本质上是在用经验分布函数 <span class="math inline">\(\hat{F}_n\)</span> 的前 <span class="math inline">\(k\)</span> 个矩特征去匹配参数模型的前 <span class="math inline">\(k\)</span> 个矩特征——它不关心整个分布的形状，只要求两个分布的”粗粒度轮廓”对齐。</p>
+<p><strong>矩估计 vs.&nbsp;MLE</strong>：</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th></th>
+<th>矩估计</th>
+<th>MLE</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>依赖假设</td>
+<td>仅需矩存在</td>
+<td>需完整的分布形式</td>
+</tr>
+<tr class="even">
+<td>最优性</td>
+<td>一般达不到 C-R 下界</td>
+<td>渐近达到 C-R 下界</td>
+</tr>
+<tr class="odd">
+<td>稳健性</td>
+<td>对模型误设更宽容</td>
+<td>对模型误设敏感</td>
+</tr>
+<tr class="even">
+<td>计算</td>
+<td>解方程组即可</td>
+<td>常需数值优化</td>
+</tr>
+</tbody>
+</table>
+<blockquote class="blockquote">
+<p>矩估计是经验主义的：不相信任何分布假设，只用样本的粗粒度特征去反推参数。它的朴实使它成为 MLE 不可或缺的对比基准——当你不知道真实分布时，矩估计至少是相合的；当你知道真实分布时，MLE 是渐近最优的。两者之间的取舍，取决于你对模型假设的信心。</p>
+</blockquote>
+<hr>
+<p><strong>速查卡片</strong>：</p>
+<ul>
+<li><strong>核心问题</strong>：观测到数据 <span class="math inline">\(\{X_i\}\)</span> 后，如何逆向还原参数 <span class="math inline">\(\theta\)</span>？能还原到多准？</li>
+<li><strong>关键概念</strong>：似然函数（逆概率） → 无偏性与 MSE（Bias² + Var） → 充分性原则 + Rao-Blackwell（条件期望提纯） → Fisher 信息量（似然的曲率） → C-R 下界（精度极限） → MLE（信息论最优解 = 最小化 KL 散度） → 相合性与渐近正态性（大样本保证） → 矩估计（非参数替代方案）</li>
+<li><strong>R 命令</strong>：<code>MASS::fitdistr()</code>, <code>bbmle::mle2()</code>, <code>fitdistrplus::fitdist()</code>, <code>optim()</code> 自定义似然</li>
+<li><strong>参见</strong>：Ch01（KL 散度与 MLE 等价性）、Ch03（LLN 与 CLT 的大样本担保）、Ch04（概率不等式与有限样本界）、Ch05（充分统计量）、Ch08（贝叶斯估计与 MAP）、Ch10（正则化 = 偏差-方差权衡的实践）、Ch18/Ch20（交叉熵 = MLE 的深度学习化身）</li>
+</ul>
+<hr>
+<p><strong>深度思考</strong>：</p>
+<ol type="1">
+<li><p>Rao-Blackwell 定理说 <span class="math inline">\(E[\hat{\theta} \mid T]\)</span> 的方差不大于 <span class="math inline">\(\hat{\theta}\)</span>。这个”不大于”是严格的吗？在什么条件下两者方差相等？——提示：当 <span class="math inline">\(\hat{\theta}\)</span> 已经是 <span class="math inline">\(T\)</span> 的函数时，条件期望不改变它。Rao-Blackwell 只有在原始估计量”不充分”时才起作用——这本身就是一个诊断工具：你的估计量离充分性有多远？</p></li>
+<li><p>Fisher 信息量 <span class="math inline">\(I(\theta) = -E[\ell''(\theta)]\)</span> 的几何含义是似然函数的平均曲率。这里有一个容易被忽略的前提：<strong>期望是对</strong> <span class="math inline">\(p(x;\theta)\)</span> 取的——即”用真实的 <span class="math inline">\(\theta\)</span> 生成数据，再计算平均曲率”。如果你在错误的 <span class="math inline">\(\theta\)</span> 处取期望，得到的曲率是失真的。这对 MLE 的渐近方差估计有何影响？</p></li>
+<li><p>MLE = 最小化 <span class="math inline">\(D_{KL}(\hat{P}_n \parallel P_\theta)\)</span>——这是<strong>正向 KL</strong>。Ch09 的变分推断使用<strong>反向 KL</strong> <span class="math inline">\(D_{KL}(Q_\theta \parallel P)\)</span>。两者的不对称性在什么场景下导致截然不同的估计行为？提示：正向 KL 是”均值追踪”（覆盖所有模式），反向 KL 是”模式追踪”（锁定最可能的一个模式）。这一差异在 Ch20 的生成模型中有戏剧性的表现。</p></li>
+<li><p>C-R 下界是 <span class="math inline">\(1/(nI(\theta))\)</span>。如果 <span class="math inline">\(I(\theta) = 0\)</span>（似然函数在 <span class="math inline">\(\theta\)</span> 处是平坦的），下界发散——参数在信息论意义上不可估。什么情况下 <span class="math inline">\(I(\theta) = 0\)</span>？这意味着数据中真的没有关于 <span class="math inline">\(\theta\)</span> 的信息，还是参数化本身出了问题——两个不同的 <span class="math inline">\(\theta\)</span> 产生了完全相同的分布？</p></li>
+</ol>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="./05-统计量与抽样分布.html" class="pagination-link" aria-label="统计量与抽样分布">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-title">统计量与抽样分布</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="./07-假设检验与方差分析.html" class="pagination-link" aria-label="假设检验与方差分析">
+        <span class="nav-page-text"><span class="chapter-title">假设检验与方差分析</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
