@@ -368,7 +368,7 @@ $$E(X) = \mu, \quad Var(X) = \sigma^2$$
 
 > 正态分布是中心极限定理的终点——无论你从什么分布出发，累加足够多之后，你总会到达正态。它是**”宇宙的平均脸”**。
 
-```{r norm-plot, fig.cap = “正态分布 N(μ, σ²) 的概率密度函数。μ 控制中心位置，σ 控制离散程度。”}
+```{r norm-plot, fig.cap = "正态分布 N(μ, σ²) 的概率密度函数。μ 控制中心位置，σ 控制离散程度。"}
 curve(dnorm(x, 0, 1), from = -4, to = 8, col = "steelblue", lwd = 2,
       xlab = "x", ylab = "p(x)", main = "正态分布")
 curve(dnorm(x, 0, 2), from = -4, to = 8, col = "darkgreen", lwd = 2, add = TRUE)
